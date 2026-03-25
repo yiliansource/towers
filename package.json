@@ -7,7 +7,10 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "yarn workspaces foreach -Apvi --topological-dev run dev",
+        "dev": "concurrently \"yarn dev:shared\" \"yarn dev:api\" \"yarn dev:web\" -n \"shared,api,web\" -c \"red,blue,green\"",
+        "dev:shared": "yarn workspace @towers/shared dev",
+        "dev:web": "yarn workspace @towers/web dev",
+        "dev:api": "yarn workspace @towers/api dev",
         "build": "yarn workspaces foreach -Apvi --topological run build",
         "lint": "yarn workspaces foreach -Apvi run lint",
         "typecheck": "yarn workspaces foreach -Apvi run typecheck",
@@ -15,6 +18,7 @@
     },
     "devDependencies": {
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+        "concurrently": "^9.2.1",
         "prettier": "^3.8.1",
         "typescript": "^5.9.3"
     }

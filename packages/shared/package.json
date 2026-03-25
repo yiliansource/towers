@@ -3,14 +3,22 @@
     "version": "0.0.1",
     "private": true,
     "type": "module",
-    "main": "./src/index.ts",
-    "types": "./src/index.ts",
+    "main": "./dist/index.js",
+    "types": "./dist/index.js",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
     "scripts": {
-        "build": "tsc -p tsconfig.json",
-        "typecheck": "tsc -p tsconfig.json",
-        "lint": "echo 'no lint configured for shared'"
+        "dev": "tsc-watch -p tsconfig.json --onSuccess \"echo 'Shared package rebuilt.'\"",
+        "build": "tsc -p tsconfig.json && echo 'Shared package build complete.'"
     },
     "dependencies": {
         "typescript": "^5.9.3"
+    },
+    "devDependencies": {
+        "tsc-watch": "^7.2.0"
     }
 }

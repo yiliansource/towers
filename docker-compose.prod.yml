@@ -1,0 +1,41 @@
+services:
+    towers-web:
+        image: ghcr.io/yiliansource/towers-web:latest
+        container_name: towers-web
+        restart: unless-stopped
+        env_file:
+            - /opt/config/towers.env
+        environment:
+            PORT: 3000
+        expose:
+            - "3000"
+        networks:
+            - proxy
+            - internal
+        depends_on:
+            - towers-api
+
+    towers-api:
+        image: ghcr.io/yiliansource/towers-api:latest
+        container_name: towers-api
+        restart: unless-stopped
+        env_file:
+            - /opt/config/towers.env
+        environment:
+            PORT: 3001
+        expose:
+            - "3001"
+        volumes:
+            - towers_data:/app/apps/api/prisma
+        networks:
+            - proxy
+            - internal
+
+volumes:
+    towers_data:
+
+networks:
+    proxy:
+        external: true
+    internal:
+        driver: bridge
