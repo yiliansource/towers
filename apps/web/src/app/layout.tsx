@@ -49,7 +49,7 @@ export default function RootLayout({
                 <body className="min-h-dvh">
                     <Theme appearance="dark" accentColor="gold" className="flex flex-col">
                         <main className="grow px-4 flex flex-col">{children}</main>
-                        <footer className="py-3 px-4 select-none flex flex-row justify-between items-end">
+                        <footer className="position z-50 py-3 px-4 select-none flex flex-row justify-between items-end">
                             <Text size="2" className="text-(--gray-10)">
                                 Copypright &copy; {new Date().getFullYear()} Ian Hornik
                             </Text>

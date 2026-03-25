@@ -1,33 +1,34 @@
 "use client";
 
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { Html, OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { JSX } from "react";
-import { Vector3 } from "three";
+import { JSX, useMemo } from "react";
+import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
 
-import { axial, axialRange, hexToPixel } from "@towers/shared/hexgrid";
+import { Axial, axial, axialRange, hexToPixel } from "@towers/shared/hexgrid";
 
 export default function TestPage() {
     return (
         <div>
-            <p>lets see what we can build ...</p>
-            <div className="top-0 left-0 bg-gray-300 fixed h-dvh w-dvw">
+            <div className="top-0 left-0 fixed h-dvh w-dvw">
                 <Canvas>
-                    <PerspectiveCamera makeDefault position={new Vector3(0, 5, -5).setLength(18)} />
+                    <PerspectiveCamera makeDefault position={new THREE.Vector3(0, 5, -5).setLength(18)} />
                     <ambientLight intensity={Math.PI / 2} />
                     {/* <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} /> */}
                     <OrbitControls
                         makeDefault
-                        minPolarAngle={(10 * Math.PI) / 180}
+                        minPolarAngle={(30 * Math.PI) / 180}
                         maxPolarAngle={(70 * Math.PI) / 180}
                         enablePan={false}
-                        enableZoom={false}
+                        minDistance={10}
+                        maxDistance={20}
+                        dampingFactor={0.2}
                     />
 
                     {axialRange(axial(0, 0), 4).map((a) => {
                         const [x, y] = hexToPixel(a);
-                        return <TileFloor key={JSON.stringify(a)} position={[x, 0, y]} />;
+                        return <TileFloor key={JSON.stringify(a)} hex={a} />;
                     })}
                 </Canvas>
             </div>
@@ -35,9 +36,38 @@ export default function TestPage() {
     );
 }
 
-function TileFloor(props: Omit<JSX.IntrinsicElements["primitive"], "object">) {
+function TileFloor({ hex }: { hex: Axial }) {
     const obj = useLoader(OBJLoader, "/hextile.obj");
-    const clone = obj.clone();
-    clone.scale.copy(new Vector3(1, 1, 1).multiplyScalar(0.97));
-    return <primitive {...props} object={clone} />;
+    const coloredObj = useMemo(() => {
+        const clone = obj.clone();
+
+        clone.scale.copy(new THREE.Vector3(1, 1, 1).multiplyScalar(0.97));
+        clone.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+
+                mesh.material = new THREE.MeshStandardMaterial({
+                    color: "#444",
+                });
+
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+            }
+        });
+
+        return clone;
+    }, [obj]);
+
+    const [x, y] = hexToPixel(hex);
+
+    return (
+        <group position={[x, 0, y]}>
+            <Html className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none">
+                <p className="text-sm text-(--gray-6)">
+                    {hex.q},{hex.r}
+                </p>
+            </Html>
+            <primitive object={coloredObj} />
+        </group>
+    );
 }
