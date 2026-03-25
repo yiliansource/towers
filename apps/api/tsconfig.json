@@ -22,10 +22,13 @@
         "noFallthroughCasesInSwitch": false,
         "outDir": "./dist",
         "baseUrl": "./",
+        "rootDir": "./src",
         "paths": {
             "@/*": ["./src/*"]
         },
         "noEmit": false,
         "preserveWatchOutput": true
-    }
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["dist", "node_modules", "test", "**/*.spec.ts"]
 }
