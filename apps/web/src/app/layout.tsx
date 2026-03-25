@@ -4,6 +4,7 @@ import clsx from "clsx";
 import type { Metadata } from "next";
 import { Fruktur, Geist, Geist_Mono } from "next/font/google";
 
+import { ProfileWidget } from "@/components/profile-widget";
 import { cn } from "@/lib/cn";
 
 import "./globals.css";
@@ -48,10 +49,11 @@ export default function RootLayout({
                 <body className="min-h-dvh">
                     <Theme appearance="dark" accentColor="gold" className="flex flex-col">
                         <main className="grow px-4 flex flex-col">{children}</main>
-                        <footer className="py-3 px-4 select-none">
+                        <footer className="py-3 px-4 select-none flex flex-row justify-between items-end">
                             <Text size="2" className="text-(--gray-10)">
                                 Copypright &copy; {new Date().getFullYear()} Ian Hornik
                             </Text>
+                            <ProfileWidget />
                         </footer>
                     </Theme>
                 </body>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Spinner } from "@radix-ui/themes";
+import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -27,14 +28,12 @@ export function ProfileWidget() {
     };
 
     return user === null ? null : (
-        <div className="flex flex-col items-end">
-            <p className="mb-1">
-                hello, <span className="">{user.username}</span>
-            </p>
+        <div className="inline-flex flex-row items-center gap-1">
+            <p className="mb-1">{user.username}</p>
             <div>
-                <Button onClick={handleLogout} disabled={loggingOut}>
-                    {loggingOut ? <Spinner /> : <span>Log out</span>}
-                </Button>
+                <button onClick={handleLogout} disabled={loggingOut} className="px-1 opacity-70 cursor-pointer">
+                    {loggingOut ? <Spinner /> : <LogOutIcon className="size-4" />}
+                </button>
             </div>
         </div>
     );
