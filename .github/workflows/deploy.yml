@@ -95,6 +95,7 @@ jobs:
                   ssh "$VPS_USER@$VPS_HOST" << 'EOF'
                     set -e
                     cd /opt/towers
+                    docker compose down
                     docker compose pull
                     docker compose up -d
                     docker image prune -f

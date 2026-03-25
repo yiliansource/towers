@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Res } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { IsString, Length } from "class-validator";
 import type { Response } from "express";
 import { UserMapper } from "src/user/user.mapper";
@@ -37,6 +38,7 @@ export class AuthController {
         private readonly userService: UserService,
         private readonly userMapper: UserMapper,
         private readonly authService: AuthService,
+        private readonly configService: ConfigService,
     ) {}
 
     @Post("register")
@@ -56,11 +58,13 @@ export class AuthController {
     }
 
     private setAccessToken(res: Response, token: string) {
+        const isProd = process.env.NODE_ENV === "production";
         res.cookie("access_token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: isProd,
             sameSite: "lax",
             path: "/",
+            domain: isProd ? this.configService.get("COOKIE_DOMAIN") : undefined,
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
     }
