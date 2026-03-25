@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Res } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { IsString, Length } from "class-validator";
 import type { Response } from "express";
 import { UserMapper } from "src/user/user.mapper";
@@ -38,35 +37,20 @@ export class AuthController {
         private readonly userService: UserService,
         private readonly userMapper: UserMapper,
         private readonly authService: AuthService,
-        private readonly configService: ConfigService,
     ) {}
 
     @Post("register")
     @NoAuth()
     async handleRegister(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response): Promise<UserView> {
-        const { user, token } = await this.authService.registerUser(dto.username, dto.password);
-        this.setAccessToken(res, token);
+        const user = await this.authService.registerUser(dto.username, dto.password, res);
         return await this.userMapper.toView(user);
     }
 
     @Post("login")
     @NoAuth()
     async handleLogin(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response): Promise<UserView> {
-        const { user, token } = await this.authService.loginUser(dto.username, dto.password);
-        this.setAccessToken(res, token);
+        const user = await this.authService.loginUser(dto.username, dto.password, res);
         return await this.userMapper.toView(user);
-    }
-
-    private setAccessToken(res: Response, token: string) {
-        const isProd = process.env.NODE_ENV === "production";
-        res.cookie("access_token", token, {
-            httpOnly: true,
-            secure: isProd,
-            sameSite: "lax",
-            path: "/",
-            domain: isProd ? this.configService.get("COOKIE_DOMAIN") : undefined,
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
     }
 
     @Get("me")
@@ -76,8 +60,7 @@ export class AuthController {
 
     @Post("logout")
     logout(@Res({ passthrough: true }) res: Response) {
-        res.clearCookie("access_token");
-
+        this.authService.logoutUser(res);
         return { ok: true };
     }
 }
