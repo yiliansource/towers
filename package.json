@@ -1,0 +1,21 @@
+{
+    "name": "towers",
+    "private": true,
+    "packageManager": "yarn@4.9.2",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "yarn workspaces foreach -Apvi --topological-dev run dev",
+        "build": "yarn workspaces foreach -Apvi --topological run build",
+        "lint": "yarn workspaces foreach -Apvi run lint",
+        "typecheck": "yarn workspaces foreach -Apvi run typecheck",
+        "format": "prettier --write ."
+    },
+    "devDependencies": {
+        "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+        "prettier": "^3.8.1",
+        "typescript": "^5.9.3"
+    }
+}

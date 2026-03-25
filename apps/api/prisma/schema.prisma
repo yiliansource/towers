@@ -1,0 +1,45 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String @id @default(uuid())
+  username     String @unique
+  passwordHash String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hostedLobby Lobby? @relation("HostedLobby")
+
+  activeLobby   Lobby?  @relation("ActiveLobby", fields: [activeLobbyId], references: [id])
+  activeLobbyId String?
+
+  socketId  String? @unique
+  connected Boolean @default(false)
+}
+
+enum LobbyState {
+  WAITING
+  INGAME
+  FINISHED
+}
+
+model Lobby {
+  id       String     @id @default(uuid())
+  publicId String     @unique
+  state    LobbyState
+
+  hostUser   User   @relation("HostedLobby", fields: [hostUserId], references: [id])
+  hostUserId String @unique
+
+  users User[] @relation("ActiveLobby")
+
+  game Json?
+}

@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+    /* Your default theme */
+    --color-background: white;
+    --color-foreground: black;
+}
+
+[data-theme="dark"] {
+    --color-background: black;
+    --color-foreground: white;
+}
+
+@theme {
+    --font-fruktur: var(--font-fruktur), serif;
+}
+
+.radix-themes {
+    --default-font-family: "Geist Sans", sans-serif;
+}
