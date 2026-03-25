@@ -30,6 +30,7 @@ export default function LoginPage() {
     } = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
     });
+    const [loginError, setLoginError] = useState<string | null>(null);
 
     const router = useRouter();
     const { setUser } = useAuthStore();
@@ -39,27 +40,35 @@ export default function LoginPage() {
     const onSubmit: SubmitHandler<LoginInput> = async (data) => {
         setIsLoggingIn(true);
 
-        const res = await fetchApi("/auth/login", {
-            method: "POST",
-            body: JSON.stringify({
-                username: data.username,
-                password: data.password,
-            } satisfies LoginPayload),
-        });
-        if (!res.ok) return;
+        try {
+            const res = await fetchApi("/auth/login", {
+                method: "POST",
+                body: JSON.stringify({
+                    username: data.username,
+                    password: data.password,
+                } satisfies LoginPayload),
+            });
+            if (!res.ok) {
+                throw new Error("Invalid credentials.");
+            }
 
-        const user = (await res.json()) as UserView;
-        setUser(user);
-        setIsLoggingIn(false);
+            const user = (await res.json()) as UserView;
+            setUser(user);
 
-        router.push("/lobby");
+            router.push("/lobby");
+        } catch (e) {
+            if (e instanceof Error) {
+                setLoginError(e.message);
+            }
+        } finally {
+            setIsLoggingIn(false);
+        }
     };
 
     return (
         <>
             <Text mb="4" align="center">
-                Please log in to your account or
-                <br />
+                Please log in to your account or{" "}
                 <Link className="text-(--accent-11) hover:underline" href="/register">
                     register
                 </Link>{" "}
@@ -67,7 +76,7 @@ export default function LoginPage() {
             </Text>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Flex mb="6" direction="column" gap="1">
+                <Flex direction="column" gap="2">
                     <Box>
                         <FormLabel>Username</FormLabel>
                         <TextField.Root {...register("username")} placeholder="TowersEnjoyer" />
@@ -78,7 +87,8 @@ export default function LoginPage() {
                         <TextField.Root {...register("password")} type="password" placeholder={"•".repeat(10)} />
                         <FormError className="mt-1">{errors.password?.message}</FormError>
                     </Box>
-                    <Button mt="5" type="submit" disabled={isLoggingIn}>
+                    {loginError && <FormError className="mt-1">{loginError}</FormError>}
+                    <Button mt="4" type="submit" disabled={isLoggingIn}>
                         {isLoggingIn ? <Spinner /> : <span>Log in</span>}
                     </Button>
                 </Flex>

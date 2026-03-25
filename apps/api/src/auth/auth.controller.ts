@@ -18,7 +18,7 @@ class RegisterDto implements LoginPayload {
     username!: string;
 
     @IsString()
-    @Length(8, 72)
+    @Length(6, 72)
     password!: string;
 }
 
@@ -27,7 +27,7 @@ class LoginDto implements LoginPayload {
     username!: string;
 
     @IsString()
-    @Length(8, 72)
+    @Length(6, 72)
     password!: string;
 }
 

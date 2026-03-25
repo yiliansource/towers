@@ -21,7 +21,7 @@ export const registerSchema = z
             .string()
             .min(3, { error: "Must be 3 characters at least." })
             .max(20, { error: "Must be 20 characters at most." }),
-        password: z.string().min(6, { error: "Must be 6 characters at least." }),
+        password: z.string().min(6, { error: "Must be 6 characters at least." }).max(72),
         confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -39,6 +39,7 @@ export default function RegisterPage() {
     } = useForm<RegisterInput>({
         resolver: zodResolver(registerSchema),
     });
+    const [registerError, setRegisterError] = useState<string | null>(null);
 
     const router = useRouter();
     const { setUser } = useAuthStore();
@@ -48,27 +49,35 @@ export default function RegisterPage() {
     const onSubmit: SubmitHandler<RegisterInput> = async (data) => {
         setIsRegistering(true);
 
-        const res = await fetchApi("/auth/register", {
-            method: "POST",
-            body: JSON.stringify({
-                username: data.username,
-                password: data.password,
-            } satisfies LoginPayload),
-        });
-        if (!res.ok) return;
+        try {
+            const res = await fetchApi("/auth/register", {
+                method: "POST",
+                body: JSON.stringify({
+                    username: data.username,
+                    password: data.password,
+                } satisfies LoginPayload),
+            });
+            if (!res.ok) {
+                throw new Error("An error occurred during the registration.");
+            }
 
-        const user = (await res.json()) as UserView;
-        setUser(user);
-        setIsRegistering(false);
+            const user = (await res.json()) as UserView;
+            setUser(user);
 
-        router.push("/lobby");
+            router.push("/lobby");
+        } catch (e) {
+            if (e instanceof Error) {
+                setRegisterError(e.message);
+            }
+        } finally {
+            setIsRegistering(false);
+        }
     };
 
     return (
         <>
             <Text mb="4" align="center">
-                Please create an account or
-                <br />
+                Please create an account or{" "}
                 <Link className="text-(--accent-11) hover:underline" href="/login">
                     log in
                 </Link>{" "}
@@ -76,7 +85,7 @@ export default function RegisterPage() {
             </Text>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Flex mb="6" direction="column" gap="1">
+                <Flex direction="column" gap="2">
                     <Box>
                         <FormLabel>Username</FormLabel>
                         <TextField.Root {...register("username")} autoComplete="off" placeholder="TowersEnjoyer" />
@@ -97,7 +106,8 @@ export default function RegisterPage() {
                         <TextField.Root {...register("confirmPassword")} type="password" placeholder={"•".repeat(10)} />
                         <FormError className="mt-1">{errors.confirmPassword?.message}</FormError>
                     </Box>
-                    <Button mt="5" type="submit" disabled={isRegistering}>
+                    {registerError && <FormError className="mt-1">{registerError}</FormError>}
+                    <Button mt="4" type="submit" disabled={isRegistering}>
                         {isRegistering ? <Spinner /> : <span>Register</span>}
                     </Button>
                 </Flex>
