@@ -1,4 +1,4 @@
-import { LobbyView } from "@towers/shared";
+import { LobbyView } from "@towers/shared/contracts/lobby";
 
 import { fetchApi } from "@/lib/api";
 import { useLobbyStore } from "@/stores/lobby.store";

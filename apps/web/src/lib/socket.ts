@@ -2,7 +2,7 @@
 
 import { type Socket, io } from "socket.io-client";
 
-import type { ClientToServerEvents, ServerToClientEvents } from "@towers/shared";
+import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared/contracts/common";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 

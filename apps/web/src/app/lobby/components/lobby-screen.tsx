@@ -2,7 +2,7 @@ import { Button } from "@radix-ui/themes";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { UserView } from "@towers/shared";
+import { UserView } from "@towers/shared/contracts/auth";
 
 import { useSocket } from "@/components/socket-provider";
 import { fetchApi } from "@/lib/api";

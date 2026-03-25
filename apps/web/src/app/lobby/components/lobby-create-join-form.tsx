@@ -1,24 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Spinner, TextField } from "@radix-ui/themes";
+import { Button, Spinner, TextField } from "@radix-ui/themes";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import z from "zod";
 
-import { LobbyView } from "@towers/shared";
+import { JoinLobbyInput, JoinLobbySchema, LobbyView } from "@towers/shared/contracts/lobby";
 
 import { FormError } from "@/components/forms/FormError";
 import { FormLabel } from "@/components/forms/FormLabel";
 import { fetchApi } from "@/lib/api";
 import { useLobbyStore } from "@/stores/lobby.store";
-
-export const joinLobbySchema = z.object({
-    lobbyId: z
-        .string()
-        .length(4, "Lobby ID must be 4 characters long.")
-        .regex(/[A-Z]/, "Lobby ID must only consist of A-Z."),
-});
-
-export type JoinLobbyInput = z.infer<typeof joinLobbySchema>;
 
 export function LobbyCreateJoinForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,7 +17,7 @@ export function LobbyCreateJoinForm() {
         handleSubmit,
         formState: { errors },
     } = useForm<JoinLobbyInput>({
-        resolver: zodResolver(joinLobbySchema),
+        resolver: zodResolver(JoinLobbySchema),
     });
 
     const { setLobby } = useLobbyStore();

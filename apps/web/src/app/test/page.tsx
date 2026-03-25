@@ -6,7 +6,7 @@ import { JSX } from "react";
 import { Vector3 } from "three";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
 
-import { axial, axialRange, hexToPixel } from "@towers/shared";
+import { axial, axialRange, hexToPixel } from "@towers/shared/hexgrid";
 
 export default function TestPage() {
     return (

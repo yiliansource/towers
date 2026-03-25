@@ -1,7 +1,8 @@
 import { CrownIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { LobbyView, UserView } from "@towers/shared";
+import { UserView } from "@towers/shared/contracts/auth";
+import { LobbyView } from "@towers/shared/contracts/lobby";
 
 import { cn } from "@/lib/cn";
 

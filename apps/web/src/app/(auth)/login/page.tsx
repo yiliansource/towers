@@ -3,24 +3,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Flex, Spinner, Text, TextField } from "@radix-ui/themes";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 
-import { LoginPayload, UserView } from "@towers/shared";
+import { LoginInput, LoginInputSchema, UserView } from "@towers/shared/contracts/auth";
 
 import { FormError } from "@/components/forms/FormError";
 import { FormLabel } from "@/components/forms/FormLabel";
 import { fetchApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
-
-export const loginSchema = z.object({
-    username: z.string(),
-    password: z.string(),
-});
-
-export type LoginInput = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
     const {
@@ -28,7 +20,7 @@ export default function LoginPage() {
         handleSubmit,
         formState: { errors },
     } = useForm<LoginInput>({
-        resolver: zodResolver(loginSchema),
+        resolver: zodResolver(LoginInputSchema),
     });
     const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -46,7 +38,7 @@ export default function LoginPage() {
                 body: JSON.stringify({
                     username: data.username,
                     password: data.password,
-                } satisfies LoginPayload),
+                } satisfies LoginInput),
             });
             if (!res.ok) {
                 throw new Error("Invalid credentials.");

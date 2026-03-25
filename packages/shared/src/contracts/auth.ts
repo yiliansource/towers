@@ -33,7 +33,7 @@ export const LoginInputSchema = z.object({
     password: z.string(),
 });
 
-export type LoginInput = z.infer<typeof RegisterFormSchema>;
+export type LoginInput = z.infer<typeof LoginInputSchema>;
 
 export const UserViewSchema = z.object({
     id: z.string(),

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { UserView } from "@towers/shared";
+import { UserView } from "@towers/shared/contracts/auth";
 
 type AuthState = {
     user: UserView | null;

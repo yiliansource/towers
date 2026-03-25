@@ -6,38 +6,27 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 
-import { LoginPayload, UserView } from "@towers/shared";
+import {
+    RegisterFormInput,
+    RegisterFormSchema,
+    RegisterInput,
+    RegisterInputSchema,
+    UserView,
+} from "@towers/shared/contracts/auth";
 
 import { FormError } from "@/components/forms/FormError";
 import { FormLabel } from "@/components/forms/FormLabel";
 import { fetchApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
 
-export const registerSchema = z
-    .object({
-        username: z
-            .string()
-            .min(3, { error: "Must be 3 characters at least." })
-            .max(20, { error: "Must be 20 characters at most." }),
-        password: z.string().min(6, { error: "Must be 6 characters at least." }).max(72),
-        confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match.",
-        path: ["confirmPassword"],
-    });
-
-export type RegisterInput = z.infer<typeof registerSchema>;
-
 export default function RegisterPage() {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<RegisterInput>({
-        resolver: zodResolver(registerSchema),
+    } = useForm<RegisterFormInput>({
+        resolver: zodResolver(RegisterFormSchema),
     });
     const [registerError, setRegisterError] = useState<string | null>(null);
 
@@ -46,7 +35,7 @@ export default function RegisterPage() {
 
     const [isRegistering, setIsRegistering] = useState(false);
 
-    const onSubmit: SubmitHandler<RegisterInput> = async (data) => {
+    const onSubmit: SubmitHandler<RegisterFormInput> = async (data) => {
         setIsRegistering(true);
 
         try {
@@ -55,7 +44,7 @@ export default function RegisterPage() {
                 body: JSON.stringify({
                     username: data.username,
                     password: data.password,
-                } satisfies LoginPayload),
+                } satisfies RegisterInput),
             });
             if (!res.ok) {
                 throw new Error("An error occurred during the registration.");

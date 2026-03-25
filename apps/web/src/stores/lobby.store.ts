@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 
-import { LobbyView } from "@towers/shared";
+import { LobbyView } from "@towers/shared/contracts/lobby";
 
 type LobbyState = {
     lobby: LobbyView | null;
