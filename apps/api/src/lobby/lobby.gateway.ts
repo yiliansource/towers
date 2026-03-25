@@ -10,7 +10,7 @@ import {
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
 
-import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared";
+import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared/contracts/common";
 
 import type { AuthSocket } from "@/auth/socket-auth.service";
 import { SocketAuthService } from "@/auth/socket-auth.service";

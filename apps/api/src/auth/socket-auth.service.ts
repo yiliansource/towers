@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { parse } from "cookie";
 import { Server, Socket } from "socket.io";
 
-import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared";
+import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared/contracts/common";
 
 import { User } from "@/generated/prisma/client";
 import { UserService } from "@/user/user.service";

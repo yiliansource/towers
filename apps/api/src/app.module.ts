@@ -1,6 +1,8 @@
-import { Module, ValidationPipe } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { APP_GUARD, APP_PIPE } from "@nestjs/core";
+import { APP_GUARD } from "@nestjs/core";
+
+import { ApiEnvSchema } from "@towers/shared/env/api";
 
 import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
@@ -12,7 +14,15 @@ import { UserModule } from "./user/user.module";
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            // TODO: add validation
+            validate: (config) => {
+                const parsed = ApiEnvSchema.safeParse(config);
+                if (!parsed.success) {
+                    console.error("Invalid environment variables:", parsed.error.flatten().fieldErrors);
+                    throw new Error("Invalid environment variables");
+                }
+
+                return parsed.data;
+            },
         }),
         AuthModule,
         GameModule,
@@ -23,10 +33,6 @@ import { UserModule } from "./user/user.module";
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
-        },
-        {
-            provide: APP_PIPE,
-            useClass: ValidationPipe,
         },
     ],
 })

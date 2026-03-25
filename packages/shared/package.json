@@ -4,11 +4,31 @@
     "private": true,
     "type": "module",
     "main": "./dist/index.js",
-    "types": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/index.js"
+            "default": "./dist/index.js"
+        },
+        "./contracts/common": {
+            "types": "./dist/contracts/common.d.ts",
+            "default": "./dist/contracts/common.js"
+        },
+        "./contracts/auth": {
+            "types": "./dist/contracts/auth.d.ts",
+            "default": "./dist/contracts/auth.js"
+        },
+        "./contracts/lobby": {
+            "types": "./dist/contracts/lobby.d.ts",
+            "default": "./dist/contracts/lobby.js"
+        },
+        "./env/api": {
+            "types": "./dist/env/api.d.ts",
+            "default": "./dist/env/api.js"
+        },
+        "./hexgrid": {
+            "types": "./dist/hexgrid/index.d.ts",
+            "default": "./dist/hexgrid/index.js"
         }
     },
     "scripts": {
@@ -16,7 +36,8 @@
         "build": "tsc -p tsconfig.json && echo 'Shared package build complete.'"
     },
     "dependencies": {
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "zod": "^4.3.6"
     },
     "devDependencies": {
         "tsc-watch": "^7.2.0"

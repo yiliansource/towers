@@ -3,6 +3,8 @@ import { ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
+import { ApiEnv } from "@towers/shared/env/api";
+
 import { UserModule } from "../user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
@@ -15,10 +17,10 @@ import { SocketAuthService } from "./socket-auth.service";
         PassportModule,
         JwtModule.registerAsync({
             inject: [ConfigService],
-            useFactory: (config: ConfigService) => ({
-                secret: config.get<string>("JWT_SECRET", { infer: true }),
+            useFactory: (config: ConfigService<ApiEnv, true>) => ({
+                secret: config.get("JWT_SECRET", { infer: true }),
                 signOptions: {
-                    expiresIn: config.get<null>("JWT_EXPIRES_IN", { infer: true }) ?? "7d",
+                    expiresIn: config.get("JWT_EXPIRES_IN", { infer: true }),
                 },
             }),
         }),

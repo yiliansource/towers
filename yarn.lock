@@ -4017,6 +4017,7 @@ __metadata:
     tsconfig-paths: "npm:^4.2.0"
     typescript: "npm:^5.7.3"
     typescript-eslint: "npm:^8.20.0"
+    zod: "npm:^4.3.6"
   languageName: unknown
   linkType: soft
 
@@ -4026,6 +4027,7 @@ __metadata:
   dependencies:
     tsc-watch: "npm:^7.2.0"
     typescript: "npm:^5.9.3"
+    zod: "npm:^4.3.6"
   languageName: unknown
   linkType: soft
 
@@ -11447,6 +11449,7 @@ __metadata:
     concurrently: "npm:^9.2.1"
     prettier: "npm:^3.8.1"
     typescript: "npm:^5.9.3"
+    zod: "npm:^4.3.6"
   languageName: unknown
   linkType: soft
 

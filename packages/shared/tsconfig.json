@@ -5,6 +5,7 @@
         "outDir": "./dist",
         "noEmit": false,
         "declaration": true,
+        "sourceMap": true,
         "module": "nodenext",
         "moduleResolution": "nodenext"
     },

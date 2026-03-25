@@ -1,35 +1,17 @@
 import { Body, Controller, Get, Post, Res } from "@nestjs/common";
-import { IsString, Length } from "class-validator";
 import type { Response } from "express";
-import { UserMapper } from "src/user/user.mapper";
-import { UserService } from "src/user/user.service";
 
-import type { LoginPayload, UserView } from "@towers/shared";
+import { LoginInputSchema, RegisterInputSchema } from "@towers/shared/contracts/auth";
+import type { LoginInput, RegisterInput, UserView } from "@towers/shared/contracts/auth";
 
+import { UseZodSchema } from "@/common/use-zod-schema.decorator";
 import type { User } from "@/generated/prisma/client";
+import { UserMapper } from "@/user/user.mapper";
+import { UserService } from "@/user/user.service";
 
 import { AuthService } from "./auth.service";
 import { AuthenticatedUser } from "./authenticated-user.decorator";
 import { NoAuth } from "./no-auth.decorator";
-
-class RegisterDto implements LoginPayload {
-    @IsString()
-    @Length(3, 20)
-    username!: string;
-
-    @IsString()
-    @Length(6, 72)
-    password!: string;
-}
-
-class LoginDto implements LoginPayload {
-    @IsString()
-    username!: string;
-
-    @IsString()
-    @Length(6, 72)
-    password!: string;
-}
 
 @Controller("auth")
 export class AuthController {
@@ -40,15 +22,17 @@ export class AuthController {
     ) {}
 
     @Post("register")
+    @UseZodSchema(RegisterInputSchema)
     @NoAuth()
-    async handleRegister(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response): Promise<UserView> {
+    async handleRegister(@Body() dto: RegisterInput, @Res({ passthrough: true }) res: Response): Promise<UserView> {
         const user = await this.authService.registerUser(dto.username, dto.password, res);
         return await this.userMapper.toView(user);
     }
 
     @Post("login")
+    @UseZodSchema(LoginInputSchema)
     @NoAuth()
-    async handleLogin(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response): Promise<UserView> {
+    async handleLogin(@Body() dto: LoginInput, @Res({ passthrough: true }) res: Response): Promise<UserView> {
         const user = await this.authService.loginUser(dto.username, dto.password, res);
         return await this.userMapper.toView(user);
     }

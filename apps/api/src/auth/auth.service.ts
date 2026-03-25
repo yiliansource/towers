@@ -1,8 +1,12 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import * as argon2 from "argon2";
 import { CookieOptions, Response } from "express";
-import { UserService } from "src/user/user.service";
+
+import { ApiEnv } from "@towers/shared/env/api";
+
+import { UserService } from "@/user/user.service";
 
 import { AuthJwtPayload } from "./auth.types";
 
@@ -11,6 +15,7 @@ export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
+        private readonly config: ConfigService<ApiEnv, true>,
     ) {}
 
     async registerUser(username: string, password: string, res: Response) {
@@ -62,21 +67,23 @@ export class AuthService {
 
     async verifyToken(token: string) {
         const payload = await this.jwtService.verifyAsync<AuthJwtPayload>(token, {
-            secret: process.env.JWT_SECRET,
+            secret: this.config.get("JWT_SECRET", { infer: true }),
         });
 
         return this.validateJwtPayload(payload);
     }
 
+    // TODO: decouple authservice from express
+
     private getAccessTokenCookieOptions(): CookieOptions {
-        const isProd = process.env.NODE_ENV === "production";
+        const isProd = this.config.get("NODE_ENV", { infer: true }) === "production";
 
         return {
             httpOnly: true,
             secure: isProd,
             sameSite: "lax",
             path: "/",
-            domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
+            domain: isProd ? this.config.get("COOKIE_DOMAIN", { infer: true }) : undefined,
         };
     }
 

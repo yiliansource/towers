@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { ViewMapper } from "src/common/view-mapper";
 
-import { LobbyView } from "@towers/shared";
+import { LobbyView } from "@towers/shared/contracts/lobby";
 
+import { ViewMapper } from "@/common/view-mapper";
 import { Lobby } from "@/generated/prisma/client";
 import { UserMapper } from "@/user/user.mapper";
 import { UserService } from "@/user/user.service";

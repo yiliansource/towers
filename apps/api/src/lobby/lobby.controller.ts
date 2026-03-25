@@ -9,7 +9,7 @@ import {
     UnauthorizedException,
 } from "@nestjs/common";
 
-import { LobbyView } from "@towers/shared";
+import { LobbyView } from "@towers/shared/contracts/lobby";
 
 import { AuthenticatedUser } from "@/auth/authenticated-user.decorator";
 import type { User } from "@/generated/prisma/client";

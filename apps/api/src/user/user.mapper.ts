@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { UserView } from "@towers/shared";
+import { UserView } from "@towers/shared/contracts/auth";
 
 import { ViewMapper } from "@/common/view-mapper";
 import { User } from "@/generated/prisma/client";
