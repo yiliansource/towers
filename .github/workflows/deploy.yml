@@ -36,6 +36,8 @@ jobs:
                   context: .
                   file: apps/web/Dockerfile
                   push: true
+                  build-args: |
+                      NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
                   tags: |
                       ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/towers-web:latest
                       ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/towers-web:${{ github.sha }}

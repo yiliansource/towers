@@ -4,16 +4,19 @@ WORKDIR /app
 RUN corepack enable
 
 COPY package.json yarn.lock .yarnrc.yml ./
-
 COPY apps/web/package.json apps/web/package.json
 COPY apps/api/package.json apps/api/package.json
-
 COPY packages/shared/package.json packages/shared/package.json
 
 RUN yarn install --immutable
 
 # ---- build ----
 FROM deps AS builder
+WORKDIR /app
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 COPY . .
 
 RUN yarn workspace @towers/shared build
