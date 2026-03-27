@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { UserView } from "@towers/shared/contracts/auth";
 
-type AuthState = {
+export type AuthStore = {
     user: UserView | null;
     loading: boolean;
 
@@ -12,7 +12,7 @@ type AuthState = {
     logoutLocal: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
     user: null,
     loading: false,
 

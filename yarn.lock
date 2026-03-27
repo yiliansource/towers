@@ -4048,6 +4048,7 @@ __metadata:
     "@types/react-dom": "npm:^19"
     "@types/three": "npm:^0.172.0"
     clsx: "npm:^2.1.1"
+    immer: "npm:^11.1.4"
     lucide-react: "npm:^1.0.0-rc.1"
     motion: "npm:^12.38.0"
     next: "npm:16.2.0"
@@ -7697,6 +7698,13 @@ __metadata:
   version: 3.0.6
   resolution: "immediate@npm:3.0.6"
   checksum: 10c0/f8ba7ede69bee9260241ad078d2d535848745ff5f6995c7c7cb41cfdc9ccc213f66e10fa5afb881f90298b24a3f7344b637b592beb4f54e582770cdce3f1f039
+  languageName: node
+  linkType: hard
+
+"immer@npm:^11.1.4":
+  version: 11.1.4
+  resolution: "immer@npm:11.1.4"
+  checksum: 10c0/77beca6b0a4e361b30414189d63c64beb7df40ac1d8cbf524308fcbabe755e9aa49db3c6e95a6e412911416fec621f2c8470be5ec79feedc6abd6e4f7f18a9ce
   languageName: node
   linkType: hard
 

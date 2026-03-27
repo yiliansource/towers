@@ -6,6 +6,6 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-    "lobby:subscribe": (body: { lobbyId: string }) => void;
-    "lobby:unsubscribe": (body: { lobbyId: string }) => void;
+    "lobby:subscribe": (body: { publicLobbyId: string }) => void;
+    "lobby:unsubscribe": (body: { publicLobbyId: string }) => void;
 }

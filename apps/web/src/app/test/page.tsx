@@ -1,8 +1,8 @@
 "use client";
 
-import { Html, OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { JSX, useMemo } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
 
@@ -13,21 +13,9 @@ export default function TestPage() {
         <div>
             <div className="top-0 left-0 fixed h-dvh w-dvw">
                 <Canvas>
-                    <PerspectiveCamera makeDefault position={new THREE.Vector3(0, 5, -5).setLength(18)} />
-                    <ambientLight intensity={Math.PI / 2} />
                     {/* <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} /> */}
-                    <OrbitControls
-                        makeDefault
-                        minPolarAngle={(30 * Math.PI) / 180}
-                        maxPolarAngle={(70 * Math.PI) / 180}
-                        enablePan={false}
-                        minDistance={10}
-                        maxDistance={20}
-                        dampingFactor={0.2}
-                    />
 
                     {axialRange(axial(0, 0), 4).map((a) => {
-                        const [x, y] = hexToPixel(a);
                         return <TileFloor key={JSON.stringify(a)} hex={a} />;
                     })}
                 </Canvas>

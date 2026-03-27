@@ -38,11 +38,11 @@ export class SocketAuthService {
         const user = await this.authService.verifyToken(token);
 
         socket.data.user = user;
-        await this.userService.connectSocket({ id: user.id }, socket.id);
+        await this.userService.registerSocket(user.id, socket.id);
 
         return user;
     }
     async disconnect(socket: AuthSocket) {
-        await this.userService.disconnectSocket(socket.id);
+        await this.userService.clearSocket(socket.id);
     }
 }

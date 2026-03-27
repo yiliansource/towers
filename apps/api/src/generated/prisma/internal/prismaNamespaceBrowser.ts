@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Lobby: 'Lobby'
+  Lobby: 'Lobby',
+  LobbySeat: 'LobbySeat'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -74,9 +75,7 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  activeLobbyId: 'activeLobbyId',
-  socketId: 'socketId',
-  connected: 'connected'
+  socketId: 'socketId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -86,11 +85,22 @@ export const LobbyScalarFieldEnum = {
   id: 'id',
   publicId: 'publicId',
   state: 'state',
-  hostUserId: 'hostUserId',
+  hostId: 'hostId',
   game: 'game'
 } as const
 
 export type LobbyScalarFieldEnum = (typeof LobbyScalarFieldEnum)[keyof typeof LobbyScalarFieldEnum]
+
+
+export const LobbySeatScalarFieldEnum = {
+  id: 'id',
+  lobbyId: 'lobbyId',
+  userId: 'userId',
+  slot: 'slot',
+  joinedAt: 'joinedAt'
+} as const
+
+export type LobbySeatScalarFieldEnum = (typeof LobbySeatScalarFieldEnum)[keyof typeof LobbySeatScalarFieldEnum]
 
 
 export const SortOrder = {

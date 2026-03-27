@@ -22,6 +22,10 @@
             "types": "./dist/contracts/lobby.d.ts",
             "default": "./dist/contracts/lobby.js"
         },
+        "./contracts/game": {
+            "types": "./dist/contracts/game.d.ts",
+            "default": "./dist/contracts/game.js"
+        },
         "./env/api": {
             "types": "./dist/env/api.d.ts",
             "default": "./dist/env/api.js"

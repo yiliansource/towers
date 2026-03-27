@@ -27,3 +27,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type Lobby = Prisma.LobbyModel
+/**
+ * Model LobbySeat
+ * 
+ */
+export type LobbySeat = Prisma.LobbySeatModel

@@ -1,172 +1,188 @@
-import { Inject, Injectable, InternalServerErrorException, NotFoundException, forwardRef } from "@nestjs/common";
+import { Injectable, NotImplementedException } from "@nestjs/common";
+
+import { GameState } from "@towers/shared/contracts/game";
+import { LobbyError } from "@towers/shared/contracts/lobby";
 
 import { Lobby, Prisma } from "@/generated/prisma/client";
-import { LobbyWhereUniqueInput } from "@/generated/prisma/models";
 import { PrismaService } from "@/prisma/prisma.service";
 import { UserService } from "@/user/user.service";
 
-import { LobbyGateway } from "./lobby.gateway";
+import { LobbyNotifier } from "./lobby.notifier";
+import { LobbyWithRelations } from "./lobby.types";
+
+const lobbyIncludes = {
+    host: {
+        select: {
+            id: true,
+            username: true,
+            socketId: true,
+        },
+    },
+    seats: {
+        orderBy: { slot: "asc" },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    socketId: true,
+                },
+            },
+        },
+    },
+} satisfies Prisma.LobbyInclude;
 
 @Injectable()
 export class LobbyService {
     constructor(
-        @Inject(forwardRef(() => LobbyGateway))
-        private readonly lobbyGateway: LobbyGateway,
         private readonly prisma: PrismaService,
         private readonly userService: UserService,
+        private readonly lobbyNotifier: LobbyNotifier,
     ) {}
 
-    async lobby(where: LobbyWhereUniqueInput) {
-        return await this.prisma.lobby.findUnique({
-            where,
-            include: {
-                users: true,
-            },
-        });
-    }
-    async lobbies(where: Prisma.LobbyWhereInput): Promise<Lobby[]> {
-        return this.prisma.lobby.findMany({
-            where,
-        });
-    }
-
-    async updateLobby({
-        where,
-        data,
-    }: {
-        where: Prisma.LobbyWhereUniqueInput;
-        data: Prisma.LobbyUpdateInput;
-    }): Promise<Lobby> {
-        return this.prisma.lobby.update({
-            data,
-            where,
-        });
-    }
-
-    /**
-     * accepts either the lobby id, the lobby publicId or 'current' to fetch the lobby of the user.
-     */
-    async resolveLobbyFromId(id: string, userId: string) {
-        if (id.length === 4) {
-            return await this.lobby({ publicId: id });
-        }
-        if (id === "current") {
-            const lobbyId = await this.getLobbyIdFromUser(userId);
-            if (!lobbyId) throw new NotFoundException();
-
-            return await this.lobby({ id: lobbyId });
-        }
-
-        return await this.lobby({ id });
-    }
-
-    async createLobby(hostUserId: string): Promise<Lobby> {
-        const host = await this.userService.user({ id: hostUserId });
-        if (!host) throw new InternalServerErrorException("Invalid host token.");
-
-        const publicLobbyId = await this.generatePublicLobbyId();
-        const lobby = await this.prisma.lobby.create({
+    async createLobby(hostUserId: string): Promise<LobbyWithRelations> {
+        return await this.prisma.lobby.create({
             data: {
-                publicId: publicLobbyId,
                 state: "WAITING",
-                hostUser: {
-                    connect: { id: host.id },
-                },
-                users: {
-                    connect: { id: host.id },
-                },
-            },
-        });
-
-        return lobby;
-    }
-
-    async joinLobby(lobbyId: string, userId: string): Promise<Lobby> {
-        const lobby = await this.lobby({ id: lobbyId });
-        if (!lobby) throw new NotFoundException();
-
-        const user = await this.userService.user({ id: userId });
-        if (!user) throw new NotFoundException();
-
-        await this.userService.updateUser({
-            where: { id: userId },
-            data: {
-                activeLobby: {
-                    connect: {
-                        id: lobby.id,
-                    },
-                },
-            },
-        });
-
-        void this.lobbyGateway.emitLobbyState(lobby.id);
-
-        return lobby;
-    }
-
-    async deleteLobby(lobbyId: string): Promise<boolean> {
-        const res = await this.prisma.lobby.delete({ where: { id: lobbyId } });
-        return !!res;
-    }
-
-    async removeUser(lobbyId: string, userId: string, notify?: boolean): Promise<boolean> {
-        const lobby = await this.lobby({ id: lobbyId });
-        if (!lobby) throw new NotFoundException();
-
-        const user = await this.userService.user({ id: userId });
-        if (!user) throw new NotFoundException();
-
-        const isInLobby = await this.isPlayerInLobby(lobby.id, user.id);
-        if (!isInLobby) return false;
-
-        await this.userService.updateUser({
-            where: { id: userId },
-            data: {
-                activeLobby: {
-                    disconnect: true,
-                },
-            },
-        });
-
-        if (notify && user.socketId) {
-            this.lobbyGateway.server.in(user.socketId).emit("lobby:removed");
-        }
-
-        if (lobby.hostUserId === userId) {
-            const newHost = await this.prisma.user.findFirst({
-                where: { activeLobbyId: lobby.id },
-            });
-            if (!newHost) {
-                await this.deleteLobby(lobby.id);
-                return true;
-            } else {
-                await this.updateLobby({
-                    where: { id: lobby.id },
-                    data: {
-                        hostUser: {
-                            connect: {
-                                id: newHost.id,
+                publicId: await this.generatePublicLobbyId(),
+                hostId: hostUserId,
+                seats: {
+                    createMany: {
+                        data: [
+                            {
+                                slot: 0,
+                                userId: hostUserId,
                             },
-                        },
+                            ...Array.from(Array(3).keys()).map((i) => ({
+                                slot: i + 1,
+                                userId: null,
+                            })),
+                        ],
                     },
-                });
+                },
+            },
+            include: lobbyIncludes,
+        });
+    }
+    async getLobbyById(lobbyId: string): Promise<LobbyWithRelations | null> {
+        return await this.prisma.lobby.findUnique({
+            where: { id: lobbyId },
+            include: lobbyIncludes,
+        });
+    }
+    async getLobbyByPublicId(publicLobbyId: string): Promise<LobbyWithRelations | null> {
+        return await this.prisma.lobby.findUnique({
+            where: { publicId: publicLobbyId },
+            include: lobbyIncludes,
+        });
+    }
+    async getLobbyByUser(userId: string): Promise<LobbyWithRelations | null> {
+        const seat = await this.prisma.lobbySeat.findUnique({ where: { userId } });
+        if (!seat) return null;
+
+        return await this.getLobbyById(seat.lobbyId);
+    }
+    async getLobbyByContext(id: string, userId: string): Promise<LobbyWithRelations | null> {
+        if (id.length === 4) {
+            return await this.getLobbyByPublicId(id);
+        } else if (id === "current") {
+            return await this.getLobbyByUser(userId);
+        } else {
+            return await this.getLobbyById(id);
+        }
+    }
+
+    async joinLobby(userId: string, publicId: string): Promise<LobbyWithRelations> {
+        const lobby = await this.getLobbyByPublicId(publicId);
+        if (!lobby) throw new LobbyError("LOBBY_NOT_FOUND");
+        if (lobby.state !== "WAITING") throw new LobbyError("LOBBY_ALREADY_STARTED");
+
+        const seats = lobby.seats;
+        if (seats.some((s) => s.userId === userId)) throw new LobbyError("USER_ALREADY_IN_THIS_LOBBY");
+
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: { lobbySeat: true },
+        });
+        if (!user) throw new Error("User not found.");
+        if (user.lobbySeat) throw new LobbyError("USER_ALREADY_IN_LOBBY");
+
+        const freeSeat = seats.find((s) => !s.userId);
+        if (!freeSeat) throw new LobbyError("LOBBY_FULL");
+
+        await this.prisma.lobbySeat.update({
+            where: { id: freeSeat.id },
+            data: { userId: user.id },
+        });
+
+        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
+
+        return (await this.getLobbyById(lobby.id))!;
+    }
+    async leaveLobby(userId: string): Promise<void> {
+        const lobby = await this.getLobbyByUser(userId);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        if (lobby.host.id === userId) {
+            const nextHostCandidateSeat = lobby.seats.find((s) => !!s.userId && s.userId !== userId);
+            if (!nextHostCandidateSeat) {
+                // lobby empty after leave
+                await this.prisma.lobby.delete({ where: { id: lobby.id } });
+                return;
             }
+
+            await this.prisma.lobby.update({
+                where: { id: lobby.id },
+                data: {
+                    hostId: nextHostCandidateSeat.userId!,
+                },
+            });
         }
 
-        void this.lobbyGateway.emitLobbyState(lobby.id);
+        await this.prisma.lobbySeat.update({
+            where: { userId },
+            data: { userId: null },
+        });
 
-        return true;
+        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
     }
 
-    async isPlayerInLobby(lobbyId: string, userId: string): Promise<boolean> {
-        return lobbyId === (await this.getLobbyIdFromUser(userId));
+    async kickPlayer(lobbyId: string, targetUserId: string): Promise<void> {
+        throw new NotImplementedException();
     }
-    async getLobbyIdFromUser(userId: string): Promise<string | null> {
-        const user = await this.userService.user({ id: userId });
-        if (!user || !user.activeLobbyId) return null;
+    async changeHost(lobbyId: string, newHostUserId: string): Promise<void> {
+        throw new NotImplementedException();
+    }
 
-        return user.activeLobbyId;
+    async changeSlot(lobbyId: string, userId: string, slot: number): Promise<void> {
+        const lobby = await this.getLobbyByUser(userId);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        const oldSlot = (await this.prisma.lobbySeat.findUnique({ where: { userId } }))!;
+        const newSlot = (await this.prisma.lobbySeat.findFirst({ where: { lobbyId, slot } }))!;
+
+        if (newSlot.userId) throw new LobbyError("SEAT_OCCUPIED");
+
+        await this.prisma.lobbySeat.update({
+            where: { id: oldSlot.id },
+            data: { userId: null },
+        });
+        await this.prisma.lobbySeat.update({
+            where: { id: newSlot.id },
+            data: { userId },
+        });
+
+        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
     }
+
+    async startGame(): Promise<void> {
+        throw new NotImplementedException();
+    }
+    async finishGame(): Promise<void> {
+        throw new NotImplementedException();
+    }
+
+    async updateGameState(lobbyId: string, game: GameState): Promise<void> {}
 
     private async generatePublicLobbyId(): Promise<string> {
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -176,7 +192,7 @@ export class LobbyService {
 
         do {
             newId = [...Array(4).keys()].map(() => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
-            foundLobby = await this.lobby({ publicId: newId });
+            foundLobby = await this.getLobbyByPublicId(newId);
         } while (foundLobby);
 
         return newId;

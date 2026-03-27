@@ -1,13 +1,13 @@
 import { LobbyView } from "@towers/shared/contracts/lobby";
 
-import { fetchApi } from "@/lib/api";
+import { fetchApi } from "@/lib/fetch-api";
 import { useLobbyStore } from "@/stores/lobby.store";
 
 export async function hydrateLobby() {
     try {
         useLobbyStore.getState().setLoading(true);
 
-        const res = await fetchApi("/lobby/current");
+        const res = await fetchApi("/lobby");
         if (!res.ok) {
             throw new Error();
         }

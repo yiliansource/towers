@@ -385,7 +385,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  Lobby: 'Lobby'
+  Lobby: 'Lobby',
+  LobbySeat: 'LobbySeat'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +402,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "lobby"
+    modelProps: "user" | "lobby" | "lobbySeat"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -553,6 +554,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LobbySeat: {
+      payload: Prisma.$LobbySeatPayload<ExtArgs>
+      fields: Prisma.LobbySeatFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LobbySeatFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LobbySeatFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>
+        }
+        findFirst: {
+          args: Prisma.LobbySeatFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LobbySeatFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>
+        }
+        findMany: {
+          args: Prisma.LobbySeatFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>[]
+        }
+        create: {
+          args: Prisma.LobbySeatCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>
+        }
+        createMany: {
+          args: Prisma.LobbySeatCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LobbySeatCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>[]
+        }
+        delete: {
+          args: Prisma.LobbySeatDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>
+        }
+        update: {
+          args: Prisma.LobbySeatUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>
+        }
+        deleteMany: {
+          args: Prisma.LobbySeatDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LobbySeatUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LobbySeatUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>[]
+        }
+        upsert: {
+          args: Prisma.LobbySeatUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LobbySeatPayload>
+        }
+        aggregate: {
+          args: Prisma.LobbySeatAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLobbySeat>
+        }
+        groupBy: {
+          args: Prisma.LobbySeatGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LobbySeatGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LobbySeatCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LobbySeatCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -595,9 +670,7 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  activeLobbyId: 'activeLobbyId',
-  socketId: 'socketId',
-  connected: 'connected'
+  socketId: 'socketId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -607,11 +680,22 @@ export const LobbyScalarFieldEnum = {
   id: 'id',
   publicId: 'publicId',
   state: 'state',
-  hostUserId: 'hostUserId',
+  hostId: 'hostId',
   game: 'game'
 } as const
 
 export type LobbyScalarFieldEnum = (typeof LobbyScalarFieldEnum)[keyof typeof LobbyScalarFieldEnum]
+
+
+export const LobbySeatScalarFieldEnum = {
+  id: 'id',
+  lobbyId: 'lobbyId',
+  userId: 'userId',
+  slot: 'slot',
+  joinedAt: 'joinedAt'
+} as const
+
+export type LobbySeatScalarFieldEnum = (typeof LobbySeatScalarFieldEnum)[keyof typeof LobbySeatScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -676,13 +760,6 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'LobbyState'
  */
 export type EnumLobbyStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LobbyState'>
@@ -707,6 +784,13 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 /**
@@ -806,6 +890,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   lobby?: Prisma.LobbyOmit
+  lobbySeat?: Prisma.LobbySeatOmit
 }
 
 /* Types for Logging */

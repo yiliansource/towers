@@ -3,29 +3,28 @@ import { Injectable } from "@nestjs/common";
 import { LobbyView } from "@towers/shared/contracts/lobby";
 
 import { ViewMapper } from "@/common/view-mapper";
-import { Lobby } from "@/generated/prisma/client";
 import { UserMapper } from "@/user/user.mapper";
-import { UserService } from "@/user/user.service";
+
+import { LobbyWithRelations } from "./lobby.types";
 
 @Injectable()
-export class LobbyMapper extends ViewMapper<Lobby, LobbyView> {
-    constructor(
-        private readonly userService: UserService,
-        private readonly userMapper: UserMapper,
-    ) {
+export class LobbyMapper extends ViewMapper<LobbyWithRelations, LobbyView> {
+    constructor(private readonly userMapper: UserMapper) {
         super();
     }
 
-    async toView(lobby: Lobby): Promise<LobbyView> {
-        const users = await this.userService.users({ activeLobbyId: lobby.id });
-        const userViews = await this.userMapper.toViews(users);
-
+    async toView(lobby: LobbyWithRelations): Promise<LobbyView> {
         return {
             id: lobby.id,
             publicId: lobby.publicId,
-            hostUserId: lobby.hostUserId,
             state: lobby.state,
-            users: userViews,
+            host: await this.userMapper.toView(lobby.host),
+            seats: await Promise.all(
+                lobby.seats.map(async (s) => ({
+                    user: s.user ? await this.userMapper.toView(s.user) : null,
+                    slot: s.slot,
+                })),
+            ),
         };
     }
 }

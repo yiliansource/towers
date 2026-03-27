@@ -1,26 +1,19 @@
-"use client";
-
-import { Spinner } from "@radix-ui/themes";
-import { useEffect } from "react";
+import { Metadata } from "next";
 
 import { TowersBanner } from "@/components/towers-banner";
-import { hydrateLobby } from "@/lib/hydrate-lobby";
-import { useLobbyStore } from "@/stores/lobby.store";
+import { makeMetaTitle } from "@/lib/meta-title";
 
-import { LobbyCreateJoinForm } from "./components/lobby-create-join-form";
-import { LobbyScreen } from "./components/lobby-screen";
+import { LobbySwitch } from "./lobby-switch";
+
+export const metadata: Metadata = {
+    title: makeMetaTitle("Lobby"),
+};
 
 export default function LobbyPage() {
-    const { lobby, loading } = useLobbyStore();
-
-    useEffect(() => {
-        void hydrateLobby();
-    }, []);
-
     return (
         <div className="m-auto flex flex-col items-center">
             <TowersBanner className="mb-10" />
-            {loading ? <Spinner /> : !lobby ? <LobbyCreateJoinForm /> : <LobbyScreen />}
+            <LobbySwitch />
         </div>
     );
 }

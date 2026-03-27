@@ -7,66 +7,34 @@ import { PrismaService } from "@/prisma/prisma.service";
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async user(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
-        return this.prisma.user.findUnique({
-            where: userWhereUniqueInput,
-        });
-    }
-    async users(userWhereInput: Prisma.UserWhereInput): Promise<User[]> {
-        return this.prisma.user.findMany({
-            where: userWhereInput,
-        });
-    }
-
     async createUser(data: Prisma.UserCreateInput): Promise<User> {
-        return this.prisma.user.create({
+        return await this.prisma.user.create({
             data,
         });
     }
-
-    async updateUser({
-        where,
-        data,
-    }: {
-        where: Prisma.UserWhereUniqueInput;
-        data: Prisma.UserUpdateInput;
-    }): Promise<User> {
-        return this.prisma.user.update({
-            data,
-            where,
-        });
+    async getUserById(userId: string): Promise<User | null> {
+        return await this.prisma.user.findUnique({ where: { id: userId } });
+    }
+    async getUserByName(username: string): Promise<User | null> {
+        return await this.prisma.user.findUnique({ where: { username } });
+    }
+    async getUserBySocket(socketId: string): Promise<User | null> {
+        return await this.prisma.user.findUnique({ where: { socketId } });
     }
 
-    async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
-        return this.prisma.user.delete({
-            where,
+    async registerSocket(userId: string, socketId: string): Promise<void> {
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { socketId },
         });
     }
-
-    async connectSocket(where: Prisma.UserWhereUniqueInput, socketId: string): Promise<void> {
-        await this.updateUser({
-            where,
-            data: {
-                socketId,
-                connected: true,
-            },
-        });
-    }
-    async disconnectSocket(socketId: string) {
-        const user = await this.user({ socketId });
+    async clearSocket(socketId: string): Promise<void> {
+        const user = await this.getUserBySocket(socketId);
         if (!user) return;
 
-        await this.updateUser({
+        await this.prisma.user.update({
             where: { id: user.id },
-            data: {
-                socketId: null,
-                connected: false,
-            },
+            data: { socketId: null },
         });
-    }
-
-    async userToSocket(userId: string): Promise<string | null> {
-        const user = await this.user({ id: userId });
-        return user?.socketId ?? null;
     }
 }

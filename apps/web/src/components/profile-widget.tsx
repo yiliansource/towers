@@ -5,7 +5,7 @@ import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { fetchApi } from "@/lib/api";
+import { fetchApi } from "@/lib/fetch-api";
 import { sleep } from "@/lib/sleep";
 import { useAuthStore } from "@/stores/auth.store";
 

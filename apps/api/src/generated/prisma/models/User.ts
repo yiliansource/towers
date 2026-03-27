@@ -30,9 +30,7 @@ export type UserMinAggregateOutputType = {
   passwordHash: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  activeLobbyId: string | null
   socketId: string | null
-  connected: boolean | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -41,9 +39,7 @@ export type UserMaxAggregateOutputType = {
   passwordHash: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  activeLobbyId: string | null
   socketId: string | null
-  connected: boolean | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -52,9 +48,7 @@ export type UserCountAggregateOutputType = {
   passwordHash: number
   createdAt: number
   updatedAt: number
-  activeLobbyId: number
   socketId: number
-  connected: number
   _all: number
 }
 
@@ -65,9 +59,7 @@ export type UserMinAggregateInputType = {
   passwordHash?: true
   createdAt?: true
   updatedAt?: true
-  activeLobbyId?: true
   socketId?: true
-  connected?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -76,9 +68,7 @@ export type UserMaxAggregateInputType = {
   passwordHash?: true
   createdAt?: true
   updatedAt?: true
-  activeLobbyId?: true
   socketId?: true
-  connected?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -87,9 +77,7 @@ export type UserCountAggregateInputType = {
   passwordHash?: true
   createdAt?: true
   updatedAt?: true
-  activeLobbyId?: true
   socketId?: true
-  connected?: true
   _all?: true
 }
 
@@ -171,9 +159,7 @@ export type UserGroupByOutputType = {
   passwordHash: string
   createdAt: Date
   updatedAt: Date
-  activeLobbyId: string | null
   socketId: string | null
-  connected: boolean
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -203,11 +189,9 @@ export type UserWhereInput = {
   passwordHash?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  activeLobbyId?: Prisma.StringNullableFilter<"User"> | string | null
   socketId?: Prisma.StringNullableFilter<"User"> | string | null
-  connected?: Prisma.BoolFilter<"User"> | boolean
   hostedLobby?: Prisma.XOR<Prisma.LobbyNullableScalarRelationFilter, Prisma.LobbyWhereInput> | null
-  activeLobby?: Prisma.XOR<Prisma.LobbyNullableScalarRelationFilter, Prisma.LobbyWhereInput> | null
+  lobbySeat?: Prisma.XOR<Prisma.LobbySeatNullableScalarRelationFilter, Prisma.LobbySeatWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -216,11 +200,9 @@ export type UserOrderByWithRelationInput = {
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  activeLobbyId?: Prisma.SortOrderInput | Prisma.SortOrder
   socketId?: Prisma.SortOrderInput | Prisma.SortOrder
-  connected?: Prisma.SortOrder
   hostedLobby?: Prisma.LobbyOrderByWithRelationInput
-  activeLobby?: Prisma.LobbyOrderByWithRelationInput
+  lobbySeat?: Prisma.LobbySeatOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -233,10 +215,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   passwordHash?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  activeLobbyId?: Prisma.StringNullableFilter<"User"> | string | null
-  connected?: Prisma.BoolFilter<"User"> | boolean
   hostedLobby?: Prisma.XOR<Prisma.LobbyNullableScalarRelationFilter, Prisma.LobbyWhereInput> | null
-  activeLobby?: Prisma.XOR<Prisma.LobbyNullableScalarRelationFilter, Prisma.LobbyWhereInput> | null
+  lobbySeat?: Prisma.XOR<Prisma.LobbySeatNullableScalarRelationFilter, Prisma.LobbySeatWhereInput> | null
 }, "id" | "username" | "socketId">
 
 export type UserOrderByWithAggregationInput = {
@@ -245,9 +225,7 @@ export type UserOrderByWithAggregationInput = {
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  activeLobbyId?: Prisma.SortOrderInput | Prisma.SortOrder
   socketId?: Prisma.SortOrderInput | Prisma.SortOrder
-  connected?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -262,9 +240,7 @@ export type UserScalarWhereWithAggregatesInput = {
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
-  activeLobbyId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   socketId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  connected?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
 }
 
 export type UserCreateInput = {
@@ -274,9 +250,8 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   socketId?: string | null
-  connected?: boolean
-  hostedLobby?: Prisma.LobbyCreateNestedOneWithoutHostUserInput
-  activeLobby?: Prisma.LobbyCreateNestedOneWithoutUsersInput
+  hostedLobby?: Prisma.LobbyCreateNestedOneWithoutHostInput
+  lobbySeat?: Prisma.LobbySeatCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -285,10 +260,9 @@ export type UserUncheckedCreateInput = {
   passwordHash: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  activeLobbyId?: string | null
   socketId?: string | null
-  connected?: boolean
-  hostedLobby?: Prisma.LobbyUncheckedCreateNestedOneWithoutHostUserInput
+  hostedLobby?: Prisma.LobbyUncheckedCreateNestedOneWithoutHostInput
+  lobbySeat?: Prisma.LobbySeatUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -298,9 +272,8 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hostedLobby?: Prisma.LobbyUpdateOneWithoutHostUserNestedInput
-  activeLobby?: Prisma.LobbyUpdateOneWithoutUsersNestedInput
+  hostedLobby?: Prisma.LobbyUpdateOneWithoutHostNestedInput
+  lobbySeat?: Prisma.LobbySeatUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -309,10 +282,9 @@ export type UserUncheckedUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  activeLobbyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hostedLobby?: Prisma.LobbyUncheckedUpdateOneWithoutHostUserNestedInput
+  hostedLobby?: Prisma.LobbyUncheckedUpdateOneWithoutHostNestedInput
+  lobbySeat?: Prisma.LobbySeatUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -321,9 +293,7 @@ export type UserCreateManyInput = {
   passwordHash: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  activeLobbyId?: string | null
   socketId?: string | null
-  connected?: boolean
 }
 
 export type UserUpdateManyMutationInput = {
@@ -333,7 +303,6 @@ export type UserUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -342,9 +311,7 @@ export type UserUncheckedUpdateManyInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  activeLobbyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -353,9 +320,7 @@ export type UserCountOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  activeLobbyId?: Prisma.SortOrder
   socketId?: Prisma.SortOrder
-  connected?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -364,9 +329,7 @@ export type UserMaxOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  activeLobbyId?: Prisma.SortOrder
   socketId?: Prisma.SortOrder
-  connected?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -375,9 +338,7 @@ export type UserMinOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  activeLobbyId?: Prisma.SortOrder
   socketId?: Prisma.SortOrder
-  connected?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -385,14 +346,9 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
-export type UserListRelationFilter = {
-  every?: Prisma.UserWhereInput
-  some?: Prisma.UserWhereInput
-  none?: Prisma.UserWhereInput
-}
-
-export type UserOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -407,28 +363,10 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type UserCreateNestedOneWithoutHostedLobbyInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutHostedLobbyInput, Prisma.UserUncheckedCreateWithoutHostedLobbyInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutHostedLobbyInput
   connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserCreateNestedManyWithoutActiveLobbyInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutActiveLobbyInput, Prisma.UserUncheckedCreateWithoutActiveLobbyInput> | Prisma.UserCreateWithoutActiveLobbyInput[] | Prisma.UserUncheckedCreateWithoutActiveLobbyInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActiveLobbyInput | Prisma.UserCreateOrConnectWithoutActiveLobbyInput[]
-  createMany?: Prisma.UserCreateManyActiveLobbyInputEnvelope
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-}
-
-export type UserUncheckedCreateNestedManyWithoutActiveLobbyInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutActiveLobbyInput, Prisma.UserUncheckedCreateWithoutActiveLobbyInput> | Prisma.UserCreateWithoutActiveLobbyInput[] | Prisma.UserUncheckedCreateWithoutActiveLobbyInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActiveLobbyInput | Prisma.UserCreateOrConnectWithoutActiveLobbyInput[]
-  createMany?: Prisma.UserCreateManyActiveLobbyInputEnvelope
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
 }
 
 export type UserUpdateOneRequiredWithoutHostedLobbyNestedInput = {
@@ -439,32 +377,20 @@ export type UserUpdateOneRequiredWithoutHostedLobbyNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutHostedLobbyInput, Prisma.UserUpdateWithoutHostedLobbyInput>, Prisma.UserUncheckedUpdateWithoutHostedLobbyInput>
 }
 
-export type UserUpdateManyWithoutActiveLobbyNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutActiveLobbyInput, Prisma.UserUncheckedCreateWithoutActiveLobbyInput> | Prisma.UserCreateWithoutActiveLobbyInput[] | Prisma.UserUncheckedCreateWithoutActiveLobbyInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActiveLobbyInput | Prisma.UserCreateOrConnectWithoutActiveLobbyInput[]
-  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutActiveLobbyInput | Prisma.UserUpsertWithWhereUniqueWithoutActiveLobbyInput[]
-  createMany?: Prisma.UserCreateManyActiveLobbyInputEnvelope
-  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  update?: Prisma.UserUpdateWithWhereUniqueWithoutActiveLobbyInput | Prisma.UserUpdateWithWhereUniqueWithoutActiveLobbyInput[]
-  updateMany?: Prisma.UserUpdateManyWithWhereWithoutActiveLobbyInput | Prisma.UserUpdateManyWithWhereWithoutActiveLobbyInput[]
-  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+export type UserCreateNestedOneWithoutLobbySeatInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLobbySeatInput, Prisma.UserUncheckedCreateWithoutLobbySeatInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLobbySeatInput
+  connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUncheckedUpdateManyWithoutActiveLobbyNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutActiveLobbyInput, Prisma.UserUncheckedCreateWithoutActiveLobbyInput> | Prisma.UserCreateWithoutActiveLobbyInput[] | Prisma.UserUncheckedCreateWithoutActiveLobbyInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActiveLobbyInput | Prisma.UserCreateOrConnectWithoutActiveLobbyInput[]
-  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutActiveLobbyInput | Prisma.UserUpsertWithWhereUniqueWithoutActiveLobbyInput[]
-  createMany?: Prisma.UserCreateManyActiveLobbyInputEnvelope
-  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  update?: Prisma.UserUpdateWithWhereUniqueWithoutActiveLobbyInput | Prisma.UserUpdateWithWhereUniqueWithoutActiveLobbyInput[]
-  updateMany?: Prisma.UserUpdateManyWithWhereWithoutActiveLobbyInput | Prisma.UserUpdateManyWithWhereWithoutActiveLobbyInput[]
-  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+export type UserUpdateOneWithoutLobbySeatNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLobbySeatInput, Prisma.UserUncheckedCreateWithoutLobbySeatInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLobbySeatInput
+  upsert?: Prisma.UserUpsertWithoutLobbySeatInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLobbySeatInput, Prisma.UserUpdateWithoutLobbySeatInput>, Prisma.UserUncheckedUpdateWithoutLobbySeatInput>
 }
 
 export type UserCreateWithoutHostedLobbyInput = {
@@ -474,8 +400,7 @@ export type UserCreateWithoutHostedLobbyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   socketId?: string | null
-  connected?: boolean
-  activeLobby?: Prisma.LobbyCreateNestedOneWithoutUsersInput
+  lobbySeat?: Prisma.LobbySeatCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHostedLobbyInput = {
@@ -484,45 +409,13 @@ export type UserUncheckedCreateWithoutHostedLobbyInput = {
   passwordHash: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  activeLobbyId?: string | null
   socketId?: string | null
-  connected?: boolean
+  lobbySeat?: Prisma.LobbySeatUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutHostedLobbyInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutHostedLobbyInput, Prisma.UserUncheckedCreateWithoutHostedLobbyInput>
-}
-
-export type UserCreateWithoutActiveLobbyInput = {
-  id?: string
-  username: string
-  passwordHash: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  socketId?: string | null
-  connected?: boolean
-  hostedLobby?: Prisma.LobbyCreateNestedOneWithoutHostUserInput
-}
-
-export type UserUncheckedCreateWithoutActiveLobbyInput = {
-  id?: string
-  username: string
-  passwordHash: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  socketId?: string | null
-  connected?: boolean
-  hostedLobby?: Prisma.LobbyUncheckedCreateNestedOneWithoutHostUserInput
-}
-
-export type UserCreateOrConnectWithoutActiveLobbyInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutActiveLobbyInput, Prisma.UserUncheckedCreateWithoutActiveLobbyInput>
-}
-
-export type UserCreateManyActiveLobbyInputEnvelope = {
-  data: Prisma.UserCreateManyActiveLobbyInput | Prisma.UserCreateManyActiveLobbyInput[]
 }
 
 export type UserUpsertWithoutHostedLobbyInput = {
@@ -543,8 +436,7 @@ export type UserUpdateWithoutHostedLobbyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  activeLobby?: Prisma.LobbyUpdateOneWithoutUsersNestedInput
+  lobbySeat?: Prisma.LobbySeatUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHostedLobbyInput = {
@@ -553,81 +445,64 @@ export type UserUncheckedUpdateWithoutHostedLobbyInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  activeLobbyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lobbySeat?: Prisma.LobbySeatUncheckedUpdateOneWithoutUserNestedInput
 }
 
-export type UserUpsertWithWhereUniqueWithoutActiveLobbyInput = {
-  where: Prisma.UserWhereUniqueInput
-  update: Prisma.XOR<Prisma.UserUpdateWithoutActiveLobbyInput, Prisma.UserUncheckedUpdateWithoutActiveLobbyInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutActiveLobbyInput, Prisma.UserUncheckedCreateWithoutActiveLobbyInput>
-}
-
-export type UserUpdateWithWhereUniqueWithoutActiveLobbyInput = {
-  where: Prisma.UserWhereUniqueInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutActiveLobbyInput, Prisma.UserUncheckedUpdateWithoutActiveLobbyInput>
-}
-
-export type UserUpdateManyWithWhereWithoutActiveLobbyInput = {
-  where: Prisma.UserScalarWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutActiveLobbyInput>
-}
-
-export type UserScalarWhereInput = {
-  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-  OR?: Prisma.UserScalarWhereInput[]
-  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-  id?: Prisma.StringFilter<"User"> | string
-  username?: Prisma.StringFilter<"User"> | string
-  passwordHash?: Prisma.StringFilter<"User"> | string
-  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  activeLobbyId?: Prisma.StringNullableFilter<"User"> | string | null
-  socketId?: Prisma.StringNullableFilter<"User"> | string | null
-  connected?: Prisma.BoolFilter<"User"> | boolean
-}
-
-export type UserCreateManyActiveLobbyInput = {
+export type UserCreateWithoutLobbySeatInput = {
   id?: string
   username: string
   passwordHash: string
   createdAt?: Date | string
   updatedAt?: Date | string
   socketId?: string | null
-  connected?: boolean
+  hostedLobby?: Prisma.LobbyCreateNestedOneWithoutHostInput
 }
 
-export type UserUpdateWithoutActiveLobbyInput = {
+export type UserUncheckedCreateWithoutLobbySeatInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  socketId?: string | null
+  hostedLobby?: Prisma.LobbyUncheckedCreateNestedOneWithoutHostInput
+}
+
+export type UserCreateOrConnectWithoutLobbySeatInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLobbySeatInput, Prisma.UserUncheckedCreateWithoutLobbySeatInput>
+}
+
+export type UserUpsertWithoutLobbySeatInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLobbySeatInput, Prisma.UserUncheckedUpdateWithoutLobbySeatInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLobbySeatInput, Prisma.UserUncheckedCreateWithoutLobbySeatInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutLobbySeatInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLobbySeatInput, Prisma.UserUncheckedUpdateWithoutLobbySeatInput>
+}
+
+export type UserUpdateWithoutLobbySeatInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hostedLobby?: Prisma.LobbyUpdateOneWithoutHostUserNestedInput
+  hostedLobby?: Prisma.LobbyUpdateOneWithoutHostNestedInput
 }
 
-export type UserUncheckedUpdateWithoutActiveLobbyInput = {
+export type UserUncheckedUpdateWithoutLobbySeatInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hostedLobby?: Prisma.LobbyUncheckedUpdateOneWithoutHostUserNestedInput
-}
-
-export type UserUncheckedUpdateManyWithoutActiveLobbyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  socketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  connected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hostedLobby?: Prisma.LobbyUncheckedUpdateOneWithoutHostNestedInput
 }
 
 
@@ -638,11 +513,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   passwordHash?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  activeLobbyId?: boolean
   socketId?: boolean
-  connected?: boolean
   hostedLobby?: boolean | Prisma.User$hostedLobbyArgs<ExtArgs>
-  activeLobby?: boolean | Prisma.User$activeLobbyArgs<ExtArgs>
+  lobbySeat?: boolean | Prisma.User$lobbySeatArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -651,10 +524,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  activeLobbyId?: boolean
   socketId?: boolean
-  connected?: boolean
-  activeLobby?: boolean | Prisma.User$activeLobbyArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -663,10 +533,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  activeLobbyId?: boolean
   socketId?: boolean
-  connected?: boolean
-  activeLobby?: boolean | Prisma.User$activeLobbyArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -675,28 +542,22 @@ export type UserSelectScalar = {
   passwordHash?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  activeLobbyId?: boolean
   socketId?: boolean
-  connected?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "passwordHash" | "createdAt" | "updatedAt" | "activeLobbyId" | "socketId" | "connected", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "passwordHash" | "createdAt" | "updatedAt" | "socketId", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   hostedLobby?: boolean | Prisma.User$hostedLobbyArgs<ExtArgs>
-  activeLobby?: boolean | Prisma.User$activeLobbyArgs<ExtArgs>
+  lobbySeat?: boolean | Prisma.User$lobbySeatArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  activeLobby?: boolean | Prisma.User$activeLobbyArgs<ExtArgs>
-}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  activeLobby?: boolean | Prisma.User$activeLobbyArgs<ExtArgs>
-}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
     hostedLobby: Prisma.$LobbyPayload<ExtArgs> | null
-    activeLobby: Prisma.$LobbyPayload<ExtArgs> | null
+    lobbySeat: Prisma.$LobbySeatPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -704,9 +565,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     passwordHash: string
     createdAt: Date
     updatedAt: Date
-    activeLobbyId: string | null
     socketId: string | null
-    connected: boolean
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1102,7 +961,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   hostedLobby<T extends Prisma.User$hostedLobbyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$hostedLobbyArgs<ExtArgs>>): Prisma.Prisma__LobbyClient<runtime.Types.Result.GetResult<Prisma.$LobbyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  activeLobby<T extends Prisma.User$activeLobbyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$activeLobbyArgs<ExtArgs>>): Prisma.Prisma__LobbyClient<runtime.Types.Result.GetResult<Prisma.$LobbyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  lobbySeat<T extends Prisma.User$lobbySeatArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$lobbySeatArgs<ExtArgs>>): Prisma.Prisma__LobbySeatClient<runtime.Types.Result.GetResult<Prisma.$LobbySeatPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1137,9 +996,7 @@ export interface UserFieldRefs {
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
-  readonly activeLobbyId: Prisma.FieldRef<"User", 'String'>
   readonly socketId: Prisma.FieldRef<"User", 'String'>
-  readonly connected: Prisma.FieldRef<"User", 'Boolean'>
 }
     
 
@@ -1392,10 +1249,6 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1466,10 +1319,6 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1558,22 +1407,22 @@ export type User$hostedLobbyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * User.activeLobby
+ * User.lobbySeat
  */
-export type User$activeLobbyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$lobbySeatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Lobby
+   * Select specific fields to fetch from the LobbySeat
    */
-  select?: Prisma.LobbySelect<ExtArgs> | null
+  select?: Prisma.LobbySeatSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Lobby
+   * Omit specific fields from the LobbySeat
    */
-  omit?: Prisma.LobbyOmit<ExtArgs> | null
+  omit?: Prisma.LobbySeatOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.LobbyInclude<ExtArgs> | null
-  where?: Prisma.LobbyWhereInput
+  include?: Prisma.LobbySeatInclude<ExtArgs> | null
+  where?: Prisma.LobbySeatWhereInput
 }
 
 /**

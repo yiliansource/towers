@@ -16,13 +16,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  hostedLobby Lobby? @relation("HostedLobby")
+  socketId String? @unique
 
-  activeLobby   Lobby?  @relation("ActiveLobby", fields: [activeLobbyId], references: [id])
-  activeLobbyId String?
-
-  socketId  String? @unique
-  connected Boolean @default(false)
+  hostedLobby Lobby?     @relation("HostedLobby")
+  lobbySeat   LobbySeat?
 }
 
 enum LobbyState {
@@ -36,10 +33,27 @@ model Lobby {
   publicId String     @unique
   state    LobbyState
 
-  hostUser   User   @relation("HostedLobby", fields: [hostUserId], references: [id])
-  hostUserId String @unique
+  host   User   @relation("HostedLobby", fields: [hostId], references: [id])
+  hostId String @unique
 
-  users User[] @relation("ActiveLobby")
+  seats LobbySeat[]
 
   game Json?
+}
+
+model LobbySeat {
+  id String @id @default(uuid())
+
+  lobby   Lobby  @relation(fields: [lobbyId], references: [id], onDelete: Cascade)
+  lobbyId String
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique
+
+  slot Int
+
+  joinedAt DateTime @default(now())
+
+  @@unique([lobbyId, slot])
+  @@unique([lobbyId, userId])
 }

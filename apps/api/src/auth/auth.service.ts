@@ -2,10 +2,11 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import * as argon2 from "argon2";
-import { CookieOptions, Response } from "express";
 
+import { AuthError } from "@towers/shared/contracts/auth";
 import { ApiEnv } from "@towers/shared/env/api";
 
+import { User } from "@/generated/prisma/client";
 import { UserService } from "@/user/user.service";
 
 import { AuthJwtPayload } from "./auth.types";
@@ -18,37 +19,35 @@ export class AuthService {
         private readonly config: ConfigService<ApiEnv, true>,
     ) {}
 
-    async registerUser(username: string, password: string, res: Response) {
+    async registerUser(username: string, password: string): Promise<{ user: User; token: string }> {
         const passwordHash = await argon2.hash(password);
-        const user = await this.userService.createUser({
-            username,
-            passwordHash,
-        });
+        try {
+            const user = await this.userService.createUser({
+                username,
+                passwordHash,
+            });
 
-        const token = await this.issueToken(user.id, user.username);
-        this.setAccessTokenCookie(res, token);
+            const token = await this.issueToken(user.id, user.username);
 
-        return user;
+            return { user, token };
+        } catch {
+            throw new AuthError("USERNAME_EXISTS");
+        }
     }
 
-    async loginUser(username: string, password: string, res: Response) {
-        const user = await this.userService.user({ username });
-        if (!user) throw new UnauthorizedException("invalid credentials");
+    async loginUser(username: string, password: string): Promise<{ user: User; token: string }> {
+        const user = await this.userService.getUserByName(username);
+        if (!user) throw new AuthError("INVALID_CREDENTIALS");
 
         const valid = await argon2.verify(user.passwordHash, password);
-        if (!valid) throw new UnauthorizedException("invalid credentials");
+        if (!valid) throw new AuthError("INVALID_CREDENTIALS");
 
         const token = await this.issueToken(user.id, user.username);
-        this.setAccessTokenCookie(res, token);
 
-        return user;
+        return { user, token };
     }
 
-    logoutUser(res: Response) {
-        this.clearAccessTokenCookie(res);
-    }
-
-    private async issueToken(userId: string, username: string) {
+    private async issueToken(userId: string, username: string): Promise<string> {
         const payload: AuthJwtPayload = {
             sub: userId,
             name: username,
@@ -58,43 +57,18 @@ export class AuthService {
         return accessToken;
     }
 
-    async validateJwtPayload(payload: AuthJwtPayload) {
-        const user = await this.userService.user({ id: payload.sub });
-        if (!user) throw new UnauthorizedException();
-
-        return user;
-    }
-
     async verifyToken(token: string) {
         const payload = await this.jwtService.verifyAsync<AuthJwtPayload>(token, {
             secret: this.config.get("JWT_SECRET", { infer: true }),
         });
 
-        return this.validateJwtPayload(payload);
+        return await this.validateJwtPayload(payload);
     }
 
-    // TODO: decouple authservice from express
+    async validateJwtPayload(payload: AuthJwtPayload) {
+        const user = await this.userService.getUserById(payload.sub);
+        if (!user) throw new UnauthorizedException();
 
-    private getAccessTokenCookieOptions(): CookieOptions {
-        const isProd = this.config.get("NODE_ENV", { infer: true }) === "production";
-
-        return {
-            httpOnly: true,
-            secure: isProd,
-            sameSite: "lax",
-            path: "/",
-            domain: isProd ? this.config.get("COOKIE_DOMAIN", { infer: true }) : undefined,
-        };
-    }
-
-    private setAccessTokenCookie(res: Response, token: string) {
-        res.cookie("access_token", token, {
-            ...this.getAccessTokenCookieOptions(),
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-    }
-
-    private clearAccessTokenCookie(res: Response) {
-        res.clearCookie("access_token", this.getAccessTokenCookieOptions());
+        return user;
     }
 }

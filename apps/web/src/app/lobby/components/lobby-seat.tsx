@@ -6,22 +6,30 @@ import { LobbyView } from "@towers/shared/contracts/lobby";
 
 import { cn } from "@/lib/cn";
 
-export interface LobbySlotProps {
+export interface LobbySeatProps {
     slotIndex: number;
     user: UserView | null;
     lobby: LobbyView;
+
+    onClick?: () => void;
 }
 
 const slotColors: [string, string][] = [
-    ["bg-[#496231]", "bg-[#577538]"],
-    ["bg-[#753735]", "bg-[#9c413e]"],
-    ["bg-red-400", "bg-red-500"],
-    ["bg-red-400", "bg-red-500"],
+    ["bg-green-600", "bg-green-500"],
+    ["bg-red-600", "bg-red-500"],
+    ["bg-blue-600", "bg-blue-500"],
+    ["bg-purple-600", "bg-purple-500"],
 ];
 
-export function LobbySlotProps({ slotIndex, user, lobby }: LobbySlotProps) {
+export function LobbySeat({ slotIndex, user, lobby, onClick }: LobbySeatProps) {
     return (
-        <div className="relative shadow py-3 px-3 h-22 w-40 bg-(--gray-2) select-none overflow-hidden">
+        <div
+            className={cn(
+                "relative shadow py-3 px-3 h-22 w-40 bg-(--gray-2) select-none overflow-hidden",
+                !user && "cursor-pointer",
+            )}
+            onClick={onClick}
+        >
             <AnimatePresence initial={false}>
                 {user && (
                     <motion.p
@@ -35,7 +43,7 @@ export function LobbySlotProps({ slotIndex, user, lobby }: LobbySlotProps) {
                         {user.username}
                     </motion.p>
                 )}
-                {user && user.id === lobby.hostUserId && (
+                {user && user.id === lobby.host.id && (
                     <motion.div
                         key="crown"
                         className="absolute left-0 bottom-0 m-3 z-20"

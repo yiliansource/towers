@@ -1,4 +1,21 @@
-import { boolean, z } from "zod";
+import { z } from "zod";
+
+export const AuthErrorCode = {
+    VALIDATION_ERROR: "VALIDATION_ERROR",
+    USERNAME_EXISTS: "USERNAME_EXISTS",
+    INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+} as const;
+export type AuthErrorCode = (typeof AuthErrorCode)[keyof typeof AuthErrorCode];
+
+export class AuthError extends Error {
+    constructor(
+        public readonly code: AuthErrorCode,
+        message?: string,
+    ) {
+        super(message ?? code);
+        this.name = "AuthError";
+    }
+}
 
 export const UsernameSchema = z
     .string()
@@ -38,7 +55,7 @@ export type LoginInput = z.infer<typeof LoginInputSchema>;
 export const UserViewSchema = z.object({
     id: z.string(),
     username: z.string(),
-    connected: boolean(),
+    connected: z.boolean(),
 });
 
 export type UserView = z.infer<typeof UserViewSchema>;

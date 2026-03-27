@@ -1,0 +1,17 @@
+import { Injectable } from "@nestjs/common";
+import { Observable, Subject } from "rxjs";
+
+export type LobbyNotification = { type: "lobby.updated"; lobbyId: string };
+
+@Injectable()
+export class LobbyNotifier {
+    private readonly subject = new Subject<LobbyNotification>();
+
+    notify(event: LobbyNotification): void {
+        this.subject.next(event);
+    }
+
+    asObservable(): Observable<LobbyNotification> {
+        return this.subject.asObservable();
+    }
+}

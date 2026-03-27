@@ -28,21 +28,21 @@ export type LobbyMinAggregateOutputType = {
   id: string | null
   publicId: string | null
   state: $Enums.LobbyState | null
-  hostUserId: string | null
+  hostId: string | null
 }
 
 export type LobbyMaxAggregateOutputType = {
   id: string | null
   publicId: string | null
   state: $Enums.LobbyState | null
-  hostUserId: string | null
+  hostId: string | null
 }
 
 export type LobbyCountAggregateOutputType = {
   id: number
   publicId: number
   state: number
-  hostUserId: number
+  hostId: number
   game: number
   _all: number
 }
@@ -52,21 +52,21 @@ export type LobbyMinAggregateInputType = {
   id?: true
   publicId?: true
   state?: true
-  hostUserId?: true
+  hostId?: true
 }
 
 export type LobbyMaxAggregateInputType = {
   id?: true
   publicId?: true
   state?: true
-  hostUserId?: true
+  hostId?: true
 }
 
 export type LobbyCountAggregateInputType = {
   id?: true
   publicId?: true
   state?: true
-  hostUserId?: true
+  hostId?: true
   game?: true
   _all?: true
 }
@@ -147,7 +147,7 @@ export type LobbyGroupByOutputType = {
   id: string
   publicId: string
   state: $Enums.LobbyState
-  hostUserId: string
+  hostId: string
   game: runtime.JsonValue | null
   _count: LobbyCountAggregateOutputType | null
   _min: LobbyMinAggregateOutputType | null
@@ -176,40 +176,40 @@ export type LobbyWhereInput = {
   id?: Prisma.StringFilter<"Lobby"> | string
   publicId?: Prisma.StringFilter<"Lobby"> | string
   state?: Prisma.EnumLobbyStateFilter<"Lobby"> | $Enums.LobbyState
-  hostUserId?: Prisma.StringFilter<"Lobby"> | string
+  hostId?: Prisma.StringFilter<"Lobby"> | string
   game?: Prisma.JsonNullableFilter<"Lobby">
-  hostUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  users?: Prisma.UserListRelationFilter
+  host?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  seats?: Prisma.LobbySeatListRelationFilter
 }
 
 export type LobbyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   publicId?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  hostUserId?: Prisma.SortOrder
+  hostId?: Prisma.SortOrder
   game?: Prisma.SortOrderInput | Prisma.SortOrder
-  hostUser?: Prisma.UserOrderByWithRelationInput
-  users?: Prisma.UserOrderByRelationAggregateInput
+  host?: Prisma.UserOrderByWithRelationInput
+  seats?: Prisma.LobbySeatOrderByRelationAggregateInput
 }
 
 export type LobbyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   publicId?: string
-  hostUserId?: string
+  hostId?: string
   AND?: Prisma.LobbyWhereInput | Prisma.LobbyWhereInput[]
   OR?: Prisma.LobbyWhereInput[]
   NOT?: Prisma.LobbyWhereInput | Prisma.LobbyWhereInput[]
   state?: Prisma.EnumLobbyStateFilter<"Lobby"> | $Enums.LobbyState
   game?: Prisma.JsonNullableFilter<"Lobby">
-  hostUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  users?: Prisma.UserListRelationFilter
-}, "id" | "publicId" | "hostUserId">
+  host?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  seats?: Prisma.LobbySeatListRelationFilter
+}, "id" | "publicId" | "hostId">
 
 export type LobbyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   publicId?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  hostUserId?: Prisma.SortOrder
+  hostId?: Prisma.SortOrder
   game?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LobbyCountOrderByAggregateInput
   _max?: Prisma.LobbyMaxOrderByAggregateInput
@@ -223,7 +223,7 @@ export type LobbyScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Lobby"> | string
   publicId?: Prisma.StringWithAggregatesFilter<"Lobby"> | string
   state?: Prisma.EnumLobbyStateWithAggregatesFilter<"Lobby"> | $Enums.LobbyState
-  hostUserId?: Prisma.StringWithAggregatesFilter<"Lobby"> | string
+  hostId?: Prisma.StringWithAggregatesFilter<"Lobby"> | string
   game?: Prisma.JsonNullableWithAggregatesFilter<"Lobby">
 }
 
@@ -232,17 +232,17 @@ export type LobbyCreateInput = {
   publicId: string
   state: $Enums.LobbyState
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hostUser: Prisma.UserCreateNestedOneWithoutHostedLobbyInput
-  users?: Prisma.UserCreateNestedManyWithoutActiveLobbyInput
+  host: Prisma.UserCreateNestedOneWithoutHostedLobbyInput
+  seats?: Prisma.LobbySeatCreateNestedManyWithoutLobbyInput
 }
 
 export type LobbyUncheckedCreateInput = {
   id?: string
   publicId: string
   state: $Enums.LobbyState
-  hostUserId: string
+  hostId: string
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutActiveLobbyInput
+  seats?: Prisma.LobbySeatUncheckedCreateNestedManyWithoutLobbyInput
 }
 
 export type LobbyUpdateInput = {
@@ -250,24 +250,24 @@ export type LobbyUpdateInput = {
   publicId?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hostUser?: Prisma.UserUpdateOneRequiredWithoutHostedLobbyNestedInput
-  users?: Prisma.UserUpdateManyWithoutActiveLobbyNestedInput
+  host?: Prisma.UserUpdateOneRequiredWithoutHostedLobbyNestedInput
+  seats?: Prisma.LobbySeatUpdateManyWithoutLobbyNestedInput
 }
 
 export type LobbyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   publicId?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
-  hostUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  hostId?: Prisma.StringFieldUpdateOperationsInput | string
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  users?: Prisma.UserUncheckedUpdateManyWithoutActiveLobbyNestedInput
+  seats?: Prisma.LobbySeatUncheckedUpdateManyWithoutLobbyNestedInput
 }
 
 export type LobbyCreateManyInput = {
   id?: string
   publicId: string
   state: $Enums.LobbyState
-  hostUserId: string
+  hostId: string
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
@@ -282,7 +282,7 @@ export type LobbyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   publicId?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
-  hostUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  hostId?: Prisma.StringFieldUpdateOperationsInput | string
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
@@ -295,7 +295,7 @@ export type LobbyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   publicId?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  hostUserId?: Prisma.SortOrder
+  hostId?: Prisma.SortOrder
   game?: Prisma.SortOrder
 }
 
@@ -303,161 +303,164 @@ export type LobbyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   publicId?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  hostUserId?: Prisma.SortOrder
+  hostId?: Prisma.SortOrder
 }
 
 export type LobbyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   publicId?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  hostUserId?: Prisma.SortOrder
+  hostId?: Prisma.SortOrder
 }
 
-export type LobbyCreateNestedOneWithoutHostUserInput = {
-  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostUserInput, Prisma.LobbyUncheckedCreateWithoutHostUserInput>
-  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostUserInput
+export type LobbyScalarRelationFilter = {
+  is?: Prisma.LobbyWhereInput
+  isNot?: Prisma.LobbyWhereInput
+}
+
+export type LobbyCreateNestedOneWithoutHostInput = {
+  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostInput, Prisma.LobbyUncheckedCreateWithoutHostInput>
+  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostInput
   connect?: Prisma.LobbyWhereUniqueInput
 }
 
-export type LobbyCreateNestedOneWithoutUsersInput = {
-  create?: Prisma.XOR<Prisma.LobbyCreateWithoutUsersInput, Prisma.LobbyUncheckedCreateWithoutUsersInput>
-  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutUsersInput
+export type LobbyUncheckedCreateNestedOneWithoutHostInput = {
+  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostInput, Prisma.LobbyUncheckedCreateWithoutHostInput>
+  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostInput
   connect?: Prisma.LobbyWhereUniqueInput
 }
 
-export type LobbyUncheckedCreateNestedOneWithoutHostUserInput = {
-  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostUserInput, Prisma.LobbyUncheckedCreateWithoutHostUserInput>
-  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostUserInput
-  connect?: Prisma.LobbyWhereUniqueInput
-}
-
-export type LobbyUpdateOneWithoutHostUserNestedInput = {
-  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostUserInput, Prisma.LobbyUncheckedCreateWithoutHostUserInput>
-  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostUserInput
-  upsert?: Prisma.LobbyUpsertWithoutHostUserInput
+export type LobbyUpdateOneWithoutHostNestedInput = {
+  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostInput, Prisma.LobbyUncheckedCreateWithoutHostInput>
+  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostInput
+  upsert?: Prisma.LobbyUpsertWithoutHostInput
   disconnect?: Prisma.LobbyWhereInput | boolean
   delete?: Prisma.LobbyWhereInput | boolean
   connect?: Prisma.LobbyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.LobbyUpdateToOneWithWhereWithoutHostUserInput, Prisma.LobbyUpdateWithoutHostUserInput>, Prisma.LobbyUncheckedUpdateWithoutHostUserInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LobbyUpdateToOneWithWhereWithoutHostInput, Prisma.LobbyUpdateWithoutHostInput>, Prisma.LobbyUncheckedUpdateWithoutHostInput>
 }
 
-export type LobbyUpdateOneWithoutUsersNestedInput = {
-  create?: Prisma.XOR<Prisma.LobbyCreateWithoutUsersInput, Prisma.LobbyUncheckedCreateWithoutUsersInput>
-  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutUsersInput
-  upsert?: Prisma.LobbyUpsertWithoutUsersInput
+export type LobbyUncheckedUpdateOneWithoutHostNestedInput = {
+  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostInput, Prisma.LobbyUncheckedCreateWithoutHostInput>
+  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostInput
+  upsert?: Prisma.LobbyUpsertWithoutHostInput
   disconnect?: Prisma.LobbyWhereInput | boolean
   delete?: Prisma.LobbyWhereInput | boolean
   connect?: Prisma.LobbyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.LobbyUpdateToOneWithWhereWithoutUsersInput, Prisma.LobbyUpdateWithoutUsersInput>, Prisma.LobbyUncheckedUpdateWithoutUsersInput>
-}
-
-export type LobbyUncheckedUpdateOneWithoutHostUserNestedInput = {
-  create?: Prisma.XOR<Prisma.LobbyCreateWithoutHostUserInput, Prisma.LobbyUncheckedCreateWithoutHostUserInput>
-  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutHostUserInput
-  upsert?: Prisma.LobbyUpsertWithoutHostUserInput
-  disconnect?: Prisma.LobbyWhereInput | boolean
-  delete?: Prisma.LobbyWhereInput | boolean
-  connect?: Prisma.LobbyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.LobbyUpdateToOneWithWhereWithoutHostUserInput, Prisma.LobbyUpdateWithoutHostUserInput>, Prisma.LobbyUncheckedUpdateWithoutHostUserInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LobbyUpdateToOneWithWhereWithoutHostInput, Prisma.LobbyUpdateWithoutHostInput>, Prisma.LobbyUncheckedUpdateWithoutHostInput>
 }
 
 export type EnumLobbyStateFieldUpdateOperationsInput = {
   set?: $Enums.LobbyState
 }
 
-export type LobbyCreateWithoutHostUserInput = {
+export type LobbyCreateNestedOneWithoutSeatsInput = {
+  create?: Prisma.XOR<Prisma.LobbyCreateWithoutSeatsInput, Prisma.LobbyUncheckedCreateWithoutSeatsInput>
+  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutSeatsInput
+  connect?: Prisma.LobbyWhereUniqueInput
+}
+
+export type LobbyUpdateOneRequiredWithoutSeatsNestedInput = {
+  create?: Prisma.XOR<Prisma.LobbyCreateWithoutSeatsInput, Prisma.LobbyUncheckedCreateWithoutSeatsInput>
+  connectOrCreate?: Prisma.LobbyCreateOrConnectWithoutSeatsInput
+  upsert?: Prisma.LobbyUpsertWithoutSeatsInput
+  connect?: Prisma.LobbyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LobbyUpdateToOneWithWhereWithoutSeatsInput, Prisma.LobbyUpdateWithoutSeatsInput>, Prisma.LobbyUncheckedUpdateWithoutSeatsInput>
+}
+
+export type LobbyCreateWithoutHostInput = {
   id?: string
   publicId: string
   state: $Enums.LobbyState
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  users?: Prisma.UserCreateNestedManyWithoutActiveLobbyInput
+  seats?: Prisma.LobbySeatCreateNestedManyWithoutLobbyInput
 }
 
-export type LobbyUncheckedCreateWithoutHostUserInput = {
+export type LobbyUncheckedCreateWithoutHostInput = {
   id?: string
   publicId: string
   state: $Enums.LobbyState
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutActiveLobbyInput
+  seats?: Prisma.LobbySeatUncheckedCreateNestedManyWithoutLobbyInput
 }
 
-export type LobbyCreateOrConnectWithoutHostUserInput = {
+export type LobbyCreateOrConnectWithoutHostInput = {
   where: Prisma.LobbyWhereUniqueInput
-  create: Prisma.XOR<Prisma.LobbyCreateWithoutHostUserInput, Prisma.LobbyUncheckedCreateWithoutHostUserInput>
+  create: Prisma.XOR<Prisma.LobbyCreateWithoutHostInput, Prisma.LobbyUncheckedCreateWithoutHostInput>
 }
 
-export type LobbyCreateWithoutUsersInput = {
+export type LobbyUpsertWithoutHostInput = {
+  update: Prisma.XOR<Prisma.LobbyUpdateWithoutHostInput, Prisma.LobbyUncheckedUpdateWithoutHostInput>
+  create: Prisma.XOR<Prisma.LobbyCreateWithoutHostInput, Prisma.LobbyUncheckedCreateWithoutHostInput>
+  where?: Prisma.LobbyWhereInput
+}
+
+export type LobbyUpdateToOneWithWhereWithoutHostInput = {
+  where?: Prisma.LobbyWhereInput
+  data: Prisma.XOR<Prisma.LobbyUpdateWithoutHostInput, Prisma.LobbyUncheckedUpdateWithoutHostInput>
+}
+
+export type LobbyUpdateWithoutHostInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
+  game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  seats?: Prisma.LobbySeatUpdateManyWithoutLobbyNestedInput
+}
+
+export type LobbyUncheckedUpdateWithoutHostInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
+  game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  seats?: Prisma.LobbySeatUncheckedUpdateManyWithoutLobbyNestedInput
+}
+
+export type LobbyCreateWithoutSeatsInput = {
   id?: string
   publicId: string
   state: $Enums.LobbyState
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hostUser: Prisma.UserCreateNestedOneWithoutHostedLobbyInput
+  host: Prisma.UserCreateNestedOneWithoutHostedLobbyInput
 }
 
-export type LobbyUncheckedCreateWithoutUsersInput = {
+export type LobbyUncheckedCreateWithoutSeatsInput = {
   id?: string
   publicId: string
   state: $Enums.LobbyState
-  hostUserId: string
+  hostId: string
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
-export type LobbyCreateOrConnectWithoutUsersInput = {
+export type LobbyCreateOrConnectWithoutSeatsInput = {
   where: Prisma.LobbyWhereUniqueInput
-  create: Prisma.XOR<Prisma.LobbyCreateWithoutUsersInput, Prisma.LobbyUncheckedCreateWithoutUsersInput>
+  create: Prisma.XOR<Prisma.LobbyCreateWithoutSeatsInput, Prisma.LobbyUncheckedCreateWithoutSeatsInput>
 }
 
-export type LobbyUpsertWithoutHostUserInput = {
-  update: Prisma.XOR<Prisma.LobbyUpdateWithoutHostUserInput, Prisma.LobbyUncheckedUpdateWithoutHostUserInput>
-  create: Prisma.XOR<Prisma.LobbyCreateWithoutHostUserInput, Prisma.LobbyUncheckedCreateWithoutHostUserInput>
+export type LobbyUpsertWithoutSeatsInput = {
+  update: Prisma.XOR<Prisma.LobbyUpdateWithoutSeatsInput, Prisma.LobbyUncheckedUpdateWithoutSeatsInput>
+  create: Prisma.XOR<Prisma.LobbyCreateWithoutSeatsInput, Prisma.LobbyUncheckedCreateWithoutSeatsInput>
   where?: Prisma.LobbyWhereInput
 }
 
-export type LobbyUpdateToOneWithWhereWithoutHostUserInput = {
+export type LobbyUpdateToOneWithWhereWithoutSeatsInput = {
   where?: Prisma.LobbyWhereInput
-  data: Prisma.XOR<Prisma.LobbyUpdateWithoutHostUserInput, Prisma.LobbyUncheckedUpdateWithoutHostUserInput>
+  data: Prisma.XOR<Prisma.LobbyUpdateWithoutSeatsInput, Prisma.LobbyUncheckedUpdateWithoutSeatsInput>
 }
 
-export type LobbyUpdateWithoutHostUserInput = {
+export type LobbyUpdateWithoutSeatsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   publicId?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  users?: Prisma.UserUpdateManyWithoutActiveLobbyNestedInput
+  host?: Prisma.UserUpdateOneRequiredWithoutHostedLobbyNestedInput
 }
 
-export type LobbyUncheckedUpdateWithoutHostUserInput = {
+export type LobbyUncheckedUpdateWithoutSeatsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   publicId?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
-  game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  users?: Prisma.UserUncheckedUpdateManyWithoutActiveLobbyNestedInput
-}
-
-export type LobbyUpsertWithoutUsersInput = {
-  update: Prisma.XOR<Prisma.LobbyUpdateWithoutUsersInput, Prisma.LobbyUncheckedUpdateWithoutUsersInput>
-  create: Prisma.XOR<Prisma.LobbyCreateWithoutUsersInput, Prisma.LobbyUncheckedCreateWithoutUsersInput>
-  where?: Prisma.LobbyWhereInput
-}
-
-export type LobbyUpdateToOneWithWhereWithoutUsersInput = {
-  where?: Prisma.LobbyWhereInput
-  data: Prisma.XOR<Prisma.LobbyUpdateWithoutUsersInput, Prisma.LobbyUncheckedUpdateWithoutUsersInput>
-}
-
-export type LobbyUpdateWithoutUsersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  publicId?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
-  game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hostUser?: Prisma.UserUpdateOneRequiredWithoutHostedLobbyNestedInput
-}
-
-export type LobbyUncheckedUpdateWithoutUsersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  publicId?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumLobbyStateFieldUpdateOperationsInput | $Enums.LobbyState
-  hostUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  hostId?: Prisma.StringFieldUpdateOperationsInput | string
   game?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
@@ -467,11 +470,11 @@ export type LobbyUncheckedUpdateWithoutUsersInput = {
  */
 
 export type LobbyCountOutputType = {
-  users: number
+  seats: number
 }
 
 export type LobbyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  users?: boolean | LobbyCountOutputTypeCountUsersArgs
+  seats?: boolean | LobbyCountOutputTypeCountSeatsArgs
 }
 
 /**
@@ -487,8 +490,8 @@ export type LobbyCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
 /**
  * LobbyCountOutputType without action
  */
-export type LobbyCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
+export type LobbyCountOutputTypeCountSeatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LobbySeatWhereInput
 }
 
 
@@ -496,10 +499,10 @@ export type LobbySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   publicId?: boolean
   state?: boolean
-  hostUserId?: boolean
+  hostId?: boolean
   game?: boolean
-  hostUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  users?: boolean | Prisma.Lobby$usersArgs<ExtArgs>
+  host?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  seats?: boolean | Prisma.Lobby$seatsArgs<ExtArgs>
   _count?: boolean | Prisma.LobbyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lobby"]>
 
@@ -507,52 +510,52 @@ export type LobbySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   publicId?: boolean
   state?: boolean
-  hostUserId?: boolean
+  hostId?: boolean
   game?: boolean
-  hostUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  host?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lobby"]>
 
 export type LobbySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   publicId?: boolean
   state?: boolean
-  hostUserId?: boolean
+  hostId?: boolean
   game?: boolean
-  hostUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  host?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lobby"]>
 
 export type LobbySelectScalar = {
   id?: boolean
   publicId?: boolean
   state?: boolean
-  hostUserId?: boolean
+  hostId?: boolean
   game?: boolean
 }
 
-export type LobbyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "publicId" | "state" | "hostUserId" | "game", ExtArgs["result"]["lobby"]>
+export type LobbyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "publicId" | "state" | "hostId" | "game", ExtArgs["result"]["lobby"]>
 export type LobbyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  hostUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  users?: boolean | Prisma.Lobby$usersArgs<ExtArgs>
+  host?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  seats?: boolean | Prisma.Lobby$seatsArgs<ExtArgs>
   _count?: boolean | Prisma.LobbyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LobbyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  hostUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  host?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type LobbyIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  hostUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  host?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $LobbyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Lobby"
   objects: {
-    hostUser: Prisma.$UserPayload<ExtArgs>
-    users: Prisma.$UserPayload<ExtArgs>[]
+    host: Prisma.$UserPayload<ExtArgs>
+    seats: Prisma.$LobbySeatPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     publicId: string
     state: $Enums.LobbyState
-    hostUserId: string
+    hostId: string
     game: runtime.JsonValue | null
   }, ExtArgs["result"]["lobby"]>
   composites: {}
@@ -948,8 +951,8 @@ readonly fields: LobbyFieldRefs;
  */
 export interface Prisma__LobbyClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  hostUser<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  users<T extends Prisma.Lobby$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lobby$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  host<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  seats<T extends Prisma.Lobby$seatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lobby$seatsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LobbySeatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -982,7 +985,7 @@ export interface LobbyFieldRefs {
   readonly id: Prisma.FieldRef<"Lobby", 'String'>
   readonly publicId: Prisma.FieldRef<"Lobby", 'String'>
   readonly state: Prisma.FieldRef<"Lobby", 'LobbyState'>
-  readonly hostUserId: Prisma.FieldRef<"Lobby", 'String'>
+  readonly hostId: Prisma.FieldRef<"Lobby", 'String'>
   readonly game: Prisma.FieldRef<"Lobby", 'Json'>
 }
     
@@ -1383,27 +1386,27 @@ export type LobbyDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * Lobby.users
+ * Lobby.seats
  */
-export type Lobby$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Lobby$seatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the LobbySeat
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.LobbySeatSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the LobbySeat
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.LobbySeatOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
-  cursor?: Prisma.UserWhereUniqueInput
+  include?: Prisma.LobbySeatInclude<ExtArgs> | null
+  where?: Prisma.LobbySeatWhereInput
+  orderBy?: Prisma.LobbySeatOrderByWithRelationInput | Prisma.LobbySeatOrderByWithRelationInput[]
+  cursor?: Prisma.LobbySeatWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  distinct?: Prisma.LobbySeatScalarFieldEnum | Prisma.LobbySeatScalarFieldEnum[]
 }
 
 /**
