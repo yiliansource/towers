@@ -1,4 +1,4 @@
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/util/cn";
 
 export function FormLabel({ className, children, ...props }: React.ComponentPropsWithoutRef<"p">) {
     return (

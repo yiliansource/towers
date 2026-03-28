@@ -2,8 +2,7 @@
 
 import { createContext, useContext, useEffect } from "react";
 
-import { socket } from "@/lib/socket";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@/lib/stores/auth.store";
 
 const SocketContext = createContext(socket);
 

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 import { TowersBanner } from "@/components/towers-banner";
-import { makeMetaTitle } from "@/lib/meta-title";
+import { makeMetaTitle } from "@/lib/util/meta-title";
 
 import { LobbySwitch } from "./lobby-switch";
 

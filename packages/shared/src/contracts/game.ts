@@ -13,7 +13,6 @@ export const GameStateSchema = z.object({
     turn: z.number(),
     activePlayerId: z.string(),
     towers: z.record(z.string(), z.object({})),
-    players: z.record(z.string(), z.object({})),
 });
 
 export type GameState = z.infer<typeof GameStateSchema>;

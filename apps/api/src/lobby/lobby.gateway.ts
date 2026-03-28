@@ -1,46 +1,39 @@
-import { Inject, Logger, NotFoundException, OnModuleDestroy, forwardRef } from "@nestjs/common";
-import {
-    ConnectedSocket,
-    MessageBody,
-    OnGatewayConnection,
-    OnGatewayDisconnect,
-    OnGatewayInit,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer,
-} from "@nestjs/websockets";
+import { Logger, OnModuleDestroy } from "@nestjs/common";
+import { OnGatewayInit, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Subscription } from "rxjs";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 
-import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared/contracts/common";
+import { LobbyClientToServerEvents, LobbyServerToClientEvents } from "@towers/shared/contracts/lobby";
 
+import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import type { AuthSocket } from "@/auth/socket-auth.service";
 import { SocketAuthService } from "@/auth/socket-auth.service";
 
+import { LobbyPresenceService } from "./lobby-presence.service";
 import { LobbyMapper } from "./lobby.mapper";
 import { LobbyNotification, LobbyNotifier } from "./lobby.notifier";
 import { LobbyService } from "./lobby.service";
 
 @WebSocketGateway({
-    cors: {
-        origin: "*",
-        credentials: true,
-    },
+    namespace: "/lobby",
+    cors: { origin: true, credentials: true },
 })
-export class LobbyGateway implements OnGatewayInit, OnModuleDestroy, OnGatewayConnection, OnGatewayDisconnect {
+export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit, OnModuleDestroy {
     private readonly logger = new Logger(LobbyGateway.name);
     private subscription?: Subscription;
 
     @WebSocketServer()
-    server!: Server<ClientToServerEvents, ServerToClientEvents>;
+    server!: Server<LobbyClientToServerEvents, LobbyServerToClientEvents>;
 
     constructor(
-        @Inject(forwardRef(() => LobbyService))
         private readonly lobbyService: LobbyService,
         private readonly lobbyMapper: LobbyMapper,
         private readonly lobbyNotifier: LobbyNotifier,
-        private readonly socketAuthService: SocketAuthService,
-    ) {}
+        private readonly lobbyPresenceService: LobbyPresenceService,
+        socketAuthService: SocketAuthService,
+    ) {
+        super(socketAuthService);
+    }
 
     afterInit(): void {
         this.subscription = this.lobbyNotifier.asObservable().subscribe({
@@ -62,49 +55,36 @@ export class LobbyGateway implements OnGatewayInit, OnModuleDestroy, OnGatewayCo
             if (!lobby) return;
 
             const view = await this.lobbyMapper.toView(lobby);
-            this.server.to(event.lobbyId).emit("lobby:state", view);
+            this.server.to(event.lobbyId).emit("lobby.updated", view);
+        } else if (event.type === "lobby.started") {
+            const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
+            if (!lobby) return;
+
+            this.server.to(event.lobbyId).emit("lobby.game_started");
+        }
+    }
+
+    protected async onAuthenticatedConnection(client: AuthSocket): Promise<void> {
+        const lobby = await this.lobbyService.getLobbyByUser(client.data.user.id);
+        if (!lobby) {
+            client.disconnect();
             return;
         }
+
+        await this.lobbyPresenceService.bindClientToLobby(client, lobby.id);
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
 
-    async handleConnection(socket: AuthSocket) {
-        try {
-            await this.socketAuthService.authenticate(socket);
-        } catch (e) {
-            this.logger.error(e);
-            socket.disconnect();
+    override async handleDisconnect(client: Socket): Promise<void> {
+        const lobbyId = this.lobbyPresenceService.getLobbyIdForSocket(client.id);
+        await this.lobbyPresenceService.unbindClient(client);
+
+        if (lobbyId) {
+            this.lobbyNotifier.emitLobbyUpdate(lobbyId);
         }
     }
 
-    async handleDisconnect(socket: AuthSocket) {
-        await this.socketAuthService.disconnect(socket);
-    }
-
-    @SubscribeMessage("lobby:subscribe")
-    async handleSubscribe(
-        @MessageBody() { publicLobbyId }: { publicLobbyId: string },
-        @ConnectedSocket() socket: AuthSocket,
-    ) {
-        const lobby = await this.lobbyService.getLobbyByPublicId(publicLobbyId);
-        if (!lobby) throw new NotFoundException();
-
-        await socket.join(lobby.id);
-        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
-
-        return { ok: true };
-    }
-
-    @SubscribeMessage("lobby:unsubscribe")
-    async handleUnsubscribe(
-        @MessageBody() { publicLobbyId }: { publicLobbyId: string },
-        @ConnectedSocket() socket: AuthSocket,
-    ) {
-        const lobby = await this.lobbyService.getLobbyByPublicId(publicLobbyId);
-        if (!lobby) throw new NotFoundException();
-
-        await socket.leave(lobby.id);
-        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
-
-        return { ok: true };
+    protected async afterDisconnect(client: AuthSocket): Promise<void> {
+        await this.lobbyPresenceService.unbindClient(client);
     }
 }

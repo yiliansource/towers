@@ -1,37 +1,42 @@
+"use client";
+
 import { Button } from "@radix-ui/themes";
 import { CheckIcon, CopyIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useSocket } from "@/components/socket-provider";
-import { fetchApi } from "@/lib/fetch-api";
-import { useAuthStore } from "@/stores/auth.store";
-import { useLobbyStore } from "@/stores/lobby.store";
+import { useLobbySocket } from "@/lib/hooks/use-lobby-socket";
+import { useAuthStore } from "@/lib/stores/auth.store";
+import { useLobbyStore } from "@/lib/stores/lobby.store";
+import { fetchApi } from "@/lib/util/fetch-api";
 
 import { LobbySeat } from "./lobby-seat";
 
 export function LobbyScreen() {
     const { lobby, setLobby } = useLobbyStore();
+    const { socket, connected, startGame, switchSlot } = useLobbySocket();
     const { user } = useAuthStore();
 
-    const socket = useSocket();
+    const router = useRouter();
 
     const [lobbyIdCopied, setLobbyIdCopied] = useState(false);
 
     useEffect(() => {
         if (!lobby) return;
 
-        socket.emit("lobby:subscribe", { publicLobbyId: lobby.publicId });
         socket.on("lobby:state", (state) => setLobby(state));
         socket.on("lobby:removed", () => {
             setLobby(null);
             console.warn("you have been removed from the lobby.");
+        });
+        socket.on("lobby:start", () => {
+            router.push("/game");
         });
 
         socket.connect();
 
         return () => {
             socket.off("lobby:state");
-            socket.emit("lobby:unsubscribe", { publicLobbyId: lobby.id });
 
             if (socket.connected) socket.disconnect();
         };
@@ -69,13 +74,13 @@ export function LobbyScreen() {
     };
 
     const handleKickUser = async (targetUserId: string) => {
-        await fetchApi("/lobby/current/kick/" + targetUserId, {
+        await fetchApi("/lobby/kick/" + targetUserId, {
             method: "POST",
         });
     };
 
     const handleStartGame = async () => {
-        await fetchApi("/lobby/current/start", {
+        await fetchApi("/lobby/start", {
             method: "POST",
         });
     };
@@ -101,7 +106,7 @@ export function LobbyScreen() {
                     </div>
                 </div>
             </div>
-            <div className="mb-4 flex flex-col lg:flex-row gap-3">
+            <div className="mb-4 flex flex-col md:flex-row gap-3">
                 {lobby.seats.map((s) => (
                     <LobbySeat
                         key={s.slot}

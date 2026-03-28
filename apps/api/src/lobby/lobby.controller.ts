@@ -3,7 +3,6 @@ import {
     Get,
     MethodNotAllowedException,
     NotFoundException,
-    NotImplementedException,
     Param,
     ParseIntPipe,
     Post,
@@ -81,6 +80,15 @@ export class LobbyController {
         if (!lobby) throw new NotFoundException();
         if (lobby.hostId !== user.id) throw new UnauthorizedException();
 
-        throw new NotImplementedException();
+        await this.lobbyService.startGame(lobby.id);
+    }
+
+    @Post("finish")
+    async finishGame(@AuthenticatedUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new NotFoundException();
+        if (lobby.hostId !== user.id) throw new UnauthorizedException();
+
+        await this.lobbyService.finishGame(lobby.id);
     }
 }

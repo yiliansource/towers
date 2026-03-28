@@ -1,4 +1,4 @@
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/util/cn";
 
 export function FormError({ className, children, ...props }: React.ComponentPropsWithoutRef<"p">) {
     return (

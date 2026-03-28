@@ -5,9 +5,9 @@ import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { fetchApi } from "@/lib/fetch-api";
-import { sleep } from "@/lib/sleep";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@/lib/stores/auth.store";
+import { fetchApi } from "@/lib/util/fetch-api";
+import { sleep } from "@/lib/util/sleep";
 
 export function ProfileWidget() {
     const router = useRouter();

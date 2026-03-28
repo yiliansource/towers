@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { UserView } from "@towers/shared/contracts/auth";
 import { LobbyView } from "@towers/shared/contracts/lobby";
 
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/util/cn";
 
 export interface LobbySeatProps {
     slotIndex: number;
@@ -27,6 +27,7 @@ export function LobbySeat({ slotIndex, user, lobby, onClick }: LobbySeatProps) {
             className={cn(
                 "relative shadow py-3 px-3 h-22 w-40 bg-(--gray-2) select-none overflow-hidden",
                 !user && "cursor-pointer",
+                user && !user.connected && "opacity-30 grayscale-75",
             )}
             onClick={onClick}
         >
@@ -54,19 +55,6 @@ export function LobbySeat({ slotIndex, user, lobby, onClick }: LobbySeatProps) {
                     >
                         <CrownIcon className="text-amber-400" />
                     </motion.div>
-                )}
-                {user && (
-                    <motion.div
-                        key="connected"
-                        className={cn(
-                            "absolute top-0 right-0 m-2 size-2 rounded-full z-20 transition-color duration-100",
-                            user?.connected ? "bg-green-500" : "bg-gray-700",
-                        )}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.1 }}
-                    ></motion.div>
                 )}
 
                 {user && (

@@ -2,6 +2,16 @@ import z from "zod";
 
 import { UserView } from "./auth.js";
 
+export interface LobbyServerToClientEvents {
+    "lobby.updated": (payload: LobbyView) => void;
+    "lobby.game_started": () => void;
+}
+
+export interface LobbyClientToServerEvents {
+    "lobby.switch_slot": (payload: { slot: number }) => void;
+    "lobby.start_game": () => void;
+}
+
 export const LobbyErrorCode = {
     LOBBY_NOT_FOUND: "LOBBY_NOT_FOUND",
     LOBBY_FULL: "LOBBY_FULL",

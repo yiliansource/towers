@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { Fruktur, Geist, Geist_Mono } from "next/font/google";
 
 import { ProfileWidget } from "@/components/profile-widget";
-import { cn } from "@/lib/cn";
-import { makeMetaTitle } from "@/lib/meta-title";
+import { cn } from "@/lib/util/cn";
+import { makeMetaTitle } from "@/lib/util/meta-title";
 
 import "./globals.css";
 import { Providers } from "./providers";
