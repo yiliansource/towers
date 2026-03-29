@@ -1,12 +1,12 @@
 import React from "react";
 
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/util/cn";
 
 export function TowersBanner({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
     return (
         <div {...props} className={cn(className, "flex flex-row gap-4 items-center select-none")}>
             <Ornament className="-rotate-90" />
-            <h1 className="leading-none font-fruktur text-[70px] lg:text-[100px]">towers</h1>
+            <h1 className="leading-none font-fruktur text-[70px] md:text-[100px]">towers</h1>
             <Ornament className="rotate-90" />
         </div>
     );
@@ -18,7 +18,7 @@ function Ornament({ className, ...props }: React.ImgHTMLAttributes<HTMLImageElem
             <img
                 {...props}
                 draggable={false}
-                className={cn(className, "w-8 lg:w-10 opacity-40 translate-y-1")}
+                className={cn(className, "w-8 md:w-10 opacity-40 translate-y-1")}
                 src="./ornament.png"
             />
         </div>

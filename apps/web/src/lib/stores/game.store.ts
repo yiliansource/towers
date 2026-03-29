@@ -4,6 +4,8 @@ import { immer } from "zustand/middleware/immer";
 import { GameState } from "@towers/shared/contracts/game";
 import { Axial } from "@towers/shared/hexgrid";
 
+import { fetchApi } from "@/lib/util/fetch-api";
+
 export type GameUiState = {
     hoveredHex: Axial | null;
     selectedHex: Axial | null;
@@ -12,10 +14,12 @@ export type GameUiState = {
 };
 
 export type GameStore = {
-    state: GameState | null;
+    loading: boolean;
+    game: GameState | null;
     ui: GameUiState;
 
-    hydrateGame: (gameId: string) => Promise<void>;
+    hydrateGame: () => Promise<void>;
+    resetGame: () => void;
     connectGameSocket: (gameId: string) => void;
 
     setHoveredHex: (hex: Axial | null) => void;
@@ -28,7 +32,8 @@ export type GameStore = {
 
 export const useGameStore = create<GameStore>()(
     immer((set) => ({
-        state: null,
+        loading: true,
+        game: null,
         ui: {
             selectedHex: null,
             hoveredHex: null,
@@ -36,7 +41,23 @@ export const useGameStore = create<GameStore>()(
             isSubmittingMove: false,
         },
 
-        hydrateGame: async (gameId) => {},
+        hydrateGame: async () => {
+            try {
+                set({ loading: true });
+
+                const res = await fetchApi("/game");
+                if (!res.ok) throw new Error();
+
+                const game = (await res.json()) as GameState;
+                set({ game: game });
+            } catch {
+                set({ game: null });
+            } finally {
+                set({ loading: false });
+            }
+        },
+        resetGame: () => set({ game: null, loading: true }),
+
         connectGameSocket: (gameId) => {},
 
         setHoveredHex: (hex) => {

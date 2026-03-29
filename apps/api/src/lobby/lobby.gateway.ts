@@ -1,9 +1,7 @@
-import { Inject, Logger, NotFoundException, OnModuleDestroy, forwardRef } from "@nestjs/common";
+import { Logger, NotFoundException, OnModuleDestroy, UnauthorizedException } from "@nestjs/common";
 import {
-    ConnectedSocket,
+    Ack,
     MessageBody,
-    OnGatewayConnection,
-    OnGatewayDisconnect,
     OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
@@ -12,35 +10,39 @@ import {
 import { Subscription } from "rxjs";
 import { Server } from "socket.io";
 
-import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared/contracts/common";
+import { LobbyClientToServerEvents, LobbyError, LobbyServerToClientEvents } from "@towers/shared/contracts/lobby";
 
+import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
+import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
 import type { AuthSocket } from "@/auth/socket-auth.service";
 import { SocketAuthService } from "@/auth/socket-auth.service";
+import type { User } from "@/generated/prisma/client";
 
+import { LobbyPresenceService } from "./lobby-presence.service";
 import { LobbyMapper } from "./lobby.mapper";
 import { LobbyNotification, LobbyNotifier } from "./lobby.notifier";
 import { LobbyService } from "./lobby.service";
 
 @WebSocketGateway({
-    cors: {
-        origin: "*",
-        credentials: true,
-    },
+    namespace: "/lobby",
+    cors: { origin: true, credentials: true },
 })
-export class LobbyGateway implements OnGatewayInit, OnModuleDestroy, OnGatewayConnection, OnGatewayDisconnect {
+export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit, OnModuleDestroy {
     private readonly logger = new Logger(LobbyGateway.name);
     private subscription?: Subscription;
 
     @WebSocketServer()
-    server!: Server<ClientToServerEvents, ServerToClientEvents>;
+    server!: Server<LobbyClientToServerEvents, LobbyServerToClientEvents>;
 
     constructor(
-        @Inject(forwardRef(() => LobbyService))
         private readonly lobbyService: LobbyService,
         private readonly lobbyMapper: LobbyMapper,
         private readonly lobbyNotifier: LobbyNotifier,
-        private readonly socketAuthService: SocketAuthService,
-    ) {}
+        private readonly lobbyPresenceService: LobbyPresenceService,
+        socketAuthService: SocketAuthService,
+    ) {
+        super(socketAuthService);
+    }
 
     afterInit(): void {
         this.subscription = this.lobbyNotifier.asObservable().subscribe({
@@ -62,49 +64,58 @@ export class LobbyGateway implements OnGatewayInit, OnModuleDestroy, OnGatewayCo
             if (!lobby) return;
 
             const view = await this.lobbyMapper.toView(lobby);
-            this.server.to(event.lobbyId).emit("lobby:state", view);
+            this.server.to(event.lobbyId).emit("lobby.updated", view);
+        } else if (event.type === "lobby.started") {
+            const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
+            if (!lobby) return;
+
+            this.server.to(event.lobbyId).emit("lobby.game_started");
+        }
+    }
+
+    override async onAuthenticatedConnect(client: AuthSocket): Promise<void> {
+        const lobby = await this.lobbyService.getLobbyByUser(client.data.user.id);
+        if (!lobby) {
+            client.disconnect();
             return;
         }
-    }
 
-    async handleConnection(socket: AuthSocket) {
-        try {
-            await this.socketAuthService.authenticate(socket);
-        } catch (e) {
-            this.logger.error(e);
-            socket.disconnect();
+        await this.lobbyPresenceService.bindClientToLobby(client, lobby.id);
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
+    }
+    override async onAuthenticatedDisconnect(client: AuthSocket): Promise<void> {
+        const lobbyId = this.lobbyPresenceService.getLobbyIdForSocket(client.id);
+        await this.lobbyPresenceService.unbindClient(client);
+
+        if (lobbyId) {
+            this.lobbyNotifier.emitLobbyUpdate(lobbyId);
         }
     }
 
-    async handleDisconnect(socket: AuthSocket) {
-        await this.socketAuthService.disconnect(socket);
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.leave")
+    async handleLobbyLeave(@AuthenticatedSocketUser() user: User, @Ack() ack: () => void): Promise<void> {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        await this.lobbyService.leaveLobby(user.id);
+
+        ack();
     }
 
-    @SubscribeMessage("lobby:subscribe")
-    async handleSubscribe(
-        @MessageBody() { publicLobbyId }: { publicLobbyId: string },
-        @ConnectedSocket() socket: AuthSocket,
-    ) {
-        const lobby = await this.lobbyService.getLobbyByPublicId(publicLobbyId);
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.switch_slot")
+    async handleLobbySwitchSlot(@MessageBody("slot") slot: number, @AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new NotFoundException();
 
-        await socket.join(lobby.id);
-        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
-
-        return { ok: true };
+        await this.lobbyService.changeSlot(lobby.id, user.id, slot);
     }
 
-    @SubscribeMessage("lobby:unsubscribe")
-    async handleUnsubscribe(
-        @MessageBody() { publicLobbyId }: { publicLobbyId: string },
-        @ConnectedSocket() socket: AuthSocket,
-    ) {
-        const lobby = await this.lobbyService.getLobbyByPublicId(publicLobbyId);
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.start_game")
+    async handleLobbyStart(@AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new NotFoundException();
+        if (lobby.hostId !== user.id) throw new UnauthorizedException();
 
-        await socket.leave(lobby.id);
-        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
-
-        return { ok: true };
+        await this.lobbyService.startGame(lobby.id);
     }
 }

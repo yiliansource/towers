@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import { makeMetaTitle } from "@/lib/meta-title";
+import { makeMetaTitle } from "@/lib/util/meta-title";
 
 import { RegisterForm } from "./register-form";
 

@@ -1,20 +1,25 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { parse } from "cookie";
-import { Server, Socket } from "socket.io";
+import { EventsMap } from "node_modules/socket.io/dist/typed-events";
+import { DefaultEventsMap, Server, Socket } from "socket.io";
 
-import { ClientToServerEvents, ServerToClientEvents } from "@towers/shared/contracts/common";
-
-import { User } from "@/generated/prisma/client";
 import { UserService } from "@/user/user.service";
 
 import { AuthService } from "./auth.service";
+import { AuthSocketData } from "./auth.types";
 
-export type AuthSocketData = {
-    user: User;
-};
-
-export type AuthServer = Server<ClientToServerEvents, ServerToClientEvents, object, AuthSocketData>;
-export type AuthSocket = Socket<ClientToServerEvents, ServerToClientEvents, object, AuthSocketData>;
+export type AuthServer<CTS extends EventsMap = DefaultEventsMap, STC extends EventsMap = DefaultEventsMap> = Server<
+    CTS,
+    STC,
+    object,
+    AuthSocketData
+>;
+export type AuthSocket<CTS extends EventsMap = DefaultEventsMap, STC extends EventsMap = DefaultEventsMap> = Socket<
+    CTS,
+    STC,
+    object,
+    AuthSocketData
+>;
 
 @Injectable()
 export class SocketAuthService {
@@ -23,7 +28,7 @@ export class SocketAuthService {
         private readonly userService: UserService,
     ) {}
 
-    async authenticate(socket: AuthSocket) {
+    async authenticate(socket: Socket) {
         const cookieHeader = socket.handshake.headers.cookie;
         if (!cookieHeader) {
             throw new UnauthorizedException("Missing cookie header");
@@ -36,10 +41,6 @@ export class SocketAuthService {
         }
 
         const user = await this.authService.verifyToken(token);
-
-        socket.data.user = user;
-        await this.userService.registerSocket(user.id, socket.id);
-
         return user;
     }
     async disconnect(socket: AuthSocket) {

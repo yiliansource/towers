@@ -1,53 +1,30 @@
+"use client";
+
 import { Button } from "@radix-ui/themes";
 import { CheckIcon, CopyIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useSocket } from "@/components/socket-provider";
-import { fetchApi } from "@/lib/fetch-api";
-import { useAuthStore } from "@/stores/auth.store";
-import { useLobbyStore } from "@/stores/lobby.store";
+import { useLobbySocket } from "@/lib/hooks/use-lobby-socket";
+import { useAuthStore } from "@/lib/stores/auth.store";
+import { useLobbyStore } from "@/lib/stores/lobby.store";
+import { fetchApi } from "@/lib/util/fetch-api";
 
 import { LobbySeat } from "./lobby-seat";
 
 export function LobbyScreen() {
     const { lobby, setLobby } = useLobbyStore();
+    const { socket, connected, ...socketActions } = useLobbySocket();
     const { user } = useAuthStore();
 
-    const socket = useSocket();
+    const router = useRouter();
 
     const [lobbyIdCopied, setLobbyIdCopied] = useState(false);
-
-    useEffect(() => {
-        if (!lobby) return;
-
-        socket.emit("lobby:subscribe", { publicLobbyId: lobby.publicId });
-        socket.on("lobby:state", (state) => setLobby(state));
-        socket.on("lobby:removed", () => {
-            setLobby(null);
-            console.warn("you have been removed from the lobby.");
-        });
-
-        socket.connect();
-
-        return () => {
-            socket.off("lobby:state");
-            socket.emit("lobby:unsubscribe", { publicLobbyId: lobby.id });
-
-            if (socket.connected) socket.disconnect();
-        };
-    }, [lobby?.id]);
 
     if (!lobby) return null;
     if (!user) return null;
 
     const isHostUser = lobby.host.id === user.id;
-
-    const handleLeave = async () => {
-        const res = await fetchApi("/lobby/leave", { method: "POST" });
-        if (!res.ok) return;
-
-        setLobby(null);
-    };
 
     const handleCopyLobbyIdClick = async () => {
         try {
@@ -60,24 +37,16 @@ export function LobbyScreen() {
         }
     };
 
-    const handleSlotSwitch = async (slot: number) => {
+    const handleLeave = () => {
+        socketActions.leaveLobby();
+    };
+    const handleSlotSwitch = (slot: number) => {
         if (!!lobby.seats.find((s) => s.slot === slot)!.user) return;
-
-        await fetchApi("/lobby/switch-slot/" + slot, {
-            method: "POST",
-        });
+        socketActions.switchSlot(slot);
     };
-
-    const handleKickUser = async (targetUserId: string) => {
-        await fetchApi("/lobby/current/kick/" + targetUserId, {
-            method: "POST",
-        });
-    };
-
-    const handleStartGame = async () => {
-        await fetchApi("/lobby/current/start", {
-            method: "POST",
-        });
+    const handleKickUser = (targetUserId: string) => {};
+    const handleStartGame = () => {
+        socketActions.startGame();
     };
 
     return (
@@ -101,7 +70,7 @@ export function LobbyScreen() {
                     </div>
                 </div>
             </div>
-            <div className="mb-4 flex flex-col lg:flex-row gap-3">
+            <div className="mb-4 flex flex-col md:flex-row gap-3">
                 {lobby.seats.map((s) => (
                     <LobbySeat
                         key={s.slot}
@@ -124,9 +93,9 @@ export function LobbyScreen() {
                 </Button>
             </div>
 
-            {/* <pre className="text-sm">
+            <pre className="text-sm">
                 <code>{JSON.stringify(lobby, null, 2)}</code>
-            </pre> */}
+            </pre>
         </div>
     );
 }

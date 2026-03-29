@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export interface GameServerToClientEvents {
+    "game.finished": () => void;
+}
+
+export interface GameClientToServerEvents {
+    "game.finish": () => void;
+}
+
 export const GamePhase = {
     SETUP: "SETUP",
     PLAYING: "PLAYING",
@@ -13,7 +21,6 @@ export const GameStateSchema = z.object({
     turn: z.number(),
     activePlayerId: z.string(),
     towers: z.record(z.string(), z.object({})),
-    players: z.record(z.string(), z.object({})),
 });
 
 export type GameState = z.infer<typeof GameStateSchema>;

@@ -1,4 +1,6 @@
 import { Injectable, NotImplementedException } from "@nestjs/common";
+import { InputJsonValue } from "@prisma/client/runtime/client";
+import { randomUUID } from "crypto";
 
 import { GameState } from "@towers/shared/contracts/game";
 import { LobbyError } from "@towers/shared/contracts/lobby";
@@ -115,7 +117,7 @@ export class LobbyService {
             data: { userId: user.id },
         });
 
-        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
 
         return (await this.getLobbyById(lobby.id))!;
     }
@@ -144,7 +146,7 @@ export class LobbyService {
             data: { userId: null },
         });
 
-        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
 
     async kickPlayer(lobbyId: string, targetUserId: string): Promise<void> {
@@ -172,17 +174,46 @@ export class LobbyService {
             data: { userId },
         });
 
-        this.lobbyNotifier.notify({ type: "lobby.updated", lobbyId: lobby.id });
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
 
-    async startGame(): Promise<void> {
-        throw new NotImplementedException();
+    async startGame(lobbyId: string): Promise<void> {
+        const lobby = await this.getLobbyById(lobbyId);
+        if (!lobby) throw new LobbyError("LOBBY_NOT_FOUND");
+        if (lobby.state === "INGAME") throw new LobbyError("LOBBY_ALREADY_STARTED");
+
+        await this.prisma.lobby.update({
+            where: { id: lobbyId },
+            data: { state: "INGAME" },
+        });
+        await this.updateGameState(lobbyId, {
+            turn: 0,
+            phase: "SETUP",
+            activePlayerId: lobby.seats.find((s) => !!s.userId)!.userId!,
+            gameId: randomUUID(),
+            towers: {},
+        });
+
+        this.lobbyNotifier.notify({ type: "lobby.started", lobbyId: lobby.id });
     }
-    async finishGame(): Promise<void> {
-        throw new NotImplementedException();
+    async finishGame(lobbyId: string): Promise<void> {
+        const lobby = await this.getLobbyById(lobbyId);
+        if (!lobby) throw new LobbyError("LOBBY_NOT_FOUND");
+        if (lobby.state !== "INGAME") throw new Error();
+
+        await this.prisma.lobby.update({
+            where: { id: lobbyId },
+            data: { state: "WAITING" },
+        });
+        await this.updateGameState(lobbyId, null);
     }
 
-    async updateGameState(lobbyId: string, game: GameState): Promise<void> {}
+    async updateGameState(lobbyId: string, game: GameState | null): Promise<void> {
+        await this.prisma.lobby.update({
+            where: { id: lobbyId },
+            data: { game: game as InputJsonValue },
+        });
+    }
 
     private async generatePublicLobbyId(): Promise<string> {
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

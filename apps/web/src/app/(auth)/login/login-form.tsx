@@ -11,8 +11,8 @@ import { LoginInput, LoginInputSchema, UserView } from "@towers/shared/contracts
 
 import { FormError } from "@/components/forms/FormError";
 import { FormLabel } from "@/components/forms/FormLabel";
-import { fetchApi } from "@/lib/fetch-api";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@/lib/stores/auth.store";
+import { fetchApi } from "@/lib/util/fetch-api";
 
 export function LoginForm() {
     const {

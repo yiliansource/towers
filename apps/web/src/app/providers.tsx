@@ -2,17 +2,14 @@
 
 import { useEffect } from "react";
 
-import { SocketProvider } from "@/components/socket-provider";
-import { hydrateAuth } from "@/lib/hydrate-auth";
+import { useAuthStore } from "@/lib/stores/auth.store";
 
 export function Providers({ children }: { children: React.ReactNode }) {
+    const hydrateAuth = useAuthStore((s) => s.hydrateAuth);
+
     useEffect(() => {
         void hydrateAuth();
     }, []);
 
-    return (
-        <>
-            <SocketProvider>{children}</SocketProvider>
-        </>
-    );
+    return <>{children}</>;
 }

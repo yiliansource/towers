@@ -1,16 +1,6 @@
-import {
-    Controller,
-    Get,
-    MethodNotAllowedException,
-    NotFoundException,
-    NotImplementedException,
-    Param,
-    ParseIntPipe,
-    Post,
-    UnauthorizedException,
-} from "@nestjs/common";
+import { Controller, Get, NotFoundException, Param, Post } from "@nestjs/common";
 
-import { LobbyError, LobbyView } from "@towers/shared/contracts/lobby";
+import { LobbyView } from "@towers/shared/contracts/lobby";
 
 import { AuthenticatedUser } from "@/auth/authenticated-user.decorator";
 import type { User } from "@/generated/prisma/client";
@@ -50,37 +40,29 @@ export class LobbyController {
         return await this.lobbyMapper.toView(lobby);
     }
 
-    @Post("leave")
-    async leaveLobby(@AuthenticatedUser() user: User) {
-        const lobby = await this.lobbyService.getLobbyByUser(user.id);
-        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+    // @Post("leave")
+    // async leaveLobby(@AuthenticatedUser() user: User) {
+    //     const lobby = await this.lobbyService.getLobbyByUser(user.id);
+    //     if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 
-        await this.lobbyService.leaveLobby(user.id);
-    }
+    //     await this.lobbyService.leaveLobby(user.id);
+    // }
 
-    @Post("kick/:userId")
-    async kickUserFromLobby(@Param("userId") targetUserId: string, @AuthenticatedUser() user: User) {
-        const lobby = await this.lobbyService.getLobbyByUser(user.id);
-        if (!lobby) throw new NotFoundException();
-        if (lobby.hostId !== user.id) throw new MethodNotAllowedException();
+    // @Post("kick/:userId")
+    // async kickUserFromLobby(@Param("userId") targetUserId: string, @AuthenticatedUser() user: User) {
+    //     const lobby = await this.lobbyService.getLobbyByUser(user.id);
+    //     if (!lobby) throw new NotFoundException();
+    //     if (lobby.hostId !== user.id) throw new MethodNotAllowedException();
 
-        await this.lobbyService.kickPlayer(lobby.id, targetUserId);
-    }
+    //     await this.lobbyService.kickPlayer(lobby.id, targetUserId);
+    // }
 
-    @Post("switch-slot/:slot")
-    async switchSlot(@Param("slot", ParseIntPipe) slot: number, @AuthenticatedUser() user: User) {
-        const lobby = await this.lobbyService.getLobbyByUser(user.id);
-        if (!lobby) throw new NotFoundException();
+    // @Post("finish")
+    // async finishGame(@AuthenticatedUser() user: User) {
+    //     const lobby = await this.lobbyService.getLobbyByUser(user.id);
+    //     if (!lobby) throw new NotFoundException();
+    //     if (lobby.hostId !== user.id) throw new UnauthorizedException();
 
-        await this.lobbyService.changeSlot(lobby.id, user.id, slot);
-    }
-
-    @Post("start")
-    async startGame(@AuthenticatedUser() user: User) {
-        const lobby = await this.lobbyService.getLobbyByUser(user.id);
-        if (!lobby) throw new NotFoundException();
-        if (lobby.hostId !== user.id) throw new UnauthorizedException();
-
-        throw new NotImplementedException();
-    }
+    //     await this.lobbyService.finishGame(lobby.id);
+    // }
 }
