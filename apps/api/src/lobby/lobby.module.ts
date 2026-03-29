@@ -15,6 +15,6 @@ import { LobbyService } from "./lobby.service";
     imports: [AuthModule, PrismaModule, forwardRef(() => UserModule)],
     controllers: [LobbyController],
     providers: [LobbyService, LobbyGateway, LobbyMapper, LobbyNotifier, LobbyPresenceService],
-    exports: [LobbyService, LobbyMapper],
+    exports: [LobbyService, LobbyMapper, LobbyPresenceService],
 })
 export class LobbyModule {}

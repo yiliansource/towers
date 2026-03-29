@@ -1,15 +1,13 @@
 import { Button } from "@radix-ui/themes";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
 
-import { useSocket } from "@/components/socket-provider";
+import { useGameSocket } from "@/lib/hooks/use-game-socket";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { useGameStore } from "@/lib/stores/game.store";
 import { useLobbyStore } from "@/lib/stores/lobby.store";
-import { fetchApi } from "@/lib/util/fetch-api";
 
 import { HexBoard } from "./hex-board";
 
@@ -18,38 +16,20 @@ export function GameScene() {
     const { user } = useAuthStore();
     const { game } = useGameStore();
 
-    const router = useRouter();
-    const socket = useSocket();
+    const { socket, connected, finishGame } = useGameSocket();
 
-    useEffect(() => {
-        if (!lobby) return;
-        if (!game) return;
+    const towers = useGameStore((s) => s.game?.towers);
+    const tileKeys = useMemo(() => Object.keys(towers ?? {}), [towers]);
 
-        socket.on("lobby:finish", () => {
-            router.push("/lobby");
-        });
-
-        socket.connect();
-
-        return () => {
-            socket.off("lobby:finish");
-
-            if (socket.connected) socket.disconnect();
-        };
-    }, [lobby?.id, game?.gameId]);
+    const handleFinishGame = async () => {
+        void finishGame();
+    };
 
     if (!lobby) return null;
     if (!user) return null;
     if (!game) return null;
 
     const isHostUser = lobby.host.id === user.id;
-
-    const towers = useGameStore((s) => s.game!.towers);
-    const tileKeys = useMemo(() => Object.keys(towers ?? {}), [towers]);
-
-    const finishGame = async () => {
-        fetchApi("/lobby/finish", { method: "POST" });
-    };
 
     return (
         <>
@@ -58,7 +38,7 @@ export function GameScene() {
                 <SceneCamera />
                 <HexBoard tileKeys={tileKeys} />
             </Canvas>
-            <Button disabled={!isHostUser} onClick={finishGame}>
+            <Button disabled={!isHostUser} onClick={handleFinishGame}>
                 Finish game
             </Button>
         </>

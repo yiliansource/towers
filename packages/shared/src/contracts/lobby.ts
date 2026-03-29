@@ -8,6 +8,8 @@ export interface LobbyServerToClientEvents {
 }
 
 export interface LobbyClientToServerEvents {
+    "lobby.leave": () => void;
+    "lobby.message": (payload: { message: string }) => void;
     "lobby.switch_slot": (payload: { slot: number }) => void;
     "lobby.start_game": () => void;
 }

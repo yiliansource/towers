@@ -19,6 +19,7 @@ export type GameStore = {
     ui: GameUiState;
 
     hydrateGame: () => Promise<void>;
+    resetGame: () => void;
     connectGameSocket: (gameId: string) => void;
 
     setHoveredHex: (hex: Axial | null) => void;
@@ -55,6 +56,8 @@ export const useGameStore = create<GameStore>()(
                 set({ loading: false });
             }
         },
+        resetGame: () => set({ game: null, loading: true }),
+
         connectGameSocket: (gameId) => {},
 
         setHoveredHex: (hex) => {

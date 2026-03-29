@@ -14,45 +14,17 @@ import { LobbySeat } from "./lobby-seat";
 
 export function LobbyScreen() {
     const { lobby, setLobby } = useLobbyStore();
-    const { socket, connected, startGame, switchSlot } = useLobbySocket();
+    const { socket, connected, ...socketActions } = useLobbySocket();
     const { user } = useAuthStore();
 
     const router = useRouter();
 
     const [lobbyIdCopied, setLobbyIdCopied] = useState(false);
 
-    useEffect(() => {
-        if (!lobby) return;
-
-        socket.on("lobby:state", (state) => setLobby(state));
-        socket.on("lobby:removed", () => {
-            setLobby(null);
-            console.warn("you have been removed from the lobby.");
-        });
-        socket.on("lobby:start", () => {
-            router.push("/game");
-        });
-
-        socket.connect();
-
-        return () => {
-            socket.off("lobby:state");
-
-            if (socket.connected) socket.disconnect();
-        };
-    }, [lobby?.id]);
-
     if (!lobby) return null;
     if (!user) return null;
 
     const isHostUser = lobby.host.id === user.id;
-
-    const handleLeave = async () => {
-        const res = await fetchApi("/lobby/leave", { method: "POST" });
-        if (!res.ok) return;
-
-        setLobby(null);
-    };
 
     const handleCopyLobbyIdClick = async () => {
         try {
@@ -65,24 +37,16 @@ export function LobbyScreen() {
         }
     };
 
-    const handleSlotSwitch = async (slot: number) => {
+    const handleLeave = () => {
+        socketActions.leaveLobby();
+    };
+    const handleSlotSwitch = (slot: number) => {
         if (!!lobby.seats.find((s) => s.slot === slot)!.user) return;
-
-        await fetchApi("/lobby/switch-slot/" + slot, {
-            method: "POST",
-        });
+        socketActions.switchSlot(slot);
     };
-
-    const handleKickUser = async (targetUserId: string) => {
-        await fetchApi("/lobby/kick/" + targetUserId, {
-            method: "POST",
-        });
-    };
-
-    const handleStartGame = async () => {
-        await fetchApi("/lobby/start", {
-            method: "POST",
-        });
+    const handleKickUser = (targetUserId: string) => {};
+    const handleStartGame = () => {
+        socketActions.startGame();
     };
 
     return (
@@ -129,9 +93,9 @@ export function LobbyScreen() {
                 </Button>
             </div>
 
-            {/* <pre className="text-sm">
+            <pre className="text-sm">
                 <code>{JSON.stringify(lobby, null, 2)}</code>
-            </pre> */}
+            </pre>
         </div>
     );
 }

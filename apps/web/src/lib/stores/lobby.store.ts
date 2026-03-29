@@ -11,6 +11,7 @@ type LobbyState = {
     lobby: LobbyView | null;
 
     setLobby: (lobby: LobbyView | null) => void;
+    resetLobby: () => void;
     hydrateLobby: () => Promise<void>;
 };
 
@@ -19,6 +20,7 @@ export const useLobbyStore = create<LobbyState>()((set) => ({
     lobby: null,
 
     setLobby: (lobby) => set({ lobby }),
+    resetLobby: () => set({ lobby: null, loading: true }),
     hydrateLobby: async () => {
         try {
             set({ loading: true });

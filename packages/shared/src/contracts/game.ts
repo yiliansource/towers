@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export interface GameServerToClientEvents {
+    "game.finished": () => void;
+}
+
+export interface GameClientToServerEvents {
+    "game.finish": () => void;
+}
+
 export const GamePhase = {
     SETUP: "SETUP",
     PLAYING: "PLAYING",

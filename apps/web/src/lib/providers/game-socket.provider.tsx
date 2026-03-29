@@ -3,25 +3,25 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { PropsWithChildren } from "react";
 
-import { type LobbySocket, createLobbySocket } from "@/lib/socket/lobby-socket";
+import { type GameSocket, createGameSocket } from "@/lib/socket/game-socket";
 
 import { createLogger } from "../util/logger";
 
-type LobbySocketContextValue = {
-    socket: LobbySocket | null;
+type GameSocketContextValue = {
+    socket: GameSocket | null;
     connected: boolean;
 };
 
-const logger = createLogger("lobby-socket-provider");
+const GameSocketContext = createContext<GameSocketContextValue | null>(null);
 
-const LobbySocketContext = createContext<LobbySocketContextValue | null>(null);
+const logger = createLogger("game-socket-provider");
 
-export function LobbySocketProvider({ children }: PropsWithChildren) {
-    const [socket, setSocket] = useState<LobbySocket | null>(null);
+export function GameSocketProvider({ children }: PropsWithChildren) {
+    const [socket, setSocket] = useState<GameSocket | null>(null);
     const [connected, setConnected] = useState(false);
 
     useEffect(() => {
-        const nextSocket = createLobbySocket();
+        const nextSocket = createGameSocket();
 
         const onConnect = () => {
             logger.log("connected");
@@ -50,13 +50,13 @@ export function LobbySocketProvider({ children }: PropsWithChildren) {
 
     const value = useMemo(() => ({ socket, connected }), [socket, connected]);
 
-    return <LobbySocketContext.Provider value={value}>{children}</LobbySocketContext.Provider>;
+    return <GameSocketContext.Provider value={value}>{children}</GameSocketContext.Provider>;
 }
 
-export function useLobbySocketContext(): LobbySocketContextValue {
-    const value = useContext(LobbySocketContext);
+export function useGameSocketContext(): GameSocketContextValue {
+    const value = useContext(GameSocketContext);
     if (!value) {
-        throw new Error("useLobbySocketContext must be used within LobbySocketProvider");
+        throw new Error("useGameSocketContext must be used within GameSocketProvider");
     }
     return value;
 }

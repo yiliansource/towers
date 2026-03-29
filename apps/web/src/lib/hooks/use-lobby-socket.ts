@@ -13,6 +13,7 @@ export function useLobbySocket() {
     const router = useRouter();
 
     const setLobby = useLobbyStore((s) => s.setLobby);
+    const resetLobby = useLobbyStore((s) => s.resetLobby);
 
     useEffect(() => {
         if (!socket) return;
@@ -20,22 +21,29 @@ export function useLobbySocket() {
         const onLobbyUpdated = (payload: LobbyView) => {
             setLobby(payload);
         };
-        const onGameStarted = () => {
+        const onLobbyStarted = async () => {
+            resetLobby();
             router.push("/game");
         };
 
         socket.on("lobby.updated", onLobbyUpdated);
-        socket.on("lobby.game_started", onGameStarted);
+        socket.on("lobby.game_started", onLobbyStarted);
 
         return () => {
             socket.off("lobby.updated", onLobbyUpdated);
-            socket.off("lobby.game_started", onGameStarted);
+            socket.off("lobby.game_started", onLobbyStarted);
         };
     }, [socket, setLobby, router]);
 
     return {
         socket,
         connected,
+
+        leaveLobby: async () => {
+            await socket?.emitWithAck("lobby.leave");
+            setLobby(null);
+        },
+        messageLobby: (message: string) => socket?.emit("lobby.message", { message }),
         switchSlot: (slot: number) => socket?.emit("lobby.switch_slot", { slot }),
         startGame: () => socket?.emit("lobby.start_game"),
     };

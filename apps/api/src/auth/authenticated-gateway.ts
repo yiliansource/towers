@@ -1,9 +1,9 @@
-import { OnGatewayConnection } from "@nestjs/websockets";
+import { OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket } from "socket.io";
 
 import { AuthSocket, SocketAuthService } from "./socket-auth.service";
 
-export abstract class AuthenticatedGateway implements OnGatewayConnection {
+export abstract class AuthenticatedGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(private readonly socketAuthService: SocketAuthService) {}
 
     async handleConnection(client: Socket): Promise<void> {
@@ -12,10 +12,14 @@ export abstract class AuthenticatedGateway implements OnGatewayConnection {
         const authClient = client as AuthSocket;
         authClient.data.user = user;
 
-        await this.onAuthenticatedConnection(authClient);
+        await this.onAuthenticatedConnect(authClient);
+    }
+    async handleDisconnect(client: Socket): Promise<void> {
+        if ("user" in client.data) {
+            await this.onAuthenticatedDisconnect(client as AuthSocket);
+        }
     }
 
-    protected abstract onAuthenticatedConnection(client: AuthSocket): Promise<void>;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async handleDisconnect(client: Socket): Promise<void> {}
+    protected abstract onAuthenticatedConnect(client: AuthSocket): Promise<void>;
+    protected abstract onAuthenticatedDisconnect(client: AuthSocket): Promise<void>;
 }

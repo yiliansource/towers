@@ -1,13 +1,22 @@
-import { Logger, OnModuleDestroy } from "@nestjs/common";
-import { OnGatewayInit, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { Logger, NotFoundException, OnModuleDestroy, UnauthorizedException } from "@nestjs/common";
+import {
+    Ack,
+    MessageBody,
+    OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from "@nestjs/websockets";
 import { Subscription } from "rxjs";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 
-import { LobbyClientToServerEvents, LobbyServerToClientEvents } from "@towers/shared/contracts/lobby";
+import { LobbyClientToServerEvents, LobbyError, LobbyServerToClientEvents } from "@towers/shared/contracts/lobby";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
+import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
 import type { AuthSocket } from "@/auth/socket-auth.service";
 import { SocketAuthService } from "@/auth/socket-auth.service";
+import type { User } from "@/generated/prisma/client";
 
 import { LobbyPresenceService } from "./lobby-presence.service";
 import { LobbyMapper } from "./lobby.mapper";
@@ -64,7 +73,7 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
         }
     }
 
-    protected async onAuthenticatedConnection(client: AuthSocket): Promise<void> {
+    override async onAuthenticatedConnect(client: AuthSocket): Promise<void> {
         const lobby = await this.lobbyService.getLobbyByUser(client.data.user.id);
         if (!lobby) {
             client.disconnect();
@@ -74,8 +83,7 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
         await this.lobbyPresenceService.bindClientToLobby(client, lobby.id);
         this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
-
-    override async handleDisconnect(client: Socket): Promise<void> {
+    override async onAuthenticatedDisconnect(client: AuthSocket): Promise<void> {
         const lobbyId = this.lobbyPresenceService.getLobbyIdForSocket(client.id);
         await this.lobbyPresenceService.unbindClient(client);
 
@@ -84,7 +92,30 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
         }
     }
 
-    protected async afterDisconnect(client: AuthSocket): Promise<void> {
-        await this.lobbyPresenceService.unbindClient(client);
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.leave")
+    async handleLobbyLeave(@AuthenticatedSocketUser() user: User, @Ack() ack: () => void): Promise<void> {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        await this.lobbyService.leaveLobby(user.id);
+
+        ack();
+    }
+
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.switch_slot")
+    async handleLobbySwitchSlot(@MessageBody("slot") slot: number, @AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new NotFoundException();
+
+        await this.lobbyService.changeSlot(lobby.id, user.id, slot);
+    }
+
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.start_game")
+    async handleLobbyStart(@AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new NotFoundException();
+        if (lobby.hostId !== user.id) throw new UnauthorizedException();
+
+        await this.lobbyService.startGame(lobby.id);
     }
 }
