@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 
 import { AuthSocket } from "@/auth/socket-auth.service";
+import { UserService } from "@/user/user.service";
 
 type LobbyPresenceEntry = {
     socketId: string;
@@ -11,6 +12,8 @@ type LobbyPresenceEntry = {
 
 @Injectable()
 export class LobbyPresenceService {
+    constructor(private readonly userService: UserService) {}
+
     private readonly logger = new Logger(LobbyPresenceService.name);
 
     private readonly bySocketId = new Map<string, LobbyPresenceEntry>();
@@ -31,6 +34,8 @@ export class LobbyPresenceService {
         this.bySocketId.set(client.id, entry);
         this.socketIdByUserId.set(userId, client.id);
 
+        await this.userService.registerSocket(userId, client.id);
+
         await client.join(lobbyId);
     }
 
@@ -42,6 +47,8 @@ export class LobbyPresenceService {
 
         this.bySocketId.delete(socketId);
         this.socketIdByUserId.delete(entry.userId);
+
+        await this.userService.clearSocket(entry.userId);
 
         await client.leave(entry.lobbyId);
     }

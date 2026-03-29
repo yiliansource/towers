@@ -16,7 +16,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  socketId String? @unique
+  socketId String?
 
   hostedLobby Lobby?     @relation("HostedLobby")
   lobbySeat   LobbySeat?

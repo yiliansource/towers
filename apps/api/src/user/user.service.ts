@@ -19,7 +19,7 @@ export class UserService {
         return await this.prisma.user.findUnique({ where: { username } });
     }
     async getUserBySocket(socketId: string): Promise<User | null> {
-        return await this.prisma.user.findUnique({ where: { socketId } });
+        return await this.prisma.user.findFirst({ where: { socketId } });
     }
 
     async registerSocket(userId: string, socketId: string): Promise<void> {
@@ -28,12 +28,9 @@ export class UserService {
             data: { socketId },
         });
     }
-    async clearSocket(socketId: string): Promise<void> {
-        const user = await this.getUserBySocket(socketId);
-        if (!user) return;
-
+    async clearSocket(userId: string): Promise<void> {
         await this.prisma.user.update({
-            where: { id: user.id },
+            where: { id: userId },
             data: { socketId: null },
         });
     }

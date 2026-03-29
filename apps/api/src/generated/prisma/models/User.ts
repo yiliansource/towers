@@ -208,16 +208,16 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   username?: string
-  socketId?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   passwordHash?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  socketId?: Prisma.StringNullableFilter<"User"> | string | null
   hostedLobby?: Prisma.XOR<Prisma.LobbyNullableScalarRelationFilter, Prisma.LobbyWhereInput> | null
   lobbySeat?: Prisma.XOR<Prisma.LobbySeatNullableScalarRelationFilter, Prisma.LobbySeatWhereInput> | null
-}, "id" | "username" | "socketId">
+}, "id" | "username">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
