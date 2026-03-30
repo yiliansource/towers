@@ -5,6 +5,7 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { TowersBanner } from "@/components/towers-banner";
 import { useLobbySocket } from "@/lib/hooks/use-lobby-socket";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { useLobbyStore } from "@/lib/stores/lobby.store";
@@ -50,52 +51,51 @@ export function LobbyScreen() {
     };
 
     return (
-        <div className="w-full flex flex-col justify-stretch">
-            <div className="mb-2 flex flex-row justify-between">
-                <div className="flex flex-col items-start">
-                    <p className="text-sm text-(--gray-8)">Status</p>
-                    <p>Waiting for players...</p>
-                </div>
-                <div className="flex flex-col items-end">
-                    <p className="text-sm text-(--gray-8)">Lobby ID</p>
-                    <div className="flex flex-row gap-1 items-center">
-                        <span>{lobby.publicId} </span>
-                        <span onClick={handleCopyLobbyIdClick} className="cursor-pointer">
-                            {lobbyIdCopied ? (
-                                <CheckIcon className="size-4 text-green-400" />
-                            ) : (
-                                <CopyIcon className="size-4 opacity-40 hover:opacity-70" />
-                            )}
-                        </span>
+        <div className="m-auto flex flex-col items-center">
+            <TowersBanner className="mb-10" />
+            <div className="w-full flex flex-col justify-stretch">
+                <div className="mb-2 flex flex-row justify-between">
+                    <div className="flex flex-col items-start">
+                        <p className="text-sm text-(--gray-8)">Status</p>
+                        <p>Waiting for players...</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <p className="text-sm text-(--gray-8)">Lobby ID</p>
+                        <div className="flex flex-row gap-1 items-center">
+                            <span>{lobby.publicId} </span>
+                            <span onClick={handleCopyLobbyIdClick} className="cursor-pointer">
+                                {lobbyIdCopied ? (
+                                    <CheckIcon className="size-4 text-green-400" />
+                                ) : (
+                                    <CopyIcon className="size-4 opacity-40 hover:opacity-70" />
+                                )}
+                            </span>
+                        </div>
                     </div>
                 </div>
+                <div className="mb-4 flex flex-col md:flex-row gap-3">
+                    {lobby.seats.map((s) => (
+                        <LobbySeat
+                            key={s.slot}
+                            slotIndex={s.slot}
+                            user={s.user}
+                            lobby={lobby}
+                            onClick={() => handleSlotSwitch(s.slot)}
+                        />
+                    ))}
+                </div>
+                <div className="flex flex-row items-center justify-end gap-2">
+                    <Button variant="outline" onClick={handleLeave}>
+                        Leave
+                    </Button>
+                    <Button
+                        disabled={!isHostUser || lobby.seats.filter((s) => !!s.user).length < 2}
+                        onClick={handleStartGame}
+                    >
+                        Start Game
+                    </Button>
+                </div>
             </div>
-            <div className="mb-4 flex flex-col md:flex-row gap-3">
-                {lobby.seats.map((s) => (
-                    <LobbySeat
-                        key={s.slot}
-                        slotIndex={s.slot}
-                        user={s.user}
-                        lobby={lobby}
-                        onClick={() => handleSlotSwitch(s.slot)}
-                    />
-                ))}
-            </div>
-            <div className="flex flex-row items-center justify-end gap-2">
-                <Button variant="outline" onClick={handleLeave}>
-                    Leave
-                </Button>
-                <Button
-                    disabled={!isHostUser || lobby.seats.filter((s) => !!s.user).length < 2}
-                    onClick={handleStartGame}
-                >
-                    Start Game
-                </Button>
-            </div>
-
-            <pre className="text-sm">
-                <code>{JSON.stringify(lobby, null, 2)}</code>
-            </pre>
         </div>
     );
 }

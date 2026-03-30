@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 
 import { GameState } from "@towers/shared/contracts/game";
 import { LobbyError } from "@towers/shared/contracts/lobby";
+import { axial, stringifyAxial } from "@towers/shared/hexgrid";
 
 import { Lobby, Prisma } from "@/generated/prisma/client";
 import { PrismaService } from "@/prisma/prisma.service";
@@ -191,7 +192,9 @@ export class LobbyService {
             phase: "SETUP",
             activePlayerId: lobby.seats.find((s) => !!s.userId)!.userId!,
             gameId: randomUUID(),
-            towers: {},
+            towers: [axial(0, 0), axial(3, -3), axial(0, -3), axial(-3, 0), axial(-3, 3), axial(0, 3), axial(3, 0)].map(
+                stringifyAxial,
+            ),
         });
 
         this.lobbyNotifier.notify({ type: "lobby.started", lobbyId: lobby.id });

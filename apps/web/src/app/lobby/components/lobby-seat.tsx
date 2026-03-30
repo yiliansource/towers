@@ -25,7 +25,7 @@ export function LobbySeat({ slotIndex, user, lobby, onClick }: LobbySeatProps) {
     return (
         <div
             className={cn(
-                "relative shadow py-3 px-3 h-22 w-40 bg-(--gray-2) select-none overflow-hidden",
+                "relative shadow py-3 px-3 h-22 w-full lg:w-40 bg-(--gray-2) select-none overflow-hidden",
                 !user && "cursor-pointer",
                 user && !user.connected && "opacity-30 grayscale-75",
             )}
@@ -56,17 +56,16 @@ export function LobbySeat({ slotIndex, user, lobby, onClick }: LobbySeatProps) {
                         <CrownIcon className="text-amber-400" />
                     </motion.div>
                 )}
-
                 {user && (
                     <motion.div
                         key="background"
                         className={cn(
-                            "absolute size-50 rotate-45 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden pointer-events-none",
+                            "absolute size-75 lg:size-50 rotate-45 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden pointer-events-none",
                             slotColors[slotIndex][1],
                         )}
-                        initial={{ x: -200 }}
+                        initial={{ x: -300 }}
                         animate={{ x: 0 }}
-                        exit={{ x: 200 }}
+                        exit={{ x: 300 }}
                         transition={{
                             duration: 0.2,
                             ease: "easeInOut",

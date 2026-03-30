@@ -20,7 +20,7 @@ export const GameStateSchema = z.object({
     phase: z.enum(GamePhase),
     turn: z.number(),
     activePlayerId: z.string(),
-    towers: z.record(z.string(), z.object({})),
+    towers: z.array(z.string()),
 });
 
 export type GameState = z.infer<typeof GameStateSchema>;

@@ -47,3 +47,12 @@ export function axialDirection(dir: HexDirection): Axial {
 export function axialNeighbor(hex: Axial, dir: HexDirection): Axial {
     return addAxial(hex, axialDirection(dir));
 }
+
+export function stringifyAxial(axial: Axial): string {
+    return axial.q + "," + axial.r;
+}
+
+export function parseAxial(s: string): Axial {
+    const [q, r] = s.split(",").map(Number);
+    return axial(q, r);
+}

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function GamePage() {
     return (
-        <div className="m-auto flex flex-col items-center">
+        <div className="mt-4 mb-4 grow flex">
             <GameSwitch />
         </div>
     );
