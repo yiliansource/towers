@@ -37,7 +37,9 @@ export function GameSwitch() {
     }, [lobbyLoading, gameLoading, lobby, game]);
 
     return lobbyLoading || gameLoading ? (
-        <Spinner />
+        <div className="m-auto">
+            <Spinner />
+        </div>
     ) : (
         <GameSocketProvider>
             <GameScene />

@@ -8,6 +8,19 @@ export interface GameClientToServerEvents {
     "game.finish": () => void;
 }
 
+export const GamePlayerSchema = z.object({
+    id: z.string(),
+    username: z.string(),
+    points: z.number(),
+});
+export type GamePlayer = z.infer<typeof GamePlayerSchema>;
+
+export const GameContextSchema = z.object({
+    turn: z.number(),
+    currentPlayerId: z.string(),
+});
+export type GameContext = z.infer<typeof GameContextSchema>;
+
 export const GamePhase = {
     SETUP: "SETUP",
     PLAYING: "PLAYING",
@@ -16,11 +29,8 @@ export const GamePhase = {
 export type GamePhase = (typeof GamePhase)[keyof typeof GamePhase];
 
 export const GameStateSchema = z.object({
-    gameId: z.string(),
-    phase: z.enum(GamePhase),
-    turn: z.number(),
-    activePlayerId: z.string(),
+    ctx: GameContextSchema,
     towers: z.array(z.string()),
+    players: z.array(GamePlayerSchema),
 });
-
 export type GameState = z.infer<typeof GameStateSchema>;

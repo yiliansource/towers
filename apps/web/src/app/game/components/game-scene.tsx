@@ -1,16 +1,8 @@
 import { Button } from "@radix-ui/themes";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useThree } from "@react-three/fiber";
-import { useMemo } from "react";
-import { useEffect } from "react";
-import * as THREE from "three";
-
-import { UserViewSchema } from "@towers/shared/contracts/auth";
-import { LobbySeatView } from "@towers/shared/contracts/lobby";
 
 import { DebugJson } from "@/components/debug-json";
-import { TowersBanner } from "@/components/towers-banner";
+import { DevOnly } from "@/components/dev-only";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { useGameStore } from "@/lib/stores/game.store";
@@ -48,7 +40,7 @@ export function GameScene() {
                         .filter((s) => !!s.user)
                         .map((s) => (
                             <div key={s.slot}>
-                                <p className={cn(game.activePlayerId === s.user!.id && "font-bold")}>
+                                <p className={cn(game.ctx.currentPlayerId === s.user!.id && "font-bold")}>
                                     {s.user!.username}
                                 </p>
                             </div>
@@ -61,7 +53,9 @@ export function GameScene() {
                             Finish game
                         </Button>
                     </div>
-                    {/* <DebugJson object={game} /> */}
+                    <DevOnly>
+                        <DebugJson object={game} />
+                    </DevOnly>
                 </div>
             </div>
 

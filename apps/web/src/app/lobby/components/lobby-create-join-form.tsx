@@ -7,6 +7,7 @@ import { JoinLobbyInput, JoinLobbySchema, LobbyView } from "@towers/shared/contr
 
 import { FormError } from "@/components/forms/FormError";
 import { FormLabel } from "@/components/forms/FormLabel";
+import { TowersBanner } from "@/components/towers-banner";
 import { useLobbyStore } from "@/lib/stores/lobby.store";
 import { fetchApi } from "@/lib/util/fetch-api";
 
@@ -55,27 +56,30 @@ export function LobbyCreateJoinForm() {
     };
 
     return (
-        <div className="w-full flex flex-col md:flex-row items-start md:items-center">
-            <div>
-                <p className="mb-2">Create a new lobby.</p>
-                <Button onClick={onCreateSubmit} disabled={isSubmitting}>
-                    {isSubmitting ? <Spinner /> : <span>Create Lobby</span>}
-                </Button>
-            </div>
-            <div className="mx-4 md:mx-14 my-8 md:my-4 self-stretch">
-                <div className="h-px w-full md:w-px md:h-full bg-(--gray-7)"></div>
-            </div>
-            <form onSubmit={handleSubmit(onJoinSubmit)}>
-                <p className="mb-2">Join an existing lobby.</p>
-                <div className="mb-4">
-                    <FormLabel>Lobby ID</FormLabel>
-                    <TextField.Root {...register("lobbyId")} autoComplete="off" placeholder="ABCD" />
-                    <FormError className="mt-1">{errors.lobbyId?.message}</FormError>
+        <div className="m-auto flex flex-col items-center">
+            <TowersBanner className="mb-10" />
+            <div className="w-full flex flex-col md:flex-row items-start md:items-center">
+                <div>
+                    <p className="mb-2">Create a new lobby.</p>
+                    <Button onClick={onCreateSubmit} disabled={isSubmitting}>
+                        {isSubmitting ? <Spinner /> : <span>Create Lobby</span>}
+                    </Button>
                 </div>
-                <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? <Spinner /> : <span>Join Lobby</span>}
-                </Button>
-            </form>
+                <div className="mx-4 md:mx-14 my-8 md:my-4 self-stretch">
+                    <div className="h-px w-full md:w-px md:h-full bg-(--gray-7)"></div>
+                </div>
+                <form onSubmit={handleSubmit(onJoinSubmit)}>
+                    <p className="mb-2">Join an existing lobby.</p>
+                    <div className="mb-4">
+                        <FormLabel>Lobby ID</FormLabel>
+                        <TextField.Root {...register("lobbyId")} autoComplete="off" placeholder="ABCD" />
+                        <FormError className="mt-1">{errors.lobbyId?.message}</FormError>
+                    </div>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? <Spinner /> : <span>Join Lobby</span>}
+                    </Button>
+                </form>
+            </div>
         </div>
     );
 }

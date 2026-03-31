@@ -188,13 +188,20 @@ export class LobbyService {
             data: { state: "INGAME" },
         });
         await this.updateGameState(lobbyId, {
-            turn: 0,
-            phase: "SETUP",
-            activePlayerId: lobby.seats.find((s) => !!s.userId)!.userId!,
-            gameId: randomUUID(),
+            ctx: {
+                currentPlayerId: lobby.seats.find((s) => !!s.userId)!.userId!,
+                turn: 0,
+            },
             towers: [axial(0, 0), axial(3, -3), axial(0, -3), axial(-3, 0), axial(-3, 3), axial(0, 3), axial(3, 0)].map(
                 stringifyAxial,
             ),
+            players: lobby.seats
+                .filter((s) => !!s.userId)
+                .map((s) => ({
+                    id: s.user!.id,
+                    points: 0,
+                    username: s.user!.username,
+                })),
         });
 
         this.lobbyNotifier.notify({ type: "lobby.started", lobbyId: lobby.id });

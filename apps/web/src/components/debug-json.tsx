@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { cn } from "@/lib/util/cn";
 
 export interface DebugJsonProps extends React.HTMLAttributes<HTMLElement> {

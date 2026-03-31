@@ -5,6 +5,8 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { DebugJson } from "@/components/debug-json";
+import { DevOnly } from "@/components/dev-only";
 import { TowersBanner } from "@/components/towers-banner";
 import { useLobbySocket } from "@/lib/hooks/use-lobby-socket";
 import { useAuthStore } from "@/lib/stores/auth.store";
@@ -94,6 +96,9 @@ export function LobbyScreen() {
                     >
                         Start Game
                     </Button>
+                    <DevOnly>
+                        <DebugJson object={lobby} />
+                    </DevOnly>
                 </div>
             </div>
         </div>

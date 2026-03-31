@@ -4,7 +4,7 @@
     "private": true,
     "type": "commonjs",
     "scripts": {
-        "build": "nest build -p tsconfig.build.json",
+        "build": "nest build -p tsconfig.build.json && echo 'API build complete.'",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "dev": "nest start --watch",
         "start": "nest start",
