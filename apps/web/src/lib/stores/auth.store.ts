@@ -24,7 +24,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
             set({ loading: true });
 
             const res = await fetchApi("/auth/me");
-            if (!res.ok) throw new Error();
+            if (!res.ok) {
+                if (res.status === 401) {
+                    await fetchApi("/auth/logout", { method: "POST" });
+                    return;
+                }
+
+                throw new Error();
+            }
 
             const user = (await res.json()) as UserView;
             set({ user });

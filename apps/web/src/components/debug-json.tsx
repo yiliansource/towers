@@ -12,7 +12,7 @@ export function DebugJson({ className, object, ...props }: DebugJsonProps) {
             {...props}
             className={cn(
                 className,
-                "max-w-full overflow-auto whitespace-pre",
+                "block w-full max-w-full min-w-0 overflow-x-auto whitespace-pre",
                 "border border-(--gray-3) text-(--gray-11) p-2 text-sm",
             )}
         >

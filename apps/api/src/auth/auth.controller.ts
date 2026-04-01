@@ -48,6 +48,7 @@ export class AuthController {
     }
 
     @Post("logout")
+    @NoAuth()
     logout(@Res({ passthrough: true }) res: Response) {
         this.clearAccessTokenCookie(res);
         return { ok: true };

@@ -53,9 +53,9 @@ export function LobbyScreen() {
     };
 
     return (
-        <div className="m-auto flex flex-col items-center">
+        <div className="m-auto py-12 flex flex-col items-center">
             <TowersBanner className="mb-10" />
-            <div className="w-full flex flex-col justify-stretch">
+            <div className="min-w-0 flex flex-col justify-stretch">
                 <div className="mb-2 flex flex-row justify-between">
                     <div className="flex flex-col items-start">
                         <p className="text-sm text-(--gray-8)">Status</p>
@@ -96,8 +96,11 @@ export function LobbyScreen() {
                     >
                         Start Game
                     </Button>
+                </div>
+
+                <div className="">
                     <DevOnly>
-                        <DebugJson object={lobby} />
+                        <DebugJson className="w-full mt-4" object={lobby} />
                     </DevOnly>
                 </div>
             </div>

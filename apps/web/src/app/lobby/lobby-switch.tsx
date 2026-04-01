@@ -30,7 +30,9 @@ export function LobbySwitch() {
     }, [lobby, lobby?.state]);
 
     return loading ? (
-        <Spinner />
+        <div className="m-auto">
+            <Spinner />
+        </div>
     ) : !lobby ? (
         <LobbyCreateJoinForm />
     ) : (
