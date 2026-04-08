@@ -261,18 +261,27 @@ function Knight({ playerId }: { playerId: string }) {
     if (!lobby) throw new Error();
 
     const color = ["#00c950", "#fb2c36", "#2b7fff", "#ad46ff"][lobby.seats.findIndex((s) => s.user?.id === playerId)];
-
+    const height = 0.8;
     return (
-        <Cylinder position={[0, 0.25, 0]} args={[0.25, 0.35, 1.2]} receiveShadow castShadow>
+        <Cylinder position={[0, height / 2, 0]} args={[0.25, 0.35, height]} receiveShadow castShadow>
             <meshStandardMaterial color={color} />
         </Cylinder>
     );
 }
 
 function King() {
+    const height = 1.2;
     return (
-        <Cylinder position={[0, 0.25, 0]} args={[0.3, 0.4, 1.4]} receiveShadow castShadow>
-            <meshStandardMaterial color="white" />
-        </Cylinder>
+        <group>
+            <Cylinder position={[0, height / 2, 0]} args={[0.3, 0.4, height]} receiveShadow castShadow>
+                <meshStandardMaterial color="white" />
+            </Cylinder>
+            <Box position={[0, 1.5, 0]} args={[0.5, 0.15, 0.15]}>
+                <meshStandardMaterial color="white" />
+            </Box>
+            <Box position={[0, 1.45, 0]} args={[0.15, 0.5, 0.15]}>
+                <meshStandardMaterial color="white" />
+            </Box>
+        </group>
     );
 }

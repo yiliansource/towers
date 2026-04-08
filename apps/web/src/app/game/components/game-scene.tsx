@@ -46,7 +46,7 @@ export function GameScene() {
 
 function SceneLights() {
     const dir = new THREE.Vector3(0, 0, 1).setLength(10);
-    dir.applyEuler(new THREE.Euler(-45 * (Math.PI / 180), -45 * (Math.PI / 180), 0));
+    dir.applyEuler(new THREE.Euler(-40 * (Math.PI / 180), -40 * (Math.PI / 180), 0));
 
     return (
         <>

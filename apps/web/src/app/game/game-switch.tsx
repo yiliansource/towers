@@ -39,17 +39,13 @@ export function GameSwitch() {
         }
     }, [lobbyLoading, gameLoading, lobby, game]);
 
-    if ((windowsize.width ?? 0) < 1024) {
-        return (
-            <div className="m-auto">
-                <p>Small screens are not supported yet. Sorry!</p>
-            </div>
-        );
-    }
-
     return lobbyLoading || gameLoading ? (
         <div className="m-auto">
             <Spinner />
+        </div>
+    ) : (windowsize.width ?? 0) < 1024 ? (
+        <div className="m-auto">
+            <p>Small screens are not supported yet. Sorry!</p>
         </div>
     ) : (
         <GameSocketProvider>
