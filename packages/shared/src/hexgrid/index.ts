@@ -9,6 +9,7 @@ export * from "./coords/convert.js";
 export * from "./coords/cube.js";
 
 export * from "./layout/hexToPixel.js";
-// export * from "./layout/pixelToHex";
+export * from "./layout/pixelToHex.js";
 
 export * from "./math/range.js";
+export * from "./math/ring.js";

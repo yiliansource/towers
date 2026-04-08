@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { parse } from "cookie";
-import { EventsMap } from "node_modules/socket.io/dist/typed-events";
 import { DefaultEventsMap, Server, Socket } from "socket.io";
 
 import { UserService } from "@/user/user.service";
@@ -8,18 +7,14 @@ import { UserService } from "@/user/user.service";
 import { AuthService } from "./auth.service";
 import { AuthSocketData } from "./auth.types";
 
-export type AuthServer<CTS extends EventsMap = DefaultEventsMap, STC extends EventsMap = DefaultEventsMap> = Server<
-    CTS,
-    STC,
-    object,
-    AuthSocketData
->;
-export type AuthSocket<CTS extends EventsMap = DefaultEventsMap, STC extends EventsMap = DefaultEventsMap> = Socket<
-    CTS,
-    STC,
-    object,
-    AuthSocketData
->;
+export type AuthServer<
+    CTS extends Record<string, any> = DefaultEventsMap,
+    STC extends Record<string, any> = DefaultEventsMap,
+> = Server<CTS, STC, object, AuthSocketData>;
+export type AuthSocket<
+    CTS extends Record<string, any> = DefaultEventsMap,
+    STC extends Record<string, any> = DefaultEventsMap,
+> = Socket<CTS, STC, object, AuthSocketData>;
 
 @Injectable()
 export class SocketAuthService {

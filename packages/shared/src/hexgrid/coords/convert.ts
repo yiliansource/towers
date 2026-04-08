@@ -3,7 +3,7 @@ import { axial } from "./axial.js";
 import { cube } from "./cube.js";
 
 export function cubeToAxial(cube: Cube) {
-    return axial(cube.x, cube.y);
+    return axial(cube.q, cube.r);
 }
 
 export function axialToCube(hex: Axial) {

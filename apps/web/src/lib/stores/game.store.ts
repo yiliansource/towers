@@ -6,11 +6,11 @@ import { Axial } from "@towers/shared/hexgrid";
 
 import { fetchApi } from "@/lib/util/fetch-api";
 
+import { sleep } from "../util/sleep";
+
 export type GameUiState = {
     hoveredHex: Axial | null;
     selectedHex: Axial | null;
-    selectedUnitId: string | null;
-    isSubmittingMove: boolean;
 };
 
 export type GameStore = {
@@ -37,14 +37,13 @@ export const useGameStore = create<GameStore>()(
         ui: {
             selectedHex: null,
             hoveredHex: null,
-            selectedUnitId: null,
-            isSubmittingMove: false,
         },
 
         hydrateGame: async () => {
             try {
                 set({ loading: true });
 
+                await sleep(200);
                 const res = await fetchApi("/game");
                 if (!res.ok) throw new Error();
 
@@ -78,6 +77,10 @@ export const useGameStore = create<GameStore>()(
         },
 
         submitMove: async () => {},
-        applySnapshot: (snapshot) => {},
+        applySnapshot: (snapshot) => {
+            set((state) => {
+                state.game = snapshot;
+            });
+        },
     })),
 );

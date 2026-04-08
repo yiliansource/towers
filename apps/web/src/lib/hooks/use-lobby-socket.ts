@@ -43,8 +43,8 @@ export function useLobbySocket() {
             await socket?.emitWithAck("lobby.leave");
             setLobby(null);
         },
-        messageLobby: (message: string) => socket?.emit("lobby.message", { message }),
-        switchSlot: (slot: number) => socket?.emit("lobby.switch_slot", { slot }),
-        startGame: () => socket?.emit("lobby.start_game"),
+        messageLobby: (message: string) => socket?.timeout(5000).emit("lobby.message", { message }),
+        switchSlot: (slot: number) => socket?.timeout(5000).emit("lobby.switch_slot", { slot }),
+        startGame: () => socket?.timeout(5000).emit("lobby.start_game"),
     };
 }

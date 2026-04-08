@@ -8,7 +8,7 @@ export function SceneCamera() {
     const controlsRef = useRef<OrbitControlsImpl>(null);
     const { gl } = useThree();
 
-    const cameraPosition = useMemo(() => new THREE.Vector3(-1, 4, -5).setLength(16), []);
+    const defaultCameraPosition = useMemo(() => new THREE.Vector3(0, 5, 5).setLength(16), []);
 
     useEffect(() => {
         const el = gl.domElement;
@@ -114,7 +114,7 @@ export function SceneCamera() {
 
     return (
         <>
-            <PerspectiveCamera makeDefault position={cameraPosition} />
+            <PerspectiveCamera makeDefault position={defaultCameraPosition} />
             <OrbitControls
                 ref={controlsRef}
                 makeDefault

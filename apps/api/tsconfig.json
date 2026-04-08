@@ -21,7 +21,6 @@
         "strictBindCallApply": false,
         "noFallthroughCasesInSwitch": false,
         "outDir": "./dist",
-        "baseUrl": "./",
         "rootDir": "./src",
         "paths": {
             "@/*": ["./src/*"]
@@ -30,5 +29,10 @@
         "preserveWatchOutput": true
     },
     "include": ["src/**/*.ts"],
-    "exclude": ["dist", "node_modules", "test", "**/*.spec.ts"]
+    "exclude": ["dist", "node_modules", "test", "**/*.spec.ts"],
+    "references": [
+        {
+            "path": "../../packages/shared/tsconfig.json"
+        }
+    ]
 }

@@ -1,5 +1,8 @@
 import type { Axial, HexDirection } from "../types.js";
+import { axialToCube, cubeToAxial } from "./convert.js";
+import { cubeRound } from "./cube.js";
 
+export const AXIAL_ZERO: Axial = { q: 0, r: 0 } as const;
 export const AXIAL_DIRECTIONS: readonly Axial[] = [
     { q: 1, r: 0 },
     { q: 1, r: -1 },
@@ -46,6 +49,10 @@ export function axialDirection(dir: HexDirection): Axial {
 
 export function axialNeighbor(hex: Axial, dir: HexDirection): Axial {
     return addAxial(hex, axialDirection(dir));
+}
+
+export function axialRound(f: Axial): Axial {
+    return cubeToAxial(cubeRound(axialToCube(f)));
 }
 
 export function stringifyAxial(axial: Axial): string {

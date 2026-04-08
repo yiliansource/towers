@@ -3,9 +3,9 @@ export type Axial = Readonly<{
     r: number;
 }>;
 export type Cube = Readonly<{
-    x: number;
-    y: number;
-    z: number;
+    q: number;
+    r: number;
+    s: number;
 }>;
 
 export type HexCoord = Axial;

@@ -12,6 +12,7 @@ import type { AuthSocket } from "@/auth/socket-auth.service";
 import { SocketAuthService } from "@/auth/socket-auth.service";
 import type { User } from "@/generated/prisma/client";
 import { LobbyPresenceService } from "@/lobby/lobby-presence.service";
+import { LobbyNotification, LobbyNotifier } from "@/lobby/lobby.notifier";
 import { LobbyService } from "@/lobby/lobby.service";
 
 import { GameNotification, GameNotifier } from "./game.notifier";
@@ -23,12 +24,14 @@ import { GameService } from "./game.service";
 })
 export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, OnModuleDestroy {
     private readonly logger = new Logger(GameGateway.name);
-    private subscription?: Subscription;
+    private gameNotifierSub?: Subscription;
+    private lobbyNotifierSub?: Subscription;
 
     @WebSocketServer()
     server!: Server<GameClientToServerEvents, GameServerToClientEvents>;
 
     constructor(
+        private readonly lobbyNotifier: LobbyNotifier,
         private readonly lobbyService: LobbyService,
         private readonly gameService: GameService,
         private readonly lobbyPresenceService: LobbyPresenceService,
@@ -39,30 +42,41 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
     }
 
     afterInit(): void {
-        this.subscription = this.gameNotifier.asObservable().subscribe({
+        this.gameNotifierSub = this.gameNotifier.asObservable().subscribe({
             next: (event) => {
                 void this.handleGameNotification(event).catch((error: unknown) => {
                     this.logger.error(error);
                 });
             },
         });
+        this.lobbyNotifierSub = this.lobbyNotifier.asObservable().subscribe({
+            next: (event) => {
+                void this.handleLobbyNotification(event).catch((error: unknown) => {
+                    this.logger.error(error);
+                });
+            },
+        });
     }
     onModuleDestroy(): void {
-        this.subscription?.unsubscribe();
+        this.gameNotifierSub?.unsubscribe();
     }
 
     private async handleGameNotification(event: GameNotification): Promise<void> {
         if (event.type === "game.updated") {
-            const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
-            if (!lobby) return;
+            const game = await this.gameService.getGameByLobby(event.lobbyId);
+            if (!game) return;
 
-            // const view = await this.lobbyMapper.toView(lobby);
-            // this.server.to(event.lobbyId).emit("game.updated", {});
+            this.server.to(event.lobbyId).emit("game.updated", game);
         } else if (event.type === "game.finished") {
             const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
             if (!lobby) return;
 
             this.server.to(event.lobbyId).emit("game.finished");
+        }
+    }
+    private async handleLobbyNotification(event: LobbyNotification): Promise<void> {
+        if (event.type === "lobby.game_started") {
+            await this.gameService.initializeGame(event.lobbyId);
         }
     }
 
@@ -82,11 +96,13 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
         // if (lobbyId) {}
     }
 
-    @SubscribeMessage<keyof GameClientToServerEvents>("game.finish")
-    async handleLobbyLeave(@AuthenticatedSocketUser() user: User): Promise<void> {
+    @SubscribeMessage<keyof GameClientToServerEvents>("game.perform_action")
+    async handleLobbyLeave(@AuthenticatedSocketUser() user: User) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 
-        await this.gameService.finishGame(lobby.id);
+        await this.gameService.endPlayerTurn(lobby.id);
+
+        return { ok: true };
     }
 }

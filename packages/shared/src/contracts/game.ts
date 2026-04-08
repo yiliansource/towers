@@ -1,11 +1,22 @@
 import { z } from "zod";
 
+import { AxialSchema } from "./hex.js";
+
+export const GamePhase = {
+    SETUP: "SETUP",
+    PLAYING: "PLAYING",
+    FINISHED: "FINISHED",
+} as const;
+export type GamePhase = (typeof GamePhase)[keyof typeof GamePhase];
+
 export interface GameServerToClientEvents {
     "game.finished": () => void;
+    "game.updated": (snapshot: GameState) => void;
 }
 
 export interface GameClientToServerEvents {
-    "game.finish": () => void;
+    "game.perform_action": (payload: GamePerformActionPayload) => boolean;
+    "game.message": (payload: string) => void;
 }
 
 export const GamePlayerSchema = z.object({
@@ -17,20 +28,32 @@ export type GamePlayer = z.infer<typeof GamePlayerSchema>;
 
 export const GameContextSchema = z.object({
     turn: z.number(),
+    phase: z.enum(GamePhase),
     currentPlayerId: z.string(),
+    totalPlayers: z.number(),
+    playOrder: z.array(z.string()),
+    playOrderPos: z.int(),
 });
 export type GameContext = z.infer<typeof GameContextSchema>;
 
-export const GamePhase = {
-    SETUP: "SETUP",
-    PLAYING: "PLAYING",
-    FINISHED: "FINISHED",
-} as const;
-export type GamePhase = (typeof GamePhase)[keyof typeof GamePhase];
-
 export const GameStateSchema = z.object({
     ctx: GameContextSchema,
-    towers: z.array(z.string()),
+    towers: z.array(AxialSchema),
+    units: z.record(z.string(), z.array(AxialSchema)),
     players: z.array(GamePlayerSchema),
 });
 export type GameState = z.infer<typeof GameStateSchema>;
+
+export const GamePerformActionPayloadSchema = z.discriminatedUnion("type", [
+    z.object({
+        type: z.literal("none"),
+    }),
+    z.object({
+        type: z.literal("endTurn"),
+    }),
+    z.object({
+        type: z.literal("placeUnit"),
+        pos: AxialSchema,
+    }),
+]);
+export type GamePerformActionPayload = z.infer<typeof GamePerformActionPayloadSchema>;

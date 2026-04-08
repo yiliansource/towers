@@ -4001,6 +4001,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.0.1"
     eslint-plugin-prettier: "npm:^5.2.2"
     globals: "npm:^16.0.0"
+    immer: "npm:^11.1.4"
     jest: "npm:^30.0.0"
     passport: "npm:^0.7.0"
     passport-jwt: "npm:^4.0.1"

@@ -65,7 +65,7 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
 
             const view = await this.lobbyMapper.toView(lobby);
             this.server.to(event.lobbyId).emit("lobby.updated", view);
-        } else if (event.type === "lobby.started") {
+        } else if (event.type === "lobby.game_started") {
             const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
             if (!lobby) return;
 

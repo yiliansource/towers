@@ -1,10 +1,6 @@
 import { Injectable, NotImplementedException } from "@nestjs/common";
-import { InputJsonValue } from "@prisma/client/runtime/client";
-import { randomUUID } from "crypto";
 
-import { GameState } from "@towers/shared/contracts/game";
 import { LobbyError } from "@towers/shared/contracts/lobby";
-import { axial, stringifyAxial } from "@towers/shared/hexgrid";
 
 import { Lobby, Prisma } from "@/generated/prisma/client";
 import { PrismaService } from "@/prisma/prisma.service";
@@ -150,9 +146,11 @@ export class LobbyService {
         this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
 
+    // eslint-disable-next-line
     async kickPlayer(lobbyId: string, targetUserId: string): Promise<void> {
         throw new NotImplementedException();
     }
+    // eslint-disable-next-line
     async changeHost(lobbyId: string, newHostUserId: string): Promise<void> {
         throw new NotImplementedException();
     }
@@ -187,43 +185,21 @@ export class LobbyService {
             where: { id: lobbyId },
             data: { state: "INGAME" },
         });
-        await this.updateGameState(lobbyId, {
-            ctx: {
-                currentPlayerId: lobby.seats.find((s) => !!s.userId)!.userId!,
-                turn: 0,
-            },
-            towers: [axial(0, 0), axial(3, -3), axial(0, -3), axial(-3, 0), axial(-3, 3), axial(0, 3), axial(3, 0)].map(
-                stringifyAxial,
-            ),
-            players: lobby.seats
-                .filter((s) => !!s.userId)
-                .map((s) => ({
-                    id: s.user!.id,
-                    points: 0,
-                    username: s.user!.username,
-                })),
-        });
 
-        this.lobbyNotifier.notify({ type: "lobby.started", lobbyId: lobby.id });
+        this.lobbyNotifier.notify({ type: "lobby.game_started", lobbyId: lobby.id });
     }
-    async finishGame(lobbyId: string): Promise<void> {
-        const lobby = await this.getLobbyById(lobbyId);
-        if (!lobby) throw new LobbyError("LOBBY_NOT_FOUND");
-        if (lobby.state !== "INGAME") throw new Error();
+    // async finishGame(lobbyId: string): Promise<void> {
+    //     const lobby = await this.getLobbyById(lobbyId);
+    //     if (!lobby) throw new LobbyError("LOBBY_NOT_FOUND");
+    //     if (lobby.state !== "INGAME") throw new Error();
 
-        await this.prisma.lobby.update({
-            where: { id: lobbyId },
-            data: { state: "WAITING" },
-        });
-        await this.updateGameState(lobbyId, null);
-    }
+    //     await this.prisma.lobby.update({
+    //         where: { id: lobbyId },
+    //         data: { state: "WAITING" },
+    //     });
 
-    async updateGameState(lobbyId: string, game: GameState | null): Promise<void> {
-        await this.prisma.lobby.update({
-            where: { id: lobbyId },
-            data: { game: game as InputJsonValue },
-        });
-    }
+    //     this.lobbyNotifier.notify({ type: "lobby.game_ended" });
+    // }
 
     private async generatePublicLobbyId(): Promise<string> {
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
