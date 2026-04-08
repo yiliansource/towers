@@ -11,9 +11,10 @@
         "dev:shared": "yarn workspace @towers/shared dev",
         "dev:web": "yarn workspace @towers/web dev",
         "dev:api": "yarn workspace @towers/api dev",
-        "build": "yarn workspaces foreach -Apvi --topological run build",
-        "lint": "yarn workspaces foreach -Apvi run lint",
-        "typecheck": "yarn workspaces foreach -Apvi run typecheck",
+        "build": "yarn build:shared && concurrently \"yarn build:api\" \"yarn build:web\" -n \"api,web\" -c \"blue,green\"",
+        "build:shared": "yarn workspace @towers/shared build",
+        "build:web": "yarn workspace @towers/web build",
+        "build:api": "yarn workspace @towers/api build",
         "format": "prettier --write ."
     },
     "devDependencies": {

@@ -4,8 +4,10 @@
         "composite": true,
         "rootDir": "./src",
         "outDir": "./dist",
-        "noEmit": false,
         "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "noEmit": false,
         "module": "nodenext",
         "moduleResolution": "nodenext"
     },
