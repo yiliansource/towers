@@ -1,9 +1,12 @@
-import { Box, Line } from "@react-three/drei";
-import { useLoader } from "@react-three/fiber";
-import { useMemo } from "react";
+import { SpringValue, animated, useTransition } from "@react-spring/three";
+import { easings } from "@react-spring/web";
+import { Box, Cylinder, Line } from "@react-three/drei";
+import { Canvas, useLoader } from "@react-three/fiber";
+import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
 
+import { UnitType } from "@towers/shared/contracts/game";
 import {
     STACKED_AXIAL_UP,
     StackedAxial,
@@ -12,6 +15,7 @@ import {
     axialRange,
     axialToStacked,
     equalStackedAxial,
+    parseStackedAxial,
     stringifyStackedAxial,
 } from "@towers/shared/hexgrid";
 
@@ -19,6 +23,7 @@ import { useGameInfo } from "@/lib/hooks/use-game-info";
 import { useGameStore } from "@/lib/stores/game.store";
 import { useLobbyStore } from "@/lib/stores/lobby.store";
 import { stackedToWorld } from "@/lib/util/hex2three";
+import { sleep } from "@/lib/util/sleep";
 
 import { useHexGeometry } from "./hex-geometry";
 import { PlacementPickSurface } from "./placement-pick-surface";
@@ -29,7 +34,7 @@ export function HexBoard() {
 
     if (!game) throw new Error();
 
-    const floorPositions = useMemo(() => axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0)), []);
+    const gridPositions = useMemo(() => axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0)), []);
 
     const pickablePositions = useMemo(() => {
         const candidates: StackedAxial[] = axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0));
@@ -37,14 +42,13 @@ export function HexBoard() {
             candidates.push(addStackedAxial(t, STACKED_AXIAL_UP));
         }
 
-        return candidates.filter((p) => !game.towers.some((t) => equalStackedAxial(t, p)));
+        const blockedPositions = game.towers.concat([game.king]);
+        return candidates.filter((p) => !blockedPositions.some((t) => equalStackedAxial(t, p)));
     }, [game.towers]);
 
     return (
         <>
-            {floorPositions.map((p) => (
-                <HexTileOutline key={stringifyStackedAxial(p)} coord={p} />
-            ))}
+            <HexTileGrid positions={gridPositions} />
 
             {isInTurn && ui.hoveredHex && (!ui.selectedHex || !equalStackedAxial(ui.hoveredHex, ui.selectedHex)) && (
                 <HexTileHighlight coord={ui.hoveredHex} color="yellow" />
@@ -54,27 +58,50 @@ export function HexBoard() {
             {isInTurn &&
                 pickablePositions.map((p) => <PlacementPickSurface key={stringifyStackedAxial(p)} coord={p} />)}
 
-            {game.towers.map((coord) => (
-                <Tower key={stringifyStackedAxial(coord)} coord={coord} />
-            ))}
-            {Object.entries(game.units).map(([pid, coords]) =>
-                coords.map((c) => <Unit key={stringifyStackedAxial(c)} coord={c} playerId={pid} />),
-            )}
+            <Towers coordList={game.towers} />
+            <Units coordLookup={game.units} kingCoord={game.king} />
         </>
     );
 }
 
-function HexTileOutline({ coord }: { coord: StackedAxial }) {
+function HexTileGrid({ positions }: { positions: StackedAxial[] }) {
+    const transitions = useTransition(positions, {
+        from: {
+            opacity: 0,
+        },
+        enter: {
+            opacity: 1,
+        },
+        leave: {
+            opacity: 0,
+        },
+        config: { easing: easings.easeOutSine },
+        delay: (i) => {
+            const coord = i as unknown as StackedAxial;
+            return (4 + coord.q + coord.r + coord.h) * 100;
+        },
+    });
+
+    return (
+        <>
+            {transitions((style, item) => (
+                <group key={stringifyStackedAxial(item)} position={stackedToWorld(item)}>
+                    <HexTileOutline opacity={style.opacity} />
+                </group>
+            ))}
+        </>
+    );
+}
+
+const AnimatedLine = animated(Line);
+
+function HexTileOutline({ opacity }: { opacity?: number | SpringValue<number> }) {
     const points = [...Array(7).keys()].map((i) => {
         const theta = ((i + 0.5) / 6) * (Math.PI * 2);
         return [Math.cos(theta), 0, Math.sin(theta)] as [number, number, number];
     });
 
-    return (
-        <group position={stackedToWorld(coord)}>
-            <Line points={points} color="#333" lineWidth={1} />
-        </group>
-    );
+    return <AnimatedLine points={points} color="#333" lineWidth={1} scale={opacity} transparent />;
 }
 
 function HexTileHighlight({ coord, color }: { coord: StackedAxial; color: string }) {
@@ -89,7 +116,48 @@ function HexTileHighlight({ coord, color }: { coord: StackedAxial; color: string
     );
 }
 
-function Tower({ coord }: { coord: StackedAxial }) {
+function Towers({ coordList }: { coordList: StackedAxial[] }) {
+    const [initial, setInitial] = useState(true);
+
+    const transitions = useTransition(coordList, {
+        from: {
+            scale: [0, 0, 0] as [number, number, number],
+            position: [0, -1, 0] as [number, number, number],
+        },
+        enter: {
+            scale: [1, 1, 1] as [number, number, number],
+            position: [0, 0, 0] as [number, number, number],
+        },
+        leave: {
+            scale: [0, 0, 0] as [number, number, number],
+            position: [0, 1, 0] as [number, number, number],
+        },
+        config: { tension: 170, friction: 20 },
+        delay: (i) => {
+            const coord = parseStackedAxial(i);
+            return initial ? (4 + coord.q + coord.r + coord.h) * 100 : 0;
+        },
+        keys: (i) => stringifyStackedAxial(i),
+    });
+
+    useEffect(() => {
+        sleep(1000).then(() => setInitial(false));
+    }, []);
+
+    return (
+        <>
+            {transitions((style, item) => (
+                <group key={stringifyStackedAxial(item)} position={stackedToWorld(item)}>
+                    <animated.group position={style.position} scale={style.scale}>
+                        <Tower />
+                    </animated.group>
+                </group>
+            ))}
+        </>
+    );
+}
+
+function Tower() {
     const obj = useLoader(OBJLoader, "/tower.obj");
     const coloredObj = useMemo(() => {
         const clone = obj.clone();
@@ -106,32 +174,105 @@ function Tower({ coord }: { coord: StackedAxial }) {
 
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
-
-                console.log(mesh);
             }
         });
 
         return clone;
     }, [obj]);
 
+    return <primitive object={coloredObj} />;
+}
+
+type UnitTransitionItem =
+    | {
+          unit: "KNIGHT";
+          pid: string;
+          coord: StackedAxial;
+      }
+    | {
+          unit: "KING";
+          coord: StackedAxial;
+      };
+
+function Units({
+    coordLookup,
+    kingCoord,
+}: {
+    coordLookup: Record<string, StackedAxial[]>;
+    kingCoord: StackedAxial | null;
+}) {
+    const [initial, setInitial] = useState(true);
+
+    const items: UnitTransitionItem[] = [
+        ...Object.entries(coordLookup).flatMap(([pid, coords]) =>
+            coords.map((c) => ({ unit: "KNIGHT", pid, coord: c }) satisfies UnitTransitionItem),
+        ),
+    ];
+    if (kingCoord) {
+        items.push({
+            unit: "KING",
+            coord: kingCoord,
+        });
+    }
+
+    const transitions = useTransition(items, {
+        from: {
+            scale: [0, 0, 0] as [number, number, number],
+            position: [0, -1, 0] as [number, number, number],
+        },
+        enter: {
+            scale: [1, 1, 1] as [number, number, number],
+            position: [0, 0, 0] as [number, number, number],
+        },
+        leave: {
+            scale: [0, 0, 0] as [number, number, number],
+            position: [0, 1, 0] as [number, number, number],
+        },
+        config: { tension: 170, friction: 20 },
+        delay: (i) => {
+            const coord = parseStackedAxial(i.split("-")[1]);
+            return initial ? (4 + coord.q + coord.r + coord.h) * 100 : 0;
+        },
+        keys: (i) => {
+            return i.unit + "-" + stringifyStackedAxial(i.coord);
+        },
+    });
+
+    useEffect(() => {
+        sleep(1000).then(() => setInitial(false));
+    }, []);
+
     return (
-        <group position={stackedToWorld(coord)}>
-            <primitive object={coloredObj} />
-        </group>
+        <>
+            {transitions((style, item, state) => (
+                <group key={state.key} position={stackedToWorld(item.coord)}>
+                    <animated.group position={style.position} scale={style.scale}>
+                        {item.unit === "KNIGHT" && <Knight playerId={item.pid} />}
+                        {item.unit === "KING" && <King />}
+                    </animated.group>
+                </group>
+            ))}
+        </>
     );
 }
 
-function Unit({ coord, playerId }: { coord: StackedAxial; playerId: string }) {
+function Knight({ playerId }: { playerId: string }) {
     const { lobby } = useLobbyStore();
     if (!lobby) throw new Error();
 
     const color = ["#00c950", "#fb2c36", "#2b7fff", "#ad46ff"][lobby.seats.findIndex((s) => s.user?.id === playerId)];
 
     return (
-        <group position={stackedToWorld(coord)}>
-            <Box position={[0, 0.25, 0]} args={[0.5, 0.5, 0.5]} receiveShadow castShadow>
-                <meshStandardMaterial color={color} />
-            </Box>
-        </group>
+        <Cylinder position={[0, 0.25, 0]} args={[0.25, 0.35, 1.2]} receiveShadow castShadow>
+            <meshStandardMaterial color={color} />
+        </Cylinder>
+    );
+}
+
+function King() {
+    return (
+        <Cylinder position={[0, 0.25, 0]} args={[0.3, 0.4, 1.4]} receiveShadow castShadow>
+            <meshStandardMaterial color="white" />
+        </Cylinder>
     );
 }

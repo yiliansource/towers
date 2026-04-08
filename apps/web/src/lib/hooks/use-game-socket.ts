@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { GamePerformActionPayload, GameState } from "@towers/shared/contracts/game";
+import { GamePerformActionPayload, GameState, UnitType } from "@towers/shared/contracts/game";
+import { LobbyView } from "@towers/shared/contracts/lobby";
 import { StackedAxial } from "@towers/shared/hexgrid";
 
 import { useGameSocketContext } from "../providers/game-socket.provider";
@@ -15,6 +16,8 @@ export function useGameSocket() {
     const router = useRouter();
 
     const { resetGame, applySnapshot } = useGameStore();
+
+    const setLobby = useLobbyStore((s) => s.setLobby);
     const resetLobby = useLobbyStore((s) => s.resetLobby);
 
     const [pendingAction, setPendingAction] = useState<GamePerformActionPayload>({ type: "none" });
@@ -46,6 +49,12 @@ export function useGameSocket() {
     useEffect(() => {
         if (!socket) return;
 
+        const onLobbyUpdated = (payload: LobbyView) => {
+            setLobby(payload);
+        };
+
+        socket.on("lobby.updated", onLobbyUpdated);
+
         const onGameUpdated = (snapshot: GameState) => {
             applySnapshot(snapshot);
         };
@@ -67,7 +76,8 @@ export function useGameSocket() {
         socket,
         connected,
 
-        placeUnit: (coord: StackedAxial) => void runAction({ type: "placeUnit", coord }),
+        placeKnight: (coord: StackedAxial) => void runAction({ type: "placeKnight", coord }),
         endTurn: () => void runAction({ type: "endTurn" }),
+        abortGame: () => void runAction({ type: "abortGame" }),
     };
 }

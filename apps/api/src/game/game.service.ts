@@ -7,6 +7,7 @@ import { LobbyError } from "@towers/shared/contracts/lobby";
 import {
     AXIAL_ZERO,
     STACKED_AXIAL_DOWN,
+    STACKED_AXIAL_UP,
     STACKED_AXIAL_ZERO,
     StackedAxial,
     addStackedAxial,
@@ -66,6 +67,7 @@ export class GameService {
                 ),
             ],
             units: Object.fromEntries(playOrder.map((p) => [p, []])),
+            king: addStackedAxial(STACKED_AXIAL_ZERO, STACKED_AXIAL_UP),
             players: lobby.seats
                 .filter((s) => !!s.userId)
                 .map((s) => ({
@@ -97,12 +99,13 @@ export class GameService {
         );
     }
 
-    async placeUnit(lobbyId: string, playerId: string, coord: StackedAxial) {
+    async placeKnight(lobbyId: string, playerId: string, coord: StackedAxial) {
         const game = await this.getGameByLobby(lobbyId);
 
         if (game.ctx.phase === "SETUP") {
             const coordBelow = addStackedAxial(coord, STACKED_AXIAL_DOWN);
             if (!game.towers.some((t) => equalStackedAxial(t, coordBelow))) return;
+            if (equalStackedAxial(game.king, coord)) return;
             if (Object.values(game.units).some((coords) => coords.some((c) => equalStackedAxial(c, coord)))) return;
 
             await this.updateGameState(
@@ -128,7 +131,7 @@ export class GameService {
     async finishGame(lobbyId: string) {
         await this.prisma.lobby.update({
             where: { id: lobbyId },
-            data: { game: undefined, state: "WAITING" },
+            data: { game: Prisma.DbNull, state: "WAITING" },
         });
 
         this.gameNotifier.notify({ type: "game.finished", lobbyId });
@@ -137,15 +140,28 @@ export class GameService {
     async performAction(lobbyId: string, playerId: string, payload: GamePerformActionPayload) {
         const game = await this.getGameByLobby(lobbyId);
 
+        if (payload.type === "abortGame") {
+            await this.finishGame(lobbyId);
+            return;
+        }
+
         if (game.ctx.phase === "SETUP") {
-            if (payload.type === "placeUnit") {
-                await this.placeUnit(lobbyId, playerId, payload.coord);
+            if (payload.type === "none") {
+                return;
+            } else if (payload.type === "placeKnight") {
+                await this.placeKnight(lobbyId, playerId, payload.coord);
+                return;
             }
         } else if (game.ctx.phase === "PLAYING") {
-            if (payload.type === "endTurn") {
+            if (payload.type === "none") {
+                return;
+            } else if (payload.type === "endTurn") {
                 await this.endPlayerTurn(lobbyId);
+                return;
             }
         }
+
+        this.logger.warn(`Unhandled action ${payload.type} in phase ${game.ctx.phase}.`);
     }
 
     private async ensureGameState(lobby: Lobby | null): Promise<GameState> {

@@ -1,6 +1,7 @@
 "use client";
 
 import { Spinner } from "@radix-ui/themes";
+import { useWindowSize } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -19,6 +20,8 @@ export function GameSwitch() {
 
     const router = useRouter();
 
+    const windowsize = useWindowSize();
+
     useEffect(() => {
         void hydrateLobby();
         void hydrateGame();
@@ -35,6 +38,14 @@ export function GameSwitch() {
             router.push("/lobby");
         }
     }, [lobbyLoading, gameLoading, lobby, game]);
+
+    if ((windowsize.width ?? 0) < 1024) {
+        return (
+            <div className="m-auto">
+                <p>Small screens are not supported yet. Sorry!</p>
+            </div>
+        );
+    }
 
     return lobbyLoading || gameLoading ? (
         <div className="m-auto">

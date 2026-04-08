@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { StackedAxialSchema } from "./hex.js";
+import { LobbyView } from "./lobby.js";
 
 export const GameErrorCode = {
     INVALID_GAME_STATE: "INVALID_GAME_STATE",
@@ -27,6 +28,7 @@ export type GamePhase = (typeof GamePhase)[keyof typeof GamePhase];
 export interface GameServerToClientEvents {
     "game.finished": () => void;
     "game.updated": (snapshot: GameState) => void;
+    "lobby.updated": (payload: LobbyView) => void;
 }
 
 export interface GameClientToServerEvents {
@@ -55,19 +57,29 @@ export const GameStateSchema = z.object({
     ctx: GameContextSchema,
     towers: z.array(StackedAxialSchema),
     units: z.record(z.string(), z.array(StackedAxialSchema)),
+    king: StackedAxialSchema,
     players: z.array(GamePlayerSchema),
 });
 export type GameState = z.infer<typeof GameStateSchema>;
+
+export const UnitType = {
+    KNIGHT: "KNIGHT",
+    KING: "KING",
+} as const;
+export type UnitType = (typeof UnitType)[keyof typeof UnitType];
 
 export const GamePerformActionPayloadSchema = z.discriminatedUnion("type", [
     z.object({
         type: z.literal("none"),
     }),
     z.object({
+        type: z.literal("abortGame"),
+    }),
+    z.object({
         type: z.literal("endTurn"),
     }),
     z.object({
-        type: z.literal("placeUnit"),
+        type: z.literal("placeKnight"),
         coord: StackedAxialSchema,
     }),
 ]);

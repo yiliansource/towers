@@ -16,6 +16,7 @@ import type { AuthSocket } from "@/auth/socket-auth.service";
 import { SocketAuthService } from "@/auth/socket-auth.service";
 import type { User } from "@/generated/prisma/client";
 import { LobbyPresenceService } from "@/lobby/lobby-presence.service";
+import { LobbyMapper } from "@/lobby/lobby.mapper";
 import { LobbyNotification, LobbyNotifier } from "@/lobby/lobby.notifier";
 import { LobbyService } from "@/lobby/lobby.service";
 
@@ -35,10 +36,11 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
     server!: Server<GameClientToServerEvents, GameServerToClientEvents>;
 
     constructor(
-        private readonly lobbyNotifier: LobbyNotifier,
+        private readonly lobbyMapper: LobbyMapper,
         private readonly lobbyService: LobbyService,
-        private readonly gameService: GameService,
+        private readonly lobbyNotifier: LobbyNotifier,
         private readonly lobbyPresenceService: LobbyPresenceService,
+        private readonly gameService: GameService,
         private readonly gameNotifier: GameNotifier,
         socketAuthService: SocketAuthService,
     ) {
@@ -79,7 +81,13 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
         }
     }
     private async handleLobbyNotification(event: LobbyNotification): Promise<void> {
-        if (event.type === "lobby.game_started") {
+        if (event.type === "lobby.updated") {
+            const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
+            if (!lobby) return;
+
+            const view = await this.lobbyMapper.toView(lobby);
+            this.server.to(event.lobbyId).emit("lobby.updated", view);
+        } else if (event.type === "lobby.game_started") {
             await this.gameService.initializeGame(event.lobbyId);
         }
     }
@@ -92,12 +100,17 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
         }
 
         await this.lobbyPresenceService.bindClientToLobby(client, lobby.id);
+        this.gameNotifier.emitGameUpdate(lobby.id);
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
     override async onAuthenticatedDisconnect(client: AuthSocket): Promise<void> {
-        // const lobbyId = this.lobbyPresenceService.getLobbyIdForSocket(client.id);
+        const lobbyId = this.lobbyPresenceService.getLobbyIdForSocket(client.id);
         await this.lobbyPresenceService.unbindClient(client);
 
-        // if (lobbyId) {}
+        if (lobbyId) {
+            this.lobbyNotifier.emitLobbyUpdate(lobbyId);
+            this.gameNotifier.emitGameUpdate(lobbyId);
+        }
     }
 
     @SubscribeMessage<keyof GameClientToServerEvents>("game.perform_action")

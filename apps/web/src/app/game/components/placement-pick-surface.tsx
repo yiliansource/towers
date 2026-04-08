@@ -4,13 +4,15 @@ import * as THREE from "three";
 import { StackedAxial } from "@towers/shared/hexgrid";
 
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
+import { useAuthStore } from "@/lib/stores/auth.store";
 import { useGameStore } from "@/lib/stores/game.store";
 import { stackedToWorld } from "@/lib/util/hex2three";
 
 export function PlacementPickSurface({ coord }: { coord: StackedAxial }) {
     const { setHoveredHex, selectHex } = useGameStore();
-    const { game } = useGameStore();
-    const { placeUnit } = useGameSocket();
+    const user = useAuthStore((s) => s.user!);
+    const game = useGameStore((s) => s.game!);
+    const { placeKnight: placeUnit } = useGameSocket();
 
     const geometry = useMemo(() => {
         const shape = new THREE.Shape();
@@ -33,7 +35,7 @@ export function PlacementPickSurface({ coord }: { coord: StackedAxial }) {
     const [x, y, z] = stackedToWorld(coord);
 
     const handleClick = () => {
-        if (game?.ctx.phase === "SETUP") {
+        if (game.ctx.phase === "SETUP") {
             placeUnit(coord);
         }
     };
