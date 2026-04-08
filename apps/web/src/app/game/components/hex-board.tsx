@@ -1,98 +1,95 @@
-import { Box, Html, Line } from "@react-three/drei";
+import { Box, Line } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
 import { useMemo } from "react";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
 
-import { Axial, axial, axialRange, parseAxial, stringifyAxial } from "@towers/shared/hexgrid";
-import { hexToPixel } from "@towers/shared/hexgrid";
+import {
+    STACKED_AXIAL_UP,
+    StackedAxial,
+    addStackedAxial,
+    axial,
+    axialRange,
+    axialToStacked,
+    equalStackedAxial,
+    stringifyStackedAxial,
+} from "@towers/shared/hexgrid";
 
+import { useGameInfo } from "@/lib/hooks/use-game-info";
 import { useGameStore } from "@/lib/stores/game.store";
+import { useLobbyStore } from "@/lib/stores/lobby.store";
+import { stackedToWorld } from "@/lib/util/hex2three";
 
-export function HexBoard({ towerPositions }: { towerPositions: Axial[] }) {
+import { useHexGeometry } from "./hex-geometry";
+import { PlacementPickSurface } from "./placement-pick-surface";
+
+export function HexBoard() {
     const { game, ui } = useGameStore();
+    const { isHostUser, isInTurn } = useGameInfo();
+
+    if (!game) throw new Error();
+
+    const floorPositions = useMemo(() => axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0)), []);
+
+    const pickablePositions = useMemo(() => {
+        const candidates: StackedAxial[] = axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0));
+        for (const t of game.towers) {
+            candidates.push(addStackedAxial(t, STACKED_AXIAL_UP));
+        }
+
+        return candidates.filter((p) => !game.towers.some((t) => equalStackedAxial(t, p)));
+    }, [game.towers]);
 
     return (
         <>
-            <Floor />
-
-            {ui.hoveredHex && <Highlighter hex={ui.hoveredHex} />}
-
-            {towerPositions.map((axial) => (
-                <Tower key={stringifyAxial(axial)} hex={axial} />
+            {floorPositions.map((p) => (
+                <HexTileOutline key={stringifyStackedAxial(p)} coord={p} />
             ))}
+
+            {isInTurn && ui.hoveredHex && (!ui.selectedHex || !equalStackedAxial(ui.hoveredHex, ui.selectedHex)) && (
+                <HexTileHighlight coord={ui.hoveredHex} color="yellow" />
+            )}
+            {isInTurn && ui.selectedHex && <HexTileHighlight coord={ui.selectedHex} color="green" />}
+
+            {isInTurn &&
+                pickablePositions.map((p) => <PlacementPickSurface key={stringifyStackedAxial(p)} coord={p} />)}
+
+            {game.towers.map((coord) => (
+                <Tower key={stringifyStackedAxial(coord)} coord={coord} />
+            ))}
+            {Object.entries(game.units).map(([pid, coords]) =>
+                coords.map((c) => <Unit key={stringifyStackedAxial(c)} coord={c} playerId={pid} />),
+            )}
         </>
     );
 }
 
-function Floor() {
-    return axialRange(axial(0, 0), 4).map((a) => <TileFloor key={stringifyAxial(a)} hex={a} />);
-}
-
-function TileFloor({ hex }: { hex: Axial }) {
-    const [x, y] = hexToPixel(hex);
-
-    return (
-        <group position={[x, 0, y]}>
-            {/* <Html center className="select-none pointer-events-none" position={[0, 0.1, 0]}>
-                <p className="text-xs text-white opacity-10">
-                    {hex.q},{hex.r}
-                </p>
-            </Html> */}
-            <HexBase />
-        </group>
-    );
-}
-
-export function Highlighter({ hex }: { hex: Axial }) {
-    const [x, y] = hexToPixel(hex);
-
-    return (
-        <group position={[x, 0, y]}>
-            <HexHighlighter />
-        </group>
-    );
-}
-
-function HexHighlighter() {
-    const geometry = useMemo(() => {
-        const shape = new THREE.Shape();
-
-        const radius = 1;
-
-        const points = [...Array(6).keys()].map((i) => {
-            const theta = ((i + 0.5) / 6) * Math.PI * 2;
-            return new THREE.Vector2(Math.cos(theta) * radius, Math.sin(theta) * radius);
-        });
-
-        shape.moveTo(points[0].x, points[0].y);
-        points.slice(1).forEach((p) => shape.lineTo(p.x, p.y));
-        shape.closePath();
-
-        const geo = new THREE.ShapeGeometry(shape);
-
-        geo.rotateX(-Math.PI / 2);
-
-        return geo;
-    }, []);
-
-    return (
-        <mesh geometry={geometry}>
-            <meshBasicMaterial color="yellow" transparent opacity={0.3} depthWrite={false} />
-        </mesh>
-    );
-}
-
-function HexBase() {
+function HexTileOutline({ coord }: { coord: StackedAxial }) {
     const points = [...Array(7).keys()].map((i) => {
         const theta = ((i + 0.5) / 6) * (Math.PI * 2);
         return [Math.cos(theta), 0, Math.sin(theta)] as [number, number, number];
     });
 
-    return <Line points={points} color="#333" lineWidth={1} />;
+    return (
+        <group position={stackedToWorld(coord)}>
+            <Line points={points} color="#333" lineWidth={1} />
+        </group>
+    );
 }
 
-function Tower({ hex }: { hex: Axial }) {
+function HexTileHighlight({ coord, color }: { coord: StackedAxial; color: string }) {
+    const geometry = useHexGeometry();
+
+    return (
+        <group position={stackedToWorld(coord)}>
+            <mesh geometry={geometry}>
+                <meshBasicMaterial color={color} transparent opacity={0.3} depthWrite={false} />
+            </mesh>
+        </group>
+    );
+}
+
+function Tower({ coord }: { coord: StackedAxial }) {
     const obj = useLoader(OBJLoader, "/tower.obj");
     const coloredObj = useMemo(() => {
         const clone = obj.clone();
@@ -109,17 +106,32 @@ function Tower({ hex }: { hex: Axial }) {
 
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
+
+                console.log(mesh);
             }
         });
 
         return clone;
     }, [obj]);
 
-    const [x, y] = hexToPixel(hex);
+    return (
+        <group position={stackedToWorld(coord)}>
+            <primitive object={coloredObj} />
+        </group>
+    );
+}
+
+function Unit({ coord, playerId }: { coord: StackedAxial; playerId: string }) {
+    const { lobby } = useLobbyStore();
+    if (!lobby) throw new Error();
+
+    const color = ["#00c950", "#fb2c36", "#2b7fff", "#ad46ff"][lobby.seats.findIndex((s) => s.user?.id === playerId)];
 
     return (
-        <group position={[x, 0, y]}>
-            <primitive object={coloredObj} />
+        <group position={stackedToWorld(coord)}>
+            <Box position={[0, 0.25, 0]} args={[0.5, 0.5, 0.5]} receiveShadow castShadow>
+                <meshStandardMaterial color={color} />
+            </Box>
         </group>
     );
 }

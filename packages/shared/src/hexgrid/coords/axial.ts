@@ -32,15 +32,15 @@ export function equalAxial(a: Axial, b: Axial): boolean {
 }
 
 export function addAxial(a: Axial, b: Axial): Axial {
-    return { q: a.q + b.q, r: a.r + b.r };
+    return axial(a.q + b.q, a.r + b.r);
 }
 
 export function subAxial(a: Axial, b: Axial): Axial {
-    return { q: a.q - b.q, r: a.r - b.r };
+    return axial(a.q - b.q, a.r - b.r);
 }
 
 export function scaleAxial(hex: Axial, factor: number): Axial {
-    return { q: hex.q * factor, r: hex.r * factor };
+    return axial(hex.q * factor, hex.r * factor);
 }
 
 export function axialDirection(dir: HexDirection): Axial {

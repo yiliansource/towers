@@ -1,9 +1,13 @@
 import { Logger, OnModuleDestroy } from "@nestjs/common";
-import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Subscription } from "rxjs";
 import { Server } from "socket.io";
 
-import { GameClientToServerEvents, GameServerToClientEvents } from "@towers/shared/contracts/game";
+import type {
+    GameClientToServerEvents,
+    GamePerformActionPayload,
+    GameServerToClientEvents,
+} from "@towers/shared/contracts/game";
 import { LobbyError } from "@towers/shared/contracts/lobby";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
@@ -97,11 +101,11 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
     }
 
     @SubscribeMessage<keyof GameClientToServerEvents>("game.perform_action")
-    async handleLobbyLeave(@AuthenticatedSocketUser() user: User) {
+    async handleLobbyLeave(@AuthenticatedSocketUser() user: User, @MessageBody() payload: GamePerformActionPayload) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 
-        await this.gameService.endPlayerTurn(lobby.id);
+        await this.gameService.performAction(lobby.id, user.id, payload);
 
         return { ok: true };
     }

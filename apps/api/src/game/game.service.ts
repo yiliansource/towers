@@ -1,11 +1,23 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { InputJsonValue } from "@prisma/client/runtime/client";
 import { produce } from "immer";
 
-import { GameState, GameStateSchema } from "@towers/shared/contracts/game";
+import { GameError, GamePerformActionPayload, GameState, GameStateSchema } from "@towers/shared/contracts/game";
 import { LobbyError } from "@towers/shared/contracts/lobby";
-import { AXIAL_ZERO, axial, axialDirection, axialRotateAroundCenter, scaleAxial } from "@towers/shared/hexgrid";
+import {
+    AXIAL_ZERO,
+    STACKED_AXIAL_DOWN,
+    STACKED_AXIAL_ZERO,
+    StackedAxial,
+    addStackedAxial,
+    axialDirection,
+    axialRotateAroundCenter,
+    axialToStacked,
+    equalStackedAxial,
+    scaleAxial,
+} from "@towers/shared/hexgrid";
 
+import { Lobby, Prisma } from "@/generated/prisma/client";
 import { LobbyService } from "@/lobby/lobby.service";
 import { PrismaService } from "@/prisma/prisma.service";
 
@@ -13,6 +25,8 @@ import { GameNotifier } from "./game.notifier";
 
 @Injectable()
 export class GameService {
+    private readonly logger = new Logger(GameService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly lobbyService: LobbyService,
@@ -21,17 +35,11 @@ export class GameService {
 
     async getGameByLobby(lobbyId: string): Promise<GameState> {
         const lobby = await this.lobbyService.getLobbyById(lobbyId);
-        if (!lobby) throw new NotFoundException();
-        if (lobby.state !== "INGAME") throw new BadRequestException();
-
-        return GameStateSchema.parse(lobby.game);
+        return this.ensureGameState(lobby);
     }
     async getGameByUser(userId: string): Promise<GameState> {
         const lobby = await this.lobbyService.getLobbyByUser(userId);
-        if (!lobby) throw new NotFoundException();
-        if (lobby.state !== "INGAME" || !lobby.state) throw new InternalServerErrorException();
-
-        return GameStateSchema.parse(lobby.game);
+        return this.ensureGameState(lobby);
     }
 
     async initializeGame(lobbyId: string) {
@@ -51,7 +59,12 @@ export class GameService {
                 currentPlayerId: playOrder[0],
                 totalPlayers: occupiedSeats.length,
             },
-            towers: [axial(0, 0), ...axialRotateAroundCenter(scaleAxial(axialDirection(0), 3), AXIAL_ZERO)],
+            towers: [
+                STACKED_AXIAL_ZERO,
+                ...axialRotateAroundCenter(scaleAxial(axialDirection(0), 3), AXIAL_ZERO).map((a) =>
+                    axialToStacked(a, 0),
+                ),
+            ],
             units: Object.fromEntries(playOrder.map((p) => [p, []])),
             players: lobby.seats
                 .filter((s) => !!s.userId)
@@ -71,12 +84,36 @@ export class GameService {
                 // advance to the next player
                 draft.ctx.playOrderPos++;
                 if (draft.ctx.playOrderPos >= draft.ctx.totalPlayers) {
-                    draft.ctx.turn++;
-                    draft.ctx.playOrderPos = 0;
+                    if (draft.ctx.phase === "SETUP") {
+                        draft.ctx.playOrderPos = 0;
+                        draft.ctx.phase = "PLAYING";
+                    } else {
+                        draft.ctx.turn++;
+                        draft.ctx.playOrderPos = 0;
+                    }
                 }
                 draft.ctx.currentPlayerId = draft.ctx.playOrder[draft.ctx.playOrderPos];
             }),
         );
+    }
+
+    async placeUnit(lobbyId: string, playerId: string, coord: StackedAxial) {
+        const game = await this.getGameByLobby(lobbyId);
+
+        if (game.ctx.phase === "SETUP") {
+            const coordBelow = addStackedAxial(coord, STACKED_AXIAL_DOWN);
+            if (!game.towers.some((t) => equalStackedAxial(t, coordBelow))) return;
+            if (Object.values(game.units).some((coords) => coords.some((c) => equalStackedAxial(c, coord)))) return;
+
+            await this.updateGameState(
+                lobbyId,
+                produce(game, (draft) => {
+                    draft.units[playerId].push(coord);
+                }),
+            );
+
+            await this.endPlayerTurn(lobbyId);
+        }
     }
 
     async updateGameState(lobbyId: string, game: GameState | null): Promise<void> {
@@ -95,5 +132,45 @@ export class GameService {
         });
 
         this.gameNotifier.notify({ type: "game.finished", lobbyId });
+    }
+
+    async performAction(lobbyId: string, playerId: string, payload: GamePerformActionPayload) {
+        const game = await this.getGameByLobby(lobbyId);
+
+        if (game.ctx.phase === "SETUP") {
+            if (payload.type === "placeUnit") {
+                await this.placeUnit(lobbyId, playerId, payload.coord);
+            }
+        } else if (game.ctx.phase === "PLAYING") {
+            if (payload.type === "endTurn") {
+                await this.endPlayerTurn(lobbyId);
+            }
+        }
+    }
+
+    private async ensureGameState(lobby: Lobby | null): Promise<GameState> {
+        if (!lobby) throw new NotFoundException();
+        if (lobby.state !== "INGAME") throw new InternalServerErrorException();
+
+        const result = GameStateSchema.safeParse(lobby.game);
+        if (!result.success) {
+            this.logger.error(
+                `Invalid lobby state was detected in lobby ${lobby.id} and could not be recovered. ` +
+                    `The game will exit.`,
+                result.error,
+            );
+
+            await this.prisma.lobby.update({
+                where: { id: lobby.id },
+                data: {
+                    state: "WAITING",
+                    game: Prisma.DbNull,
+                },
+            });
+
+            throw new GameError("INVALID_GAME_STATE");
+        }
+
+        return result.data;
     }
 }

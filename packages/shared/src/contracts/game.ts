@@ -1,6 +1,21 @@
 import { z } from "zod";
 
-import { AxialSchema } from "./hex.js";
+import { StackedAxialSchema } from "./hex.js";
+
+export const GameErrorCode = {
+    INVALID_GAME_STATE: "INVALID_GAME_STATE",
+} as const;
+export type GameErrorCode = (typeof GameErrorCode)[keyof typeof GameErrorCode];
+
+export class GameError extends Error {
+    constructor(
+        public readonly code: GameErrorCode,
+        message?: string,
+    ) {
+        super(message ?? code);
+        this.name = "GameError";
+    }
+}
 
 export const GamePhase = {
     SETUP: "SETUP",
@@ -38,8 +53,8 @@ export type GameContext = z.infer<typeof GameContextSchema>;
 
 export const GameStateSchema = z.object({
     ctx: GameContextSchema,
-    towers: z.array(AxialSchema),
-    units: z.record(z.string(), z.array(AxialSchema)),
+    towers: z.array(StackedAxialSchema),
+    units: z.record(z.string(), z.array(StackedAxialSchema)),
     players: z.array(GamePlayerSchema),
 });
 export type GameState = z.infer<typeof GameStateSchema>;
@@ -53,7 +68,7 @@ export const GamePerformActionPayloadSchema = z.discriminatedUnion("type", [
     }),
     z.object({
         type: z.literal("placeUnit"),
-        pos: AxialSchema,
+        coord: StackedAxialSchema,
     }),
 ]);
 export type GamePerformActionPayload = z.infer<typeof GamePerformActionPayloadSchema>;

@@ -2,11 +2,14 @@ import { Button } from "@radix-ui/themes";
 import { PerformanceMonitor, Stats } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { produce } from "immer";
+import { useEffect } from "react";
+import * as THREE from "three";
 
 import { stringifyAxial } from "@towers/shared/hexgrid";
 
 import { DebugJson } from "@/components/debug-json";
 import { DevOnly } from "@/components/dev-only";
+import { useGameInfo } from "@/lib/hooks/use-game-info";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { useGameStore } from "@/lib/stores/game.store";
@@ -24,18 +27,20 @@ export function GameScene() {
 
     const { socket, connected, endTurn } = useGameSocket();
 
-    const towers = useGameStore((s) => s.game?.towers);
-
     const handleEndTurn = async () => {
         void endTurn();
     };
 
-    if (!lobby) return null;
-    if (!user) return null;
-    if (!game) return null;
+    if (!lobby) throw new Error("Lobby was not loaded.");
+    if (!user) throw new Error("User was not loaded.");
+    if (!game) throw new Error("Game was not loaded.");
 
-    const isHostUser = lobby.host.id === user.id;
-    const isInTurn = game.ctx.currentPlayerId === user.id;
+    const { isHostUser, isInTurn } = useGameInfo();
+
+    useEffect(() => {
+        if (isInTurn) console.log("turn started");
+        else console.log("turn ended");
+    }, [isInTurn]);
 
     return (
         <div className="grow grid h-[calc(100dvh-60px)] md:grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 grid-flow-row overflow-hidden">
@@ -60,20 +65,22 @@ export function GameScene() {
                         </Button>
                     </div>
                     <DevOnly>
-                        <DebugJson object={ui} />
+                        <DebugJson object={game} />
                     </DevOnly>
                 </div>
             </div>
 
             <div className="border border-(--gray-3) relative min-h-0 h-full overflow-hidden">
-                <Canvas className="absolute inset-0">
-                    <Stats />
+                <Canvas className="absolute inset-0" shadows>
+                    <DevOnly>
+                        <Stats />
+                    </DevOnly>
 
                     <SceneLights />
                     <SceneCamera />
                     <CursorTracker />
 
-                    <HexBoard towerPositions={towers ?? []} />
+                    <HexBoard />
                 </Canvas>
             </div>
         </div>
@@ -81,10 +88,24 @@ export function GameScene() {
 }
 
 function SceneLights() {
+    const dir = new THREE.Vector3(0, 0, 1).setLength(10);
+    dir.applyEuler(new THREE.Euler(-45 * (Math.PI / 180), -45 * (Math.PI / 180), 0));
+
     return (
         <>
             <ambientLight intensity={0.8} />
-            <directionalLight intensity={2} position={[-10, 10, 5]} />
+            <directionalLight
+                intensity={2}
+                position={dir}
+                castShadow
+                shadow-mapSize={[2048, 2048]}
+                shadow-camera-near={0.3}
+                shadow-camera-far={50}
+                shadow-camera-left={-10}
+                shadow-camera-right={10}
+                shadow-camera-top={10}
+                shadow-camera-bottom={-10}
+            />
         </>
     );
 }

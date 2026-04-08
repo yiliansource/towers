@@ -14,13 +14,13 @@ export function CursorTracker() {
     const { setHoveredHex } = useGameStore();
     const target = useMemo(() => new THREE.Vector3(), []);
 
-    useFrame(() => {
-        raycaster.setFromCamera(pointer, camera);
+    // useFrame(() => {
+    //     raycaster.setFromCamera(pointer, camera);
 
-        raycaster.ray.intersectPlane(plane, target);
+    //     raycaster.ray.intersectPlane(plane, target);
 
-        setHoveredHex(pixelToHex([target.x, target.z]));
-    });
+    //     setHoveredHex(pixelToHex([target.x, target.z]));
+    // });
 
     return null;
 }

@@ -1,16 +1,16 @@
-import { create, createStore } from "zustand";
+import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
 import { GameState } from "@towers/shared/contracts/game";
-import { Axial } from "@towers/shared/hexgrid";
+import { StackedAxial } from "@towers/shared/hexgrid";
 
 import { fetchApi } from "@/lib/util/fetch-api";
 
 import { sleep } from "../util/sleep";
 
 export type GameUiState = {
-    hoveredHex: Axial | null;
-    selectedHex: Axial | null;
+    hoveredHex: StackedAxial | null;
+    selectedHex: StackedAxial | null;
 };
 
 export type GameStore = {
@@ -22,8 +22,8 @@ export type GameStore = {
     resetGame: () => void;
     connectGameSocket: (gameId: string) => void;
 
-    setHoveredHex: (hex: Axial | null) => void;
-    selectHex: (hex: Axial) => void;
+    setHoveredHex: (hex: StackedAxial | null) => void;
+    selectHex: (hex: StackedAxial) => void;
     clearSelection: () => void;
 
     submitMove: () => Promise<void>;

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { GamePerformActionPayload, GameState } from "@towers/shared/contracts/game";
+import { StackedAxial } from "@towers/shared/hexgrid";
 
 import { useGameSocketContext } from "../providers/game-socket.provider";
 import { useGameStore } from "../stores/game.store";
@@ -66,6 +67,7 @@ export function useGameSocket() {
         socket,
         connected,
 
+        placeUnit: (coord: StackedAxial) => void runAction({ type: "placeUnit", coord }),
         endTurn: () => void runAction({ type: "endTurn" }),
     };
 }
