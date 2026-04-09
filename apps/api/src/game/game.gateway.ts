@@ -74,6 +74,9 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
 
     private async handleGameNotification(event: GameNotification): Promise<void> {
         if (event.type === "game.updated") {
+            const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
+            if (!lobby || lobby.state !== "INGAME") return;
+
             const game = await this.gameService.getGameByLobby(event.lobbyId);
             if (!game) return;
 

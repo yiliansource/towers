@@ -17,11 +17,9 @@ import { useIsHostUser } from "../store/use-lobby-derived";
 
 export interface LobbySeatProps {
     seat: LobbySeatView;
-
-    onClick?: () => void;
 }
 
-export function LobbySeat({ seat, onClick }: LobbySeatProps) {
+export function LobbySeat({ seat }: LobbySeatProps) {
     const lobby = useLobbyStore((s) => s.lobby!);
     const user = useAuthStore((s) => s.user!);
     const [actionsOpen, setActionsOpen] = useState(false);
@@ -36,7 +34,7 @@ export function LobbySeat({ seat, onClick }: LobbySeatProps) {
 
     const colorsInUse = lobby.seats.filter((s) => !!s.user).map((s) => s.color);
 
-    const { chooseColor, promoteSlot, kickSlot } = useLobbyCommands();
+    const { chooseColor, switchSlot, promoteSlot, kickSlot } = useLobbyCommands();
 
     const handleChooseColor = (color: SlotColor) => {
         if (isSelf && !colorsInUse.includes(color)) {
@@ -55,7 +53,7 @@ export function LobbySeat({ seat, onClick }: LobbySeatProps) {
                 !seat.user && "cursor-pointer",
                 seat.user && !seat.user.connected && "opacity-30 grayscale-75",
             )}
-            onClick={onClick}
+            onClick={() => switchSlot(seat.slot)}
             onPointerEnter={() => setActionsOpen(true)}
             onPointerLeave={() => {
                 setActionsOpen(false);
@@ -78,7 +76,7 @@ export function LobbySeat({ seat, onClick }: LobbySeatProps) {
                 {seat.user && seat.user.id === lobby.host.id && (
                     <motion.div
                         animate={{ opacity: 1 }}
-                        className="absolute left-0 bottom-0 m-2 z-20"
+                        className="absolute left-0 bottom-0 m-2 z-20 drop-shadow-sm"
                         exit={{ opacity: 0 }}
                         initial={{ opacity: 0 }}
                         key="crown"

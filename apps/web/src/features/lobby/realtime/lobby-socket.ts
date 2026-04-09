@@ -11,6 +11,7 @@ export type LobbySocket = Socket<LobbyServerToClientEvents, LobbyClientToServerE
 export function createLobbySocket(): LobbySocket {
     return io(`${clientEnv.NEXT_PUBLIC_API_URL}/lobby`, {
         withCredentials: true,
+        autoConnect: false,
         transports: ["websocket"],
     });
 }

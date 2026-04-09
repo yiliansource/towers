@@ -5,7 +5,7 @@ export * from "./components/lobby-root";
 export * from "./components/lobby-screen";
 export * from "./components/lobby-seat";
 
-export * from "./hooks/use-hydrate-lobby-on-mount";
+export * from "./hooks/use-hydrate";
 export * from "./hooks/use-lobby-page-guard";
 export * from "./hooks/use-lobby-page-lifecycle";
 

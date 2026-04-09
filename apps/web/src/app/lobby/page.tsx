@@ -2,7 +2,6 @@
 
 import { Spinner } from "@radix-ui/themes";
 
-import { createLogger } from "@/common/util/logger";
 import {
     LobbyEntryScreen,
     LobbyRoot,
@@ -10,8 +9,6 @@ import {
     useLobbyPageLifecycle,
     useLobbyStore,
 } from "@/features/lobby";
-
-const _logger = createLogger("lobby-page");
 
 export default function LobbyPage() {
     useLobbyPageLifecycle();

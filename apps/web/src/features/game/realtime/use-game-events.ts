@@ -4,7 +4,7 @@ import type { GameState, LobbyView } from "@towers/shared/contracts";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { useLobbyStore } from "@/features/lobby";
+import { useHydrateLobby, useLobbyStore } from "@/features/lobby";
 
 import { useGameStore } from "../store/game.store";
 import { useGameSocketContext } from "./game-socket.provider";
@@ -18,6 +18,7 @@ export function useGameEvents() {
 
     const setLobby = useLobbyStore((s) => s.setLobby);
     const clearLobby = useLobbyStore((s) => s.clearLobby);
+    const hydrateLobby = useHydrateLobby();
 
     useEffect(() => {
         if (!socket) return;
@@ -32,7 +33,8 @@ export function useGameEvents() {
             setGame(game);
         };
         const onGameFinished = async () => {
-            clearLobby(true);
+            clearLobby();
+            hydrateLobby();
             clearGame();
 
             router.push("/lobby");
@@ -44,5 +46,5 @@ export function useGameEvents() {
         return () => {
             socket.off("game.finished", onGameFinished);
         };
-    }, [socket, router, setLobby, setGame, clearLobby, clearGame]);
+    }, [socket, router, setLobby, setGame, clearLobby, hydrateLobby, clearGame]);
 }

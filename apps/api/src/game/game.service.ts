@@ -1,9 +1,4 @@
-import {
-    Injectable,
-    InternalServerErrorException,
-    Logger,
-    NotFoundException,
-} from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import type { InputJsonValue } from "@prisma/client/runtime/client";
 import {
     GameError,
@@ -180,7 +175,7 @@ export class GameService {
 
     private async ensureGameState(lobby: Lobby | null): Promise<GameState> {
         if (!lobby) throw new NotFoundException();
-        if (lobby.state !== "INGAME") throw new InternalServerErrorException();
+        if (lobby.state !== "INGAME") throw new GameError("INVALID_GAME_STATE");
 
         const result = GameStateSchema.safeParse(lobby.game);
         if (!result.success) {

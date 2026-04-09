@@ -1,12 +1,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-
+import { useAuthStore } from "@/features/auth";
 import { useLobbyStore } from "@/features/lobby";
-
 import { useGameStore } from "../store/game.store";
 
 export function useGamePageGuard() {
     const router = useRouter();
+
+    const user = useAuthStore((s) => s.user);
+    const userLoading = useAuthStore((s) => s.loading);
 
     const lobby = useLobbyStore((s) => s.lobby);
     const lobbyLoading = useLobbyStore((s) => s.loading);
@@ -29,8 +31,15 @@ export function useGamePageGuard() {
         }
     }, [lobbyLoading, lobby, router, clearLobby]);
 
-    const isAllowed = !lobbyLoading && !!lobby && lobby.state === "INGAME" && !!game;
-    const loading = lobbyLoading || gameLoading;
+    const isAllowed =
+        !userLoading &&
+        !!user &&
+        !lobbyLoading &&
+        !!lobby &&
+        lobby.state === "INGAME" &&
+        !gameLoading &&
+        !!game;
+    const loading = userLoading || lobbyLoading || gameLoading;
 
     return {
         isAllowed,

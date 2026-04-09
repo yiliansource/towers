@@ -4,25 +4,14 @@ import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 
 import { DevOnly } from "@/common/ui/dev-only";
-import { useAuthStore } from "@/features/auth";
-import { useLobbyStore } from "@/features/lobby";
 
 import { useGameEvents } from "../realtime/use-game-events";
-import { useGameStore } from "../store/game.store";
 import { GameBoard } from "./game-board";
 import { GameHud } from "./game-hud";
 import { SceneCamera } from "./scene-camera";
 
 export function GameScene() {
     useGameEvents();
-
-    const user = useAuthStore((s) => s.user!);
-    const lobby = useLobbyStore((s) => s.lobby!);
-    const game = useGameStore((s) => s.game!);
-
-    if (!lobby) throw new Error("Lobby was not loaded.");
-    if (!user) throw new Error("User was not loaded.");
-    if (!game) throw new Error("Game was not loaded.");
 
     return (
         <div className="grow grid h-[calc(100dvh-60px)] md:grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 grid-flow-row overflow-hidden">

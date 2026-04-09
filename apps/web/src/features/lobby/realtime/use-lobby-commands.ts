@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
 import { useAuthStore } from "@/features/auth";
-
+import { useHydrateLobby } from "../hooks/use-hydrate";
 import { useLobbyStore } from "../store/lobby.store";
 import { useLobbySocketContext } from "./lobby-socket.provider";
 
@@ -16,13 +16,18 @@ export function useLobbyCommands() {
     const user = useAuthStore((s) => s.user!);
     const lobby = useLobbyStore((s) => s.lobby);
     const clearLobby = useLobbyStore((s) => s.clearLobby);
+    const hydrateLobby = useHydrateLobby();
 
     const leaveLobby = useCallback(async () => {
         if (!socket) return;
+
         await socket.emitWithAck("lobby.leave");
+
         clearLobby();
+        hydrateLobby();
+
         router.push("/");
-    }, [socket, clearLobby, router]);
+    }, [socket, clearLobby, hydrateLobby, router]);
 
     const messageLobby = useCallback(
         async (message: string) => {
@@ -66,7 +71,7 @@ export function useLobbyCommands() {
             // @ts-expect-error
             await socket.timeout(5000).emitWithAck("lobby.kick_slot", { slot });
         },
-        [socket, lobby, lobby?.seats, user.id],
+        [socket, lobby, lobby?.seats, user?.id],
     );
     const promoteSlot = useCallback(
         async (slot: number) => {
@@ -78,7 +83,7 @@ export function useLobbyCommands() {
             // @ts-expect-error
             await socket.timeout(5000).emitWithAck("lobby.promote_slot", { slot });
         },
-        [socket, lobby, lobby?.seats, user.id],
+        [socket, lobby, lobby?.seats, user?.id],
     );
 
     const startGame = useCallback(async () => {
