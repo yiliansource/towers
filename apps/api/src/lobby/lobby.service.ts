@@ -3,10 +3,9 @@ import { Injectable } from "@nestjs/common";
 import { LobbyError, SlotColor } from "@towers/shared/contracts";
 
 import type { Lobby, Prisma } from "@/generated/prisma/client";
-import type { PrismaService } from "@/prisma/prisma.service";
-import type { UserService } from "@/user/user.service";
+import { PrismaService } from "@/prisma/prisma.service";
 
-import type { LobbyNotifier } from "./lobby.notifier";
+import { LobbyNotifier } from "./lobby.notifier";
 import type { LobbyWithRelations } from "./lobby.types";
 
 const lobbyIncludes = {
@@ -35,7 +34,6 @@ const lobbyIncludes = {
 export class LobbyService {
     constructor(
         private readonly prisma: PrismaService,
-        readonly _userService: UserService,
         private readonly lobbyNotifier: LobbyNotifier,
     ) {}
 

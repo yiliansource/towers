@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Res, UseFilters } from "@nestjs/common";
-import type { ConfigService } from "@nestjs/config";
 import {
     type LoginInput,
     LoginInputSchema,
@@ -7,14 +6,13 @@ import {
     RegisterInputSchema,
     type UserView,
 } from "@towers/shared/contracts";
-import type { ApiEnv } from "@towers/shared/env/api";
 import type { Response } from "express";
 
 import { UseZodSchema } from "@/common/decorators/use-zod-schema.decorator";
 import type { User } from "@/generated/prisma/client";
-import type { UserMapper } from "@/user/user.mapper";
-import type { AuthService } from "./auth.service";
-import type { AuthCookieService } from "./auth-cookie.service";
+import { UserMapper } from "@/user/user.mapper";
+import { AuthService } from "./auth.service";
+import { AuthCookieService } from "./auth-cookie.service";
 import { AuthenticatedUser } from "./authenticated-user.decorator";
 import { AuthHttpExceptionFilter } from "./errors/auth-http-exception-filter";
 import { NoAuth } from "./no-auth.decorator";
@@ -26,7 +24,6 @@ export class AuthController {
         private readonly userMapper: UserMapper,
         private readonly authService: AuthService,
         private readonly authCookieService: AuthCookieService,
-        readonly _config: ConfigService<ApiEnv>,
     ) {}
 
     @Post("register")

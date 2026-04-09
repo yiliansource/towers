@@ -23,15 +23,15 @@ import type { Server } from "socket.io";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
-import type { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
+import { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
 import type { User } from "@/generated/prisma/client";
-import type { UserService } from "@/user/user.service";
+import { UserService } from "@/user/user.service";
 
 import { LobbyWsExceptionFilter } from "./errors/lobby-ws-exception.filter";
-import type { LobbyMapper } from "./lobby.mapper";
-import type { LobbyNotification, LobbyNotifier } from "./lobby.notifier";
-import type { LobbyService } from "./lobby.service";
-import type { LobbyPresenceService } from "./lobby-presence.service";
+import { LobbyMapper } from "./lobby.mapper";
+import { LobbyNotification, LobbyNotifier } from "./lobby.notifier";
+import { LobbyService } from "./lobby.service";
+import { LobbyPresenceService } from "./lobby-presence.service";
 
 @WebSocketGateway({
     namespace: "/lobby",

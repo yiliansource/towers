@@ -5,7 +5,7 @@ import type { GameState } from "@towers/shared/contracts";
 import { AuthenticatedUser } from "@/auth/authenticated-user.decorator";
 import type { User } from "@/generated/prisma/client";
 
-import type { GameService } from "./game.service";
+import { GameService } from "./game.service";
 
 @Controller("game")
 export class GameController {

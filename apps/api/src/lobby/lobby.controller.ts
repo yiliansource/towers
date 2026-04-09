@@ -4,11 +4,11 @@ import type { LobbyView } from "@towers/shared/contracts";
 
 import { AuthenticatedUser } from "@/auth/authenticated-user.decorator";
 import type { User } from "@/generated/prisma/client";
-import type { UserService } from "@/user/user.service";
+import { UserService } from "@/user/user.service";
 
 import { LobbyHttpExceptionFilter } from "./errors/lobby-http-exception.filter";
-import type { LobbyMapper } from "./lobby.mapper";
-import type { LobbyService } from "./lobby.service";
+import { LobbyMapper } from "./lobby.mapper";
+import { LobbyService } from "./lobby.service";
 
 @Controller("lobby")
 @UseFilters(LobbyHttpExceptionFilter)

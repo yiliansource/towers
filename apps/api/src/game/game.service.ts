@@ -28,10 +28,10 @@ import {
 import { produce } from "immer";
 
 import { type Lobby, Prisma } from "@/generated/prisma/client";
-import type { LobbyService } from "@/lobby/lobby.service";
-import type { PrismaService } from "@/prisma/prisma.service";
+import { LobbyService } from "@/lobby/lobby.service";
+import { PrismaService } from "@/prisma/prisma.service";
 
-import type { GameNotifier } from "./game.notifier";
+import { GameNotifier } from "./game.notifier";
 
 @Injectable()
 export class GameService {

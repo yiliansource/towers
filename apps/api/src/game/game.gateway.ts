@@ -17,15 +17,15 @@ import type { Server } from "socket.io";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
-import type { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
+import { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
 import type { User } from "@/generated/prisma/client";
-import type { LobbyMapper } from "@/lobby/lobby.mapper";
-import type { LobbyNotification, LobbyNotifier } from "@/lobby/lobby.notifier";
-import type { LobbyService } from "@/lobby/lobby.service";
-import type { LobbyPresenceService } from "@/lobby/lobby-presence.service";
+import { LobbyMapper } from "@/lobby/lobby.mapper";
+import { LobbyNotification, LobbyNotifier } from "@/lobby/lobby.notifier";
+import { LobbyService } from "@/lobby/lobby.service";
+import { LobbyPresenceService } from "@/lobby/lobby-presence.service";
 
-import type { GameNotification, GameNotifier } from "./game.notifier";
-import type { GameService } from "./game.service";
+import { GameNotification, GameNotifier } from "./game.notifier";
+import { GameService } from "./game.service";
 
 @WebSocketGateway({
     namespace: "/game",

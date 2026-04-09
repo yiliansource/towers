@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { ConfigService } from "@nestjs/config";
+import { ConfigService } from "@nestjs/config";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
 import type { ApiEnv } from "@towers/shared/env/api";
@@ -8,7 +8,7 @@ import { PrismaClient } from "../generated/prisma/client";
 
 @Injectable()
 export class PrismaService extends PrismaClient {
-    constructor(readonly config: ConfigService<ApiEnv, true>) {
+    constructor(readonly config: ConfigService<ApiEnv>) {
         const adapter = new PrismaBetterSqlite3({
             url: config.get("DATABASE_URL", { infer: true }),
         });

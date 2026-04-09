@@ -3,10 +3,10 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { parse } from "cookie";
 import type { DefaultEventsMap, Server, Socket } from "socket.io";
 
-import type { UserService } from "@/user/user.service";
+import { UserService } from "@/user/user.service";
 
 import { ACCESS_TOKEN_COOKIE } from "./auth.constants";
-import type { AuthService } from "./auth.service";
+import { AuthService } from "./auth.service";
 import type { AuthSocketData } from "./auth.types";
 
 export type AuthServer<

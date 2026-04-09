@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import type { LobbyView, SlotColor } from "@towers/shared/contracts";
 
 import { ViewMapper } from "@/common/view-mapper";
-import type { UserMapper } from "@/user/user.mapper";
+import { UserMapper } from "@/user/user.mapper";
 
 import type { LobbyWithRelations } from "./lobby.types";
 

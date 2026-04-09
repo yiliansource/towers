@@ -3,7 +3,7 @@ import type { Reflector } from "@nestjs/core";
 import { AuthGuard } from "@nestjs/passport";
 import type { Response } from "express";
 
-import type { AuthCookieService } from "./auth-cookie.service";
+import { AuthCookieService } from "./auth-cookie.service";
 import { NO_AUTH_KEY } from "./no-auth.decorator";
 
 @Injectable()
