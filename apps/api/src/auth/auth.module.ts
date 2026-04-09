@@ -6,6 +6,7 @@ import { PassportModule } from "@nestjs/passport";
 import { ApiEnv } from "@towers/shared/env/api";
 
 import { UserModule } from "../user/user.module";
+import { AuthCookieService } from "./auth-cookie.service";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { JwtStrategy } from "./jwt.strategy";
@@ -26,7 +27,7 @@ import { SocketAuthService } from "./socket-auth.service";
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, SocketAuthService],
-    exports: [AuthService, SocketAuthService],
+    providers: [AuthService, AuthCookieService, JwtStrategy, SocketAuthService],
+    exports: [AuthService, AuthCookieService, SocketAuthService],
 })
 export class AuthModule {}

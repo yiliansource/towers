@@ -4,6 +4,7 @@ import { DefaultEventsMap, Server, Socket } from "socket.io";
 
 import { UserService } from "@/user/user.service";
 
+import { ACCESS_TOKEN_COOKIE } from "./auth.constants";
 import { AuthService } from "./auth.service";
 import { AuthSocketData } from "./auth.types";
 
@@ -30,7 +31,7 @@ export class SocketAuthService {
         }
 
         const cookies = parse(cookieHeader);
-        const token = cookies["access_token"];
+        const token = cookies[ACCESS_TOKEN_COOKIE];
         if (!token) {
             throw new UnauthorizedException("Missing auth cookie");
         }

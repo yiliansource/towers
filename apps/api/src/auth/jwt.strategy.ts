@@ -6,11 +6,12 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 
 import { ApiEnv } from "@towers/shared/env/api";
 
+import { ACCESS_TOKEN_COOKIE } from "./auth.constants";
 import { AuthService } from "./auth.service";
 
 function cookieExtractor(req: Request): string | null {
     if (!req?.cookies) return null;
-    return (req.cookies["access_token"] as string) ?? null;
+    return (req.cookies[ACCESS_TOKEN_COOKIE] as string) ?? null;
 }
 
 @Injectable()

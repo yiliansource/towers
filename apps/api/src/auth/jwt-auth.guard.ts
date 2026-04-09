@@ -1,12 +1,17 @@
-import { ExecutionContext, Injectable } from "@nestjs/common";
+import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { AuthGuard } from "@nestjs/passport";
+import { Response } from "express";
 
+import { AuthCookieService } from "./auth-cookie.service";
 import { NO_AUTH_KEY } from "./no-auth.decorator";
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard("jwt") {
-    constructor(private readonly reflector: Reflector) {
+    constructor(
+        private readonly reflector: Reflector,
+        private readonly authCookieService: AuthCookieService,
+    ) {
         super();
     }
 
@@ -21,5 +26,17 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
         }
 
         return super.canActivate(context);
+    }
+
+    handleRequest<TUser>(err: any, user: TUser, info: any, context: ExecutionContext) {
+        const res = context.switchToHttp().getResponse<Response>();
+
+        if (err || !user) {
+            this.authCookieService.clearAccessToken(res);
+            // TODO: the user might be presented with a corrupted screen; we should redirect them to the login page here
+
+            throw err || new UnauthorizedException();
+        }
+        return user;
     }
 }
