@@ -1,23 +1,18 @@
-import { Logger, NotFoundException, OnModuleDestroy, UnauthorizedException } from "@nestjs/common";
-import {
-    Ack,
-    MessageBody,
-    OnGatewayInit,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer,
-} from "@nestjs/websockets";
+import { Logger, NotFoundException, OnModuleDestroy, UnauthorizedException, UseFilters } from "@nestjs/common";
+import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Subscription } from "rxjs";
 import { Server } from "socket.io";
 
-import { LobbyClientToServerEvents, LobbyError, LobbyServerToClientEvents } from "@towers/shared/contracts/lobby";
+import { LobbyClientToServerEvents, LobbyError, LobbyServerToClientEvents, SlotColor } from "@towers/shared/contracts";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
 import type { AuthSocket } from "@/auth/socket-auth.service";
 import { SocketAuthService } from "@/auth/socket-auth.service";
 import type { User } from "@/generated/prisma/client";
+import { UserService } from "@/user/user.service";
 
+import { LobbyWsExceptionFilter } from "./errors/lobby-ws-exception.filter";
 import { LobbyPresenceService } from "./lobby-presence.service";
 import { LobbyMapper } from "./lobby.mapper";
 import { LobbyNotification, LobbyNotifier } from "./lobby.notifier";
@@ -27,6 +22,7 @@ import { LobbyService } from "./lobby.service";
     namespace: "/lobby",
     cors: { origin: true, credentials: true },
 })
+@UseFilters(LobbyWsExceptionFilter)
 export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit, OnModuleDestroy {
     private readonly logger = new Logger(LobbyGateway.name);
     private subscription?: Subscription;
@@ -35,6 +31,7 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
     server!: Server<LobbyClientToServerEvents, LobbyServerToClientEvents>;
 
     constructor(
+        private readonly userService: UserService,
         private readonly lobbyService: LobbyService,
         private readonly lobbyMapper: LobbyMapper,
         private readonly lobbyNotifier: LobbyNotifier,
@@ -93,13 +90,13 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
     }
 
     @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.leave")
-    async handleLobbyLeave(@AuthenticatedSocketUser() user: User, @Ack() ack: () => void): Promise<void> {
+    async handleLobbyLeave(@AuthenticatedSocketUser() user: User) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 
         await this.lobbyService.leaveLobby(user.id);
 
-        ack();
+        return { ok: true };
     }
 
     @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.switch_slot")
@@ -108,6 +105,41 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
         if (!lobby) throw new NotFoundException();
 
         await this.lobbyService.changeSlot(lobby.id, user.id, slot);
+
+        return { ok: true };
+    }
+
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.choose_color")
+    async handleLobbyChooseColor(@MessageBody("color") color: SlotColor, @AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new NotFoundException();
+
+        await this.lobbyService.chooseColor(lobby.id, user.id, color);
+
+        return { ok: true };
+    }
+
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.kick_slot")
+    async handleLobbyKickSlot(@MessageBody("slot") slot: number, @AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new NotFoundException();
+
+        // TODO: this is awkward
+        await this.lobbyService.kickSlot(lobby.id, user.id, slot);
+        const socketId = await this.userService.getSocketId(lobby.seats[slot].userId!);
+        this.server.to(socketId!).emit("lobby.removed");
+
+        return { ok: true };
+    }
+
+    @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.promote_slot")
+    async handleLobbyPromoteSlot(@MessageBody("slot") slot: number, @AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new NotFoundException();
+
+        await this.lobbyService.promoteSlot(lobby.id, user.id, slot);
+
+        return { ok: true };
     }
 
     @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.start_game")
@@ -117,5 +149,7 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
         if (lobby.hostId !== user.id) throw new UnauthorizedException();
 
         await this.lobbyService.startGame(lobby.id);
+
+        return { ok: true };
     }
 }

@@ -1,24 +1,29 @@
-import { Body, Controller, Get, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Res, UseFilters } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { CookieOptions, Response } from "express";
 
-import { LoginInputSchema, RegisterInputSchema } from "@towers/shared/contracts/auth";
-import type { LoginInput, RegisterInput, UserView } from "@towers/shared/contracts/auth";
+import {
+    type LoginInput,
+    LoginInputSchema,
+    type RegisterInput,
+    RegisterInputSchema,
+    UserView,
+} from "@towers/shared/contracts";
 import { ApiEnv } from "@towers/shared/env/api";
 
 import { UseZodSchema } from "@/common/decorators/use-zod-schema.decorator";
 import type { User } from "@/generated/prisma/client";
 import { UserMapper } from "@/user/user.mapper";
-import { UserService } from "@/user/user.service";
 
 import { AuthService } from "./auth.service";
 import { AuthenticatedUser } from "./authenticated-user.decorator";
+import { AuthHttpExceptionFilter } from "./errors/auth-http-exception-filter";
 import { NoAuth } from "./no-auth.decorator";
 
 @Controller("auth")
+@UseFilters(AuthHttpExceptionFilter)
 export class AuthController {
     constructor(
-        private readonly userService: UserService,
         private readonly userMapper: UserMapper,
         private readonly authService: AuthService,
         private readonly config: ConfigService<ApiEnv>,

@@ -1,6 +1,6 @@
-import { Injectable, NotImplementedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
-import { LobbyError } from "@towers/shared/contracts/lobby";
+import { LobbyError, SlotColor } from "@towers/shared/contracts";
 
 import { Lobby, Prisma } from "@/generated/prisma/client";
 import { PrismaService } from "@/prisma/prisma.service";
@@ -51,10 +51,12 @@ export class LobbyService {
                             {
                                 slot: 0,
                                 userId: hostUserId,
+                                color: Object.values(SlotColor)[0],
                             },
                             ...Array.from(Array(3).keys()).map((i) => ({
                                 slot: i + 1,
                                 userId: null,
+                                color: Object.values(SlotColor)[i + 1],
                             })),
                         ],
                     },
@@ -146,13 +148,66 @@ export class LobbyService {
         this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
 
-    // eslint-disable-next-line
-    async kickPlayer(lobbyId: string, targetUserId: string): Promise<void> {
-        throw new NotImplementedException();
+    async chooseColor(lobbyId: string, userId: string, color: SlotColor): Promise<void> {
+        if (!(color in SlotColor)) throw new Error();
+
+        const lobby = await this.getLobbyByUser(userId);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        const userSeat = lobby.seats.find((s) => s.userId === userId)!;
+
+        const usedColors = lobby.seats.map((s) => s.color);
+        const visibleColors = lobby.seats.filter((s) => !!s.user).map((s) => s.color);
+        if (visibleColors.includes(color)) throw new LobbyError("COLOR_OCCUPIED");
+
+        await this.prisma.lobbySeat.update({
+            where: { userId },
+            data: { color },
+        });
+
+        usedColors.splice(userSeat.slot, 1, color);
+
+        const conflictingSeat = lobby.seats.find((s) => s.color === color);
+        if (conflictingSeat) {
+            const firstFreeColor = Object.values(SlotColor).find((c) => !usedColors.includes(c));
+
+            await this.prisma.lobbySeat.updateMany({
+                where: { lobbyId, slot: conflictingSeat.slot },
+                data: { color: firstFreeColor },
+            });
+        }
+
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
-    // eslint-disable-next-line
-    async changeHost(lobbyId: string, newHostUserId: string): Promise<void> {
-        throw new NotImplementedException();
+
+    async kickSlot(lobbyId: string, userId: string, slot: number): Promise<void> {
+        const lobby = await this.getLobbyByUser(userId);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        if (lobby.hostId !== userId) throw new LobbyError("NOT_LOBBY_HOST");
+
+        await this.prisma.lobbySeat.updateMany({
+            where: { lobbyId, slot },
+            data: { userId: null },
+        });
+
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
+    }
+    async promoteSlot(lobbyId: string, userId: string, slot: number): Promise<void> {
+        const lobby = await this.getLobbyByUser(userId);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        if (lobby.hostId !== userId) throw new LobbyError("NOT_LOBBY_HOST");
+
+        const newHostUserId = lobby.seats[slot].userId;
+        if (!newHostUserId) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        await this.prisma.lobby.update({
+            where: { id: lobbyId },
+            data: { hostId: newHostUserId },
+        });
+
+        this.lobbyNotifier.emitLobbyUpdate(lobby.id);
     }
 
     async changeSlot(lobbyId: string, userId: string, slot: number): Promise<void> {
@@ -166,11 +221,11 @@ export class LobbyService {
 
         await this.prisma.lobbySeat.update({
             where: { id: oldSlot.id },
-            data: { userId: null },
+            data: { userId: null, color: newSlot.color },
         });
         await this.prisma.lobbySeat.update({
             where: { id: newSlot.id },
-            data: { userId },
+            data: { userId, color: oldSlot.color },
         });
 
         this.lobbyNotifier.emitLobbyUpdate(lobby.id);

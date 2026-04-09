@@ -3,12 +3,8 @@ import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSock
 import { Subscription } from "rxjs";
 import { Server } from "socket.io";
 
-import type {
-    GameClientToServerEvents,
-    GamePerformActionPayload,
-    GameServerToClientEvents,
-} from "@towers/shared/contracts/game";
-import { LobbyError } from "@towers/shared/contracts/lobby";
+import { GameClientToServerEvents, GameServerToClientEvents, LobbyError } from "@towers/shared/contracts";
+import { type StackedAxial } from "@towers/shared/hexgrid";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
@@ -65,6 +61,7 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
     }
     onModuleDestroy(): void {
         this.gameNotifierSub?.unsubscribe();
+        this.lobbyNotifierSub?.unsubscribe();
     }
 
     private async handleGameNotification(event: GameNotification): Promise<void> {
@@ -113,12 +110,22 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
         }
     }
 
-    @SubscribeMessage<keyof GameClientToServerEvents>("game.perform_action")
-    async handleLobbyLeave(@AuthenticatedSocketUser() user: User, @MessageBody() payload: GamePerformActionPayload) {
+    @SubscribeMessage<keyof GameClientToServerEvents>("game.abort_game")
+    async handleGameAbort(@AuthenticatedSocketUser() user: User) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 
-        await this.gameService.performAction(lobby.id, user.id, payload);
+        await this.gameService.finishGame(lobby.id);
+
+        return { ok: true };
+    }
+
+    @SubscribeMessage<keyof GameClientToServerEvents>("game.place_knight")
+    async handlePlaceKnight(@AuthenticatedSocketUser() user: User, @MessageBody("coord") coord: StackedAxial) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        await this.gameService.placeKnight(lobby.id, user.id, coord);
 
         return { ok: true };
     }

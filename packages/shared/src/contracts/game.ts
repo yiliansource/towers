@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { StackedAxial } from "../hexgrid/types.js";
 import { StackedAxialSchema } from "./hex.js";
 import { LobbyView } from "./lobby.js";
 
@@ -27,12 +28,14 @@ export type GamePhase = (typeof GamePhase)[keyof typeof GamePhase];
 
 export interface GameServerToClientEvents {
     "game.finished": () => void;
-    "game.updated": (snapshot: GameState) => void;
+    "game.updated": (payload: GameState) => void;
     "lobby.updated": (payload: LobbyView) => void;
 }
 
 export interface GameClientToServerEvents {
-    "game.perform_action": (payload: GamePerformActionPayload) => boolean;
+    "game.place_knight": (payload: { coord: StackedAxial }) => void;
+    "game.end_turn": () => void;
+    "game.abort_game": () => void;
     "game.message": (payload: string) => void;
 }
 

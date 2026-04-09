@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import * as argon2 from "argon2";
 
-import { AuthError } from "@towers/shared/contracts/auth";
+import { AuthError } from "@towers/shared/contracts";
 import { ApiEnv } from "@towers/shared/env/api";
 
 import { User } from "@/generated/prisma/client";

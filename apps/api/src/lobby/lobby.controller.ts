@@ -1,15 +1,17 @@
-import { Controller, Get, NotFoundException, Param, Post } from "@nestjs/common";
+import { Controller, Get, NotFoundException, Param, Post, UseFilters } from "@nestjs/common";
 
-import { LobbyView } from "@towers/shared/contracts/lobby";
+import { LobbyView } from "@towers/shared/contracts";
 
 import { AuthenticatedUser } from "@/auth/authenticated-user.decorator";
 import type { User } from "@/generated/prisma/client";
 import { UserService } from "@/user/user.service";
 
+import { LobbyHttpExceptionFilter } from "./errors/lobby-http-exception.filter";
 import { LobbyMapper } from "./lobby.mapper";
 import { LobbyService } from "./lobby.service";
 
 @Controller("lobby")
+@UseFilters(LobbyHttpExceptionFilter)
 export class LobbyController {
     constructor(
         private readonly lobbyService: LobbyService,

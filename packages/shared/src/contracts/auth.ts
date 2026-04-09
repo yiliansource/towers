@@ -17,6 +17,15 @@ export class AuthError extends Error {
     }
 }
 
+export interface AuthErrorHttpResponse {
+    error: "AuthError";
+    code: string;
+    message: string;
+    timestamp: string;
+    statusCode: number;
+    path: string;
+}
+
 export const UsernameSchema = z
     .string()
     .trim()

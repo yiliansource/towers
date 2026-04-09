@@ -1,6 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 
-import { LobbyError } from "@towers/shared/contracts/lobby";
+import { LobbyError, LobbyErrorReponseBase } from "@towers/shared/contracts";
 
 export function getLobbyErrorHttpStatus(error: LobbyError): HttpStatus {
     switch (error.code) {
@@ -24,4 +24,13 @@ export function getLobbyErrorHttpStatus(error: LobbyError): HttpStatus {
         default:
             return HttpStatus.BAD_REQUEST;
     }
+}
+
+export function mapLobbyError(exception: LobbyError): LobbyErrorReponseBase {
+    return {
+        error: "LobbyError",
+        code: exception.code,
+        message: exception.message,
+        timestamp: new Date().toISOString(),
+    };
 }

@@ -1,15 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-
-import { useAuthStore } from "@/lib/stores/auth.store";
+import { useHydrateAuthOnMount } from "@/features/auth/hooks/use-hydrate-auth-on-mount";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-    const hydrateAuth = useAuthStore((s) => s.hydrateAuth);
-
-    useEffect(() => {
-        void hydrateAuth();
-    }, []);
+    useHydrateAuthOnMount();
 
     return <>{children}</>;
 }

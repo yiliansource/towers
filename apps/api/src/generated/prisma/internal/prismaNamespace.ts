@@ -692,6 +692,7 @@ export const LobbySeatScalarFieldEnum = {
   lobbyId: 'lobbyId',
   userId: 'userId',
   slot: 'slot',
+  color: 'color',
   joinedAt: 'joinedAt'
 } as const
 

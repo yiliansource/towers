@@ -2,8 +2,7 @@ import { Injectable, InternalServerErrorException, Logger, NotFoundException } f
 import { InputJsonValue } from "@prisma/client/runtime/client";
 import { produce } from "immer";
 
-import { GameError, GamePerformActionPayload, GameState, GameStateSchema } from "@towers/shared/contracts/game";
-import { LobbyError } from "@towers/shared/contracts/lobby";
+import { GameError, GamePerformActionPayload, GameState, GameStateSchema, LobbyError } from "@towers/shared/contracts";
 import {
     AXIAL_ZERO,
     STACKED_AXIAL_DOWN,

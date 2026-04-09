@@ -22,6 +22,11 @@ export class UserService {
         return await this.prisma.user.findFirst({ where: { socketId } });
     }
 
+    async getSocketId(userId: string): Promise<string | null> {
+        const user = await this.getUserById(userId);
+        if (user) return user.socketId;
+        return null;
+    }
     async registerSocket(userId: string, socketId: string): Promise<void> {
         await this.prisma.user.update({
             where: { id: userId },

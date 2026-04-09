@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
 import { Request, Response } from "express";
 
-import { GameError } from "@towers/shared/contracts/game";
+import { GameError } from "@towers/shared/contracts";
 
 import { getGameErrorHttpStatus } from "./game-error.mapper";
 

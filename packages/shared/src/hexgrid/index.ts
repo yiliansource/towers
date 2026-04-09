@@ -1,7 +1,3 @@
-const SIZE = 1;
-
-const UNIT_WIDTH = 2 * SIZE;
-
 export * from "./types.js";
 
 export * from "./coords/axial.js";

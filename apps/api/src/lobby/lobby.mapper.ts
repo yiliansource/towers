@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { LobbyView } from "@towers/shared/contracts/lobby";
+import { LobbyView, SlotColor } from "@towers/shared/contracts";
 
 import { ViewMapper } from "@/common/view-mapper";
 import { UserMapper } from "@/user/user.mapper";
@@ -23,6 +23,7 @@ export class LobbyMapper extends ViewMapper<LobbyWithRelations, LobbyView> {
                 lobby.seats.map(async (s) => ({
                     user: s.user ? await this.userMapper.toView(s.user) : null,
                     slot: s.slot,
+                    color: s.color as SlotColor,
                 })),
             ),
         };

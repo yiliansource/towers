@@ -1,13 +1,12 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { APP_FILTER, APP_GUARD } from "@nestjs/core";
+import { APP_GUARD } from "@nestjs/core";
 
 import { ApiEnvSchema } from "@towers/shared/env/api";
 
 import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { GameModule } from "./game/game.module";
-import { LobbyHttpExceptionFilter } from "./lobby/errors/lobby-http-exception.filter";
 import { LobbyModule } from "./lobby/lobby.module";
 import { UserModule } from "./user/user.module";
 
@@ -34,10 +33,6 @@ import { UserModule } from "./user/user.module";
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
-        },
-        {
-            provide: APP_FILTER,
-            useClass: LobbyHttpExceptionFilter,
         },
     ],
 })

@@ -1,9 +1,9 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
 import { Request, Response } from "express";
 
-import { LobbyError } from "@towers/shared/contracts/lobby";
+import { LobbyError, LobbyErrorHttpResponse } from "@towers/shared/contracts";
 
-import { getLobbyErrorHttpStatus } from "./lobby-error.mapper";
+import { getLobbyErrorHttpStatus, mapLobbyError } from "./lobby-error.mapper";
 
 @Catch(LobbyError)
 export class LobbyHttpExceptionFilter implements ExceptionFilter {
@@ -17,11 +17,8 @@ export class LobbyHttpExceptionFilter implements ExceptionFilter {
 
         response.status(status).json({
             statusCode: status,
-            error: "LobbyError",
-            code: exception.code,
-            message: exception.message,
             path: request.url,
-            timestamp: new Date().toISOString(),
-        });
+            ...mapLobbyError(exception),
+        } satisfies LobbyErrorHttpResponse);
     }
 }

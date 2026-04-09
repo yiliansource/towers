@@ -10,25 +10,17 @@
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
         },
-        "./contracts/common": {
-            "types": "./dist/contracts/common.d.ts",
-            "default": "./dist/contracts/common.js"
-        },
-        "./contracts/auth": {
-            "types": "./dist/contracts/auth.d.ts",
-            "default": "./dist/contracts/auth.js"
-        },
-        "./contracts/lobby": {
-            "types": "./dist/contracts/lobby.d.ts",
-            "default": "./dist/contracts/lobby.js"
-        },
-        "./contracts/game": {
-            "types": "./dist/contracts/game.d.ts",
-            "default": "./dist/contracts/game.js"
+        "./contracts": {
+            "types": "./dist/contracts/index.d.ts",
+            "default": "./dist/contracts/index.js"
         },
         "./env/api": {
             "types": "./dist/env/api.d.ts",
             "default": "./dist/env/api.js"
+        },
+        "./env/web": {
+            "types": "./dist/env/web.d.ts",
+            "default": "./dist/env/web.js"
         },
         "./hexgrid": {
             "types": "./dist/hexgrid/index.d.ts",

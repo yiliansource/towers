@@ -39,6 +39,7 @@ export type LobbySeatMinAggregateOutputType = {
   lobbyId: string | null
   userId: string | null
   slot: number | null
+  color: string | null
   joinedAt: Date | null
 }
 
@@ -47,6 +48,7 @@ export type LobbySeatMaxAggregateOutputType = {
   lobbyId: string | null
   userId: string | null
   slot: number | null
+  color: string | null
   joinedAt: Date | null
 }
 
@@ -55,6 +57,7 @@ export type LobbySeatCountAggregateOutputType = {
   lobbyId: number
   userId: number
   slot: number
+  color: number
   joinedAt: number
   _all: number
 }
@@ -73,6 +76,7 @@ export type LobbySeatMinAggregateInputType = {
   lobbyId?: true
   userId?: true
   slot?: true
+  color?: true
   joinedAt?: true
 }
 
@@ -81,6 +85,7 @@ export type LobbySeatMaxAggregateInputType = {
   lobbyId?: true
   userId?: true
   slot?: true
+  color?: true
   joinedAt?: true
 }
 
@@ -89,6 +94,7 @@ export type LobbySeatCountAggregateInputType = {
   lobbyId?: true
   userId?: true
   slot?: true
+  color?: true
   joinedAt?: true
   _all?: true
 }
@@ -184,6 +190,7 @@ export type LobbySeatGroupByOutputType = {
   lobbyId: string
   userId: string | null
   slot: number
+  color: string
   joinedAt: Date
   _count: LobbySeatCountAggregateOutputType | null
   _avg: LobbySeatAvgAggregateOutputType | null
@@ -215,6 +222,7 @@ export type LobbySeatWhereInput = {
   lobbyId?: Prisma.StringFilter<"LobbySeat"> | string
   userId?: Prisma.StringNullableFilter<"LobbySeat"> | string | null
   slot?: Prisma.IntFilter<"LobbySeat"> | number
+  color?: Prisma.StringFilter<"LobbySeat"> | string
   joinedAt?: Prisma.DateTimeFilter<"LobbySeat"> | Date | string
   lobby?: Prisma.XOR<Prisma.LobbyScalarRelationFilter, Prisma.LobbyWhereInput>
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -225,6 +233,7 @@ export type LobbySeatOrderByWithRelationInput = {
   lobbyId?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   slot?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   lobby?: Prisma.LobbyOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
@@ -240,6 +249,7 @@ export type LobbySeatWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.LobbySeatWhereInput | Prisma.LobbySeatWhereInput[]
   lobbyId?: Prisma.StringFilter<"LobbySeat"> | string
   slot?: Prisma.IntFilter<"LobbySeat"> | number
+  color?: Prisma.StringFilter<"LobbySeat"> | string
   joinedAt?: Prisma.DateTimeFilter<"LobbySeat"> | Date | string
   lobby?: Prisma.XOR<Prisma.LobbyScalarRelationFilter, Prisma.LobbyWhereInput>
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -250,6 +260,7 @@ export type LobbySeatOrderByWithAggregationInput = {
   lobbyId?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   slot?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   _count?: Prisma.LobbySeatCountOrderByAggregateInput
   _avg?: Prisma.LobbySeatAvgOrderByAggregateInput
@@ -266,12 +277,14 @@ export type LobbySeatScalarWhereWithAggregatesInput = {
   lobbyId?: Prisma.StringWithAggregatesFilter<"LobbySeat"> | string
   userId?: Prisma.StringNullableWithAggregatesFilter<"LobbySeat"> | string | null
   slot?: Prisma.IntWithAggregatesFilter<"LobbySeat"> | number
+  color?: Prisma.StringWithAggregatesFilter<"LobbySeat"> | string
   joinedAt?: Prisma.DateTimeWithAggregatesFilter<"LobbySeat"> | Date | string
 }
 
 export type LobbySeatCreateInput = {
   id?: string
   slot: number
+  color: string
   joinedAt?: Date | string
   lobby: Prisma.LobbyCreateNestedOneWithoutSeatsInput
   user?: Prisma.UserCreateNestedOneWithoutLobbySeatInput
@@ -282,12 +295,14 @@ export type LobbySeatUncheckedCreateInput = {
   lobbyId: string
   userId?: string | null
   slot: number
+  color: string
   joinedAt?: Date | string
 }
 
 export type LobbySeatUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lobby?: Prisma.LobbyUpdateOneRequiredWithoutSeatsNestedInput
   user?: Prisma.UserUpdateOneWithoutLobbySeatNestedInput
@@ -298,6 +313,7 @@ export type LobbySeatUncheckedUpdateInput = {
   lobbyId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -306,12 +322,14 @@ export type LobbySeatCreateManyInput = {
   lobbyId: string
   userId?: string | null
   slot: number
+  color: string
   joinedAt?: Date | string
 }
 
 export type LobbySeatUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -320,6 +338,7 @@ export type LobbySeatUncheckedUpdateManyInput = {
   lobbyId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -353,6 +372,7 @@ export type LobbySeatCountOrderByAggregateInput = {
   lobbyId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   slot?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
 }
 
@@ -365,6 +385,7 @@ export type LobbySeatMaxOrderByAggregateInput = {
   lobbyId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   slot?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
 }
 
@@ -373,6 +394,7 @@ export type LobbySeatMinOrderByAggregateInput = {
   lobbyId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   slot?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
 }
 
@@ -465,6 +487,7 @@ export type IntFieldUpdateOperationsInput = {
 export type LobbySeatCreateWithoutUserInput = {
   id?: string
   slot: number
+  color: string
   joinedAt?: Date | string
   lobby: Prisma.LobbyCreateNestedOneWithoutSeatsInput
 }
@@ -473,6 +496,7 @@ export type LobbySeatUncheckedCreateWithoutUserInput = {
   id?: string
   lobbyId: string
   slot: number
+  color: string
   joinedAt?: Date | string
 }
 
@@ -495,6 +519,7 @@ export type LobbySeatUpdateToOneWithWhereWithoutUserInput = {
 export type LobbySeatUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lobby?: Prisma.LobbyUpdateOneRequiredWithoutSeatsNestedInput
 }
@@ -503,12 +528,14 @@ export type LobbySeatUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   lobbyId?: Prisma.StringFieldUpdateOperationsInput | string
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LobbySeatCreateWithoutLobbyInput = {
   id?: string
   slot: number
+  color: string
   joinedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutLobbySeatInput
 }
@@ -517,6 +544,7 @@ export type LobbySeatUncheckedCreateWithoutLobbyInput = {
   id?: string
   userId?: string | null
   slot: number
+  color: string
   joinedAt?: Date | string
 }
 
@@ -553,6 +581,7 @@ export type LobbySeatScalarWhereInput = {
   lobbyId?: Prisma.StringFilter<"LobbySeat"> | string
   userId?: Prisma.StringNullableFilter<"LobbySeat"> | string | null
   slot?: Prisma.IntFilter<"LobbySeat"> | number
+  color?: Prisma.StringFilter<"LobbySeat"> | string
   joinedAt?: Prisma.DateTimeFilter<"LobbySeat"> | Date | string
 }
 
@@ -560,12 +589,14 @@ export type LobbySeatCreateManyLobbyInput = {
   id?: string
   userId?: string | null
   slot: number
+  color: string
   joinedAt?: Date | string
 }
 
 export type LobbySeatUpdateWithoutLobbyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutLobbySeatNestedInput
 }
@@ -574,6 +605,7 @@ export type LobbySeatUncheckedUpdateWithoutLobbyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -581,6 +613,7 @@ export type LobbySeatUncheckedUpdateManyWithoutLobbyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  color?: Prisma.StringFieldUpdateOperationsInput | string
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -591,6 +624,7 @@ export type LobbySeatSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   lobbyId?: boolean
   userId?: boolean
   slot?: boolean
+  color?: boolean
   joinedAt?: boolean
   lobby?: boolean | Prisma.LobbyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.LobbySeat$userArgs<ExtArgs>
@@ -601,6 +635,7 @@ export type LobbySeatSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   lobbyId?: boolean
   userId?: boolean
   slot?: boolean
+  color?: boolean
   joinedAt?: boolean
   lobby?: boolean | Prisma.LobbyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.LobbySeat$userArgs<ExtArgs>
@@ -611,6 +646,7 @@ export type LobbySeatSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   lobbyId?: boolean
   userId?: boolean
   slot?: boolean
+  color?: boolean
   joinedAt?: boolean
   lobby?: boolean | Prisma.LobbyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.LobbySeat$userArgs<ExtArgs>
@@ -621,10 +657,11 @@ export type LobbySeatSelectScalar = {
   lobbyId?: boolean
   userId?: boolean
   slot?: boolean
+  color?: boolean
   joinedAt?: boolean
 }
 
-export type LobbySeatOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lobbyId" | "userId" | "slot" | "joinedAt", ExtArgs["result"]["lobbySeat"]>
+export type LobbySeatOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lobbyId" | "userId" | "slot" | "color" | "joinedAt", ExtArgs["result"]["lobbySeat"]>
 export type LobbySeatInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lobby?: boolean | Prisma.LobbyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.LobbySeat$userArgs<ExtArgs>
@@ -649,6 +686,7 @@ export type $LobbySeatPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     lobbyId: string
     userId: string | null
     slot: number
+    color: string
     joinedAt: Date
   }, ExtArgs["result"]["lobbySeat"]>
   composites: {}
@@ -1079,6 +1117,7 @@ export interface LobbySeatFieldRefs {
   readonly lobbyId: Prisma.FieldRef<"LobbySeat", 'String'>
   readonly userId: Prisma.FieldRef<"LobbySeat", 'String'>
   readonly slot: Prisma.FieldRef<"LobbySeat", 'Int'>
+  readonly color: Prisma.FieldRef<"LobbySeat", 'String'>
   readonly joinedAt: Prisma.FieldRef<"LobbySeat", 'DateTime'>
 }
     

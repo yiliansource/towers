@@ -18,3 +18,8 @@
 .radix-themes {
     --default-font-family: "Geist Sans", sans-serif;
 }
+
+::view-transition-old(.fade),
+::view-transition-new(.fade) {
+    animation-duration: 120ms;
+}

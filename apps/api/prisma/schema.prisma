@@ -50,7 +50,8 @@ model LobbySeat {
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String? @unique
 
-  slot Int
+  slot  Int
+  color String
 
   joinedAt DateTime @default(now())
 
