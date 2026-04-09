@@ -1,6 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 
-import { LobbyError, LobbyErrorReponseBase } from "@towers/shared/contracts";
+import type { LobbyError, LobbyErrorReponseBase } from "@towers/shared/contracts";
 
 export function getLobbyErrorHttpStatus(error: LobbyError): HttpStatus {
     switch (error.code) {

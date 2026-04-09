@@ -1,8 +1,8 @@
-import { ArgumentsHost, Catch, WsExceptionFilter } from "@nestjs/common";
+import { type ArgumentsHost, Catch, type WsExceptionFilter } from "@nestjs/common";
 
-import { LobbyError, LobbyErrorWsResponse } from "@towers/shared/contracts";
+import { LobbyError, type LobbyErrorWsResponse } from "@towers/shared/contracts";
 
-import { AuthSocket } from "@/auth/socket-auth.service";
+import type { AuthSocket } from "@/auth/socket-auth.service";
 
 import { mapLobbyError } from "./lobby-error.mapper";
 

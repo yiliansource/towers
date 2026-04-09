@@ -1,4 +1,4 @@
-import { Axial, Cube } from "../types.js";
+import type { Axial, Cube } from "../types.js";
 import { axial } from "./axial.js";
 import { cube } from "./cube.js";
 

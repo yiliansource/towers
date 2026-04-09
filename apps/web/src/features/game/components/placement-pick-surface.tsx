@@ -1,17 +1,16 @@
+import type { StackedAxial } from "@towers/shared/hexgrid";
 import { useMemo } from "react";
 import * as THREE from "three";
 
-import { StackedAxial } from "@towers/shared/hexgrid";
-
 import { stackedToWorld } from "@/common/util/hex2three";
-import { useAuthStore } from "@/features/auth/store/auth.store";
+import { useAuthStore } from "@/features/auth";
 
 import { useGameCommands } from "../realtime/use-game-commands";
 import { useGameStore } from "../store/game.store";
 
 export function PlacementPickSurface({ coord }: { coord: StackedAxial }) {
     // const { setHoveredHex, selectHex } = useGameStore();
-    const user = useAuthStore((s) => s.user!);
+    const _user = useAuthStore((s) => s.user!);
     const game = useGameStore((s) => s.game!);
     const { placeKnight } = useGameCommands();
 
@@ -24,7 +23,7 @@ export function PlacementPickSurface({ coord }: { coord: StackedAxial }) {
             return new THREE.Vector2(Math.cos(theta) * radius, Math.sin(theta) * radius);
         });
 
-        shape.moveTo(points[0]!.x, points[0]!.y);
+        shape.moveTo(points[0]?.x, points[0]?.y);
         for (const p of points.slice(1)) shape.lineTo(p.x, p.y);
         shape.closePath();
 
@@ -43,9 +42,11 @@ export function PlacementPickSurface({ coord }: { coord: StackedAxial }) {
 
     return (
         <mesh
-            position={[x, y + 0.02, z]}
             geometry={geometry}
-            userData={{ coord }}
+            onClick={(e) => {
+                e.stopPropagation();
+                handleClick();
+            }}
             onPointerMove={(e) => {
                 e.stopPropagation();
                 // setHoveredHex(coord);
@@ -54,12 +55,10 @@ export function PlacementPickSurface({ coord }: { coord: StackedAxial }) {
                 e.stopPropagation();
                 // setHoveredHex(null);
             }}
-            onClick={(e) => {
-                e.stopPropagation();
-                handleClick();
-            }}
+            position={[x, y + 0.02, z]}
+            userData={{ coord }}
         >
-            <meshBasicMaterial transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
+            <meshBasicMaterial depthWrite={false} opacity={0} side={THREE.DoubleSide} transparent />
         </mesh>
     );
 }

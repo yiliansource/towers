@@ -1,10 +1,11 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: TODO: fix assertions */
 import { Stats } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 
 import { DevOnly } from "@/common/ui/dev-only";
-import { useAuthStore } from "@/features/auth/store/auth.store";
-import { useLobbyStore } from "@/features/lobby/store/lobby.store";
+import { useAuthStore } from "@/features/auth";
+import { useLobbyStore } from "@/features/lobby";
 
 import { useGameEvents } from "../realtime/use-game-events";
 import { useGameStore } from "../store/game.store";
@@ -51,16 +52,16 @@ function SceneLights() {
         <>
             <ambientLight intensity={0.8} />
             <directionalLight
+                castShadow
                 intensity={2}
                 position={dir}
-                castShadow
-                shadow-mapSize={[2048, 2048]}
-                shadow-camera-near={0.3}
+                shadow-camera-bottom={-10}
                 shadow-camera-far={50}
                 shadow-camera-left={-10}
+                shadow-camera-near={0.3}
                 shadow-camera-right={10}
                 shadow-camera-top={10}
-                shadow-camera-bottom={-10}
+                shadow-mapSize={[2048, 2048]}
             />
         </>
     );

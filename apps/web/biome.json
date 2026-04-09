@@ -1,36 +1,25 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
-    "vcs": {
-        "enabled": true,
-        "clientKind": "git",
-        "useIgnoreFile": true
-    },
+    "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+    "extends": "//",
     "files": {
-        "ignoreUnknown": true,
-        "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
-    },
-    "formatter": {
-        "enabled": true,
-        "indentStyle": "space",
-        "indentWidth": 2
+        "includes": ["src/**", "app/**", "components/**", "features/**", "*.ts", "*.tsx"]
     },
     "linter": {
         "enabled": true,
         "rules": {
             "recommended": true,
-            "suspicious": {
-                "noUnknownAtRules": "off"
-            }
-        },
-        "domains": {
-            "next": "recommended",
-            "react": "recommended"
-        }
-    },
-    "assist": {
-        "actions": {
-            "source": {
-                "organizeImports": "on"
+            "style": {
+                "noRestrictedImports": {
+                    "level": "error",
+                    "options": {
+                        "patterns": [
+                            {
+                                "group": ["@/features/*/**"],
+                                "message": "Import from the feature root only."
+                            }
+                        ]
+                    }
+                }
             }
         }
     }

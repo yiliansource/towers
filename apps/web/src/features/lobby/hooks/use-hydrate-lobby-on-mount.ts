@@ -11,7 +11,7 @@ export function useHydrateLobbyOnMount() {
     const setLoading = useLobbyStore((s) => s.setLoading);
 
     useEffect(() => {
-        (async function () {
+        (async () => {
             try {
                 setLoading(true);
 
@@ -23,5 +23,5 @@ export function useHydrateLobbyOnMount() {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [setLobby, setLoading, clearLobby]);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useHydrateAuthOnMount } from "@/features/auth/hooks/use-hydrate-auth-on-mount";
+import { useHydrateAuthOnMount } from "@/features/auth";
 
 export function Providers({ children }: { children: React.ReactNode }) {
     useHydrateAuthOnMount();

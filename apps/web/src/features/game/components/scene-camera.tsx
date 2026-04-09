@@ -110,20 +110,20 @@ export function SceneCamera() {
 
             el.style.cursor = "";
         };
-    }, [gl.domElement, controlsRef.current]);
+    }, [gl.domElement]);
 
     return (
         <>
             <PerspectiveCamera makeDefault position={defaultCameraPosition} />
             <OrbitControls
-                ref={controlsRef}
-                makeDefault
-                minPolarAngle={(30 * Math.PI) / 180}
-                maxPolarAngle={(70 * Math.PI) / 180}
-                enablePan={false}
-                minDistance={10}
-                maxDistance={20}
                 dampingFactor={0.2}
+                enablePan={false}
+                makeDefault
+                maxDistance={20}
+                maxPolarAngle={(70 * Math.PI) / 180}
+                minDistance={10}
+                minPolarAngle={(30 * Math.PI) / 180}
+                ref={controlsRef}
             />
         </>
     );

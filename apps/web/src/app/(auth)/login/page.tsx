@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 import { TowersBanner } from "@/common/ui/towers-banner";
 import { makeMetaTitle } from "@/common/util/meta-title";

@@ -1,6 +1,5 @@
-import { Socket, io } from "socket.io-client";
-
-import { GameClientToServerEvents, GameServerToClientEvents } from "@towers/shared/contracts";
+import type { GameClientToServerEvents, GameServerToClientEvents } from "@towers/shared/contracts";
+import { io, type Socket } from "socket.io-client";
 
 import { clientEnv } from "@/common/env/env.client";
 

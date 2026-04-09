@@ -1,14 +1,13 @@
 import { animated, useTransition } from "@react-spring/three";
-import { useEffect, useMemo, useState } from "react";
-
 import {
-    StackedAxial,
     axial,
     axialRange,
     axialToStacked,
     parseStackedAxial,
+    type StackedAxial,
     stringifyStackedAxial,
 } from "@towers/shared/hexgrid";
+import { useEffect, useMemo, useState } from "react";
 
 import { stackedToWorld } from "@/common/util/hex2three";
 import { sleep } from "@/common/util/sleep";
@@ -22,7 +21,10 @@ import { Tower } from "./models/tower";
 export function GameBoard() {
     const game = useGameStore((s) => s.game!);
 
-    const gridPositions = useMemo(() => axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0)), []);
+    const gridPositions = useMemo(
+        () => axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0)),
+        [],
+    );
 
     return (
         <>
@@ -125,7 +127,7 @@ function Units({
             return initial ? (4 + coord.q + coord.r + coord.h) * 100 : 0;
         },
         keys: (i) => {
-            return i.unit + "-" + stringifyStackedAxial(i.coord);
+            return `${i.unit}-${stringifyStackedAxial(i.coord)}`;
         },
     });
 

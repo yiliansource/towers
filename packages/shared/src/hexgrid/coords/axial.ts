@@ -56,7 +56,7 @@ export function axialRound(f: Axial): Axial {
 }
 
 export function stringifyAxial(axial: Axial): string {
-    return axial.q + "," + axial.r;
+    return `${axial.q},${axial.r}`;
 }
 
 export function parseAxial(s: string): Axial {

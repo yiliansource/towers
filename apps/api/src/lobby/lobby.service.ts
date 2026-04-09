@@ -2,12 +2,12 @@ import { Injectable } from "@nestjs/common";
 
 import { LobbyError, SlotColor } from "@towers/shared/contracts";
 
-import { Lobby, Prisma } from "@/generated/prisma/client";
-import { PrismaService } from "@/prisma/prisma.service";
-import { UserService } from "@/user/user.service";
+import type { Lobby, Prisma } from "@/generated/prisma/client";
+import type { PrismaService } from "@/prisma/prisma.service";
+import type { UserService } from "@/user/user.service";
 
-import { LobbyNotifier } from "./lobby.notifier";
-import { LobbyWithRelations } from "./lobby.types";
+import type { LobbyNotifier } from "./lobby.notifier";
+import type { LobbyWithRelations } from "./lobby.types";
 
 const lobbyIncludes = {
     host: {
@@ -35,7 +35,7 @@ const lobbyIncludes = {
 export class LobbyService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly userService: UserService,
+        readonly _userService: UserService,
         private readonly lobbyNotifier: LobbyNotifier,
     ) {}
 
@@ -99,7 +99,8 @@ export class LobbyService {
         if (lobby.state !== "WAITING") throw new LobbyError("LOBBY_ALREADY_STARTED");
 
         const seats = lobby.seats;
-        if (seats.some((s) => s.userId === userId)) throw new LobbyError("USER_ALREADY_IN_THIS_LOBBY");
+        if (seats.some((s) => s.userId === userId))
+            throw new LobbyError("USER_ALREADY_IN_THIS_LOBBY");
 
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
@@ -125,7 +126,9 @@ export class LobbyService {
         if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 
         if (lobby.host.id === userId) {
-            const nextHostCandidateSeat = lobby.seats.find((s) => !!s.userId && s.userId !== userId);
+            const nextHostCandidateSeat = lobby.seats.find(
+                (s) => !!s.userId && s.userId !== userId,
+            );
             if (!nextHostCandidateSeat) {
                 // lobby empty after leave
                 await this.prisma.lobby.delete({ where: { id: lobby.id } });
@@ -263,7 +266,9 @@ export class LobbyService {
         let foundLobby: Lobby | null = null;
 
         do {
-            newId = [...Array(4).keys()].map(() => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
+            newId = [...Array(4).keys()]
+                .map(() => alphabet[Math.floor(Math.random() * alphabet.length)])
+                .join("");
             foundLobby = await this.getLobbyByPublicId(newId);
         } while (foundLobby);
 

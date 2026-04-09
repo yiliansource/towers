@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/features/auth/store/auth.store";
+import { useAuthStore } from "@/features/auth";
 
 import { selectIsHostUser } from "./lobby.selectors";
 import { useLobbyStore } from "./lobby.store";

@@ -1,7 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
-import { AuthSocket } from "@/auth/socket-auth.service";
-import { UserService } from "@/user/user.service";
+import type { AuthSocket } from "@/auth/socket-auth.service";
+import type { UserService } from "@/user/user.service";
 
 type LobbyPresenceEntry = {
     socketId: string;
@@ -13,8 +13,6 @@ type LobbyPresenceEntry = {
 @Injectable()
 export class LobbyPresenceService {
     constructor(private readonly userService: UserService) {}
-
-    private readonly logger = new Logger(LobbyPresenceService.name);
 
     private readonly bySocketId = new Map<string, LobbyPresenceEntry>();
     private readonly socketIdByUserId = new Map<string, string>();

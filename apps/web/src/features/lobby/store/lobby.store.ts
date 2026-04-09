@@ -1,8 +1,7 @@
 "use client";
 
+import type { LobbyView } from "@towers/shared/contracts";
 import { create } from "zustand";
-
-import { LobbyView } from "@towers/shared/contracts";
 
 type LobbyState = {
     loading: boolean;

@@ -1,14 +1,14 @@
-import { Module, forwardRef } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
-import { ApiEnv } from "@towers/shared/env/api";
+import type { ApiEnv } from "@towers/shared/env/api";
 
 import { UserModule } from "../user/user.module";
-import { AuthCookieService } from "./auth-cookie.service";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
+import { AuthCookieService } from "./auth-cookie.service";
 import { JwtStrategy } from "./jwt.strategy";
 import { SocketAuthService } from "./socket-auth.service";
 

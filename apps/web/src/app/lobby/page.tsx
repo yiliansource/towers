@@ -1,38 +1,23 @@
 "use client";
 
 import { Spinner } from "@radix-ui/themes";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 import { createLogger } from "@/common/util/logger";
 import {
     LobbyEntryScreen,
-    LobbyScreen,
-    LobbySocketProvider,
-    useHydrateLobbyOnMount,
-    useLobbyEvents,
+    LobbyRoot,
+    useLobbyPageGuard,
+    useLobbyPageLifecycle,
     useLobbyStore,
 } from "@/features/lobby";
 
-const logger = createLogger("lobby-page");
+const _logger = createLogger("lobby-page");
 
 export default function LobbyPage() {
-    useHydrateLobbyOnMount();
+    useLobbyPageLifecycle();
 
     const lobby = useLobbyStore((s) => s.lobby);
-    const loading = useLobbyStore((s) => s.loading);
-    const clearLobby = useLobbyStore((s) => s.clearLobby);
-
-    const router = useRouter();
-
-    useEffect(() => {
-        if (lobby && lobby.state !== "WAITING") {
-            logger.log("game already started, rerouting");
-
-            clearLobby(true);
-            router.push("/game");
-        }
-    }, [lobby, lobby?.state]);
+    const { isAllowed, loading } = useLobbyPageGuard();
 
     if (loading) {
         return (
@@ -46,9 +31,9 @@ export default function LobbyPage() {
         return <LobbyEntryScreen />;
     }
 
-    return (
-        <LobbySocketProvider>
-            <LobbyScreen />
-        </LobbySocketProvider>
-    );
+    if (!isAllowed) {
+        return null;
+    }
+
+    return <LobbyRoot />;
 }

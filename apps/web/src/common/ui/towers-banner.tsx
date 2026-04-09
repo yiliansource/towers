@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 import { cn } from "@/common/util/cn";
 
@@ -15,10 +15,12 @@ export function TowersBanner({ className, ...props }: React.HTMLAttributes<HTMLE
 function Ornament({ className, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
     return (
         <div>
+            {/** biome-ignore lint/performance/noImgElement: just easier to use this here */}
             <img
                 {...props}
-                draggable={false}
+                alt="Decorative Ornament"
                 className={cn(className, "w-8 md:w-10 opacity-40 translate-y-1")}
+                draggable={false}
                 src="./ornament.png"
             />
         </div>

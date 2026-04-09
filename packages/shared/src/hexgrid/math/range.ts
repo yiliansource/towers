@@ -1,5 +1,5 @@
 import { addAxial, axial } from "../coords/axial.js";
-import { Axial } from "../types.js";
+import type { Axial } from "../types.js";
 
 export function axialRange(center: Axial, n: number): Axial[] {
     const results: Axial[] = [];

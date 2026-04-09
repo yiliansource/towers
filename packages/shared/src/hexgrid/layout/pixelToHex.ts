@@ -1,5 +1,5 @@
 import { axial, axialRound } from "../coords/axial.js";
-import { Axial } from "../types.js";
+import type { Axial } from "../types.js";
 import { HEX_SIZE } from "./constants.js";
 
 export function pixelToHex([x, y]: [number, number]): Axial {

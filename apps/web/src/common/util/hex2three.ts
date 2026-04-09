@@ -1,6 +1,5 @@
+import { axial, hexToPixel, type StackedAxial } from "@towers/shared/hexgrid";
 import * as THREE from "three";
-
-import { StackedAxial, axial, hexToPixel } from "@towers/shared/hexgrid";
 
 const HEIGHT = 0.55;
 

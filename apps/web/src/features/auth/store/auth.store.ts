@@ -1,6 +1,5 @@
+import type { UserView } from "@towers/shared/contracts";
 import { create } from "zustand";
-
-import { UserView } from "@towers/shared/contracts";
 
 export type AuthStore = {
     loading: boolean;

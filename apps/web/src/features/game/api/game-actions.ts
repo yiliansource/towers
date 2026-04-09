@@ -1,4 +1,4 @@
-import { GameState } from "@towers/shared/contracts";
+import type { GameState } from "@towers/shared/contracts";
 
 import { fetchApi } from "@/common/util/fetch-api";
 

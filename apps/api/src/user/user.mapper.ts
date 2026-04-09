@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { UserView } from "@towers/shared/contracts";
+import type { UserView } from "@towers/shared/contracts";
 
 import { ViewMapper } from "@/common/view-mapper";
 

@@ -12,7 +12,7 @@ export function createHexGeometry() {
     const points = getHexVertices();
 
     shape.moveTo(points[0].x, points[0].y);
-    points.slice(1).forEach((p) => shape.lineTo(p.x, p.y));
+    points.slice(1).forEach((p) => void shape.lineTo(p.x, p.y));
     shape.closePath();
 
     const geo = new THREE.ShapeGeometry(shape);

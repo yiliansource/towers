@@ -1,27 +1,37 @@
-import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { InputJsonValue } from "@prisma/client/runtime/client";
-import { produce } from "immer";
-
-import { GameError, GamePerformActionPayload, GameState, GameStateSchema, LobbyError } from "@towers/shared/contracts";
+import {
+    Injectable,
+    InternalServerErrorException,
+    Logger,
+    NotFoundException,
+} from "@nestjs/common";
+import type { InputJsonValue } from "@prisma/client/runtime/client";
+import {
+    GameError,
+    type GamePerformActionPayload,
+    type GameState,
+    GameStateSchema,
+    LobbyError,
+} from "@towers/shared/contracts";
 import {
     AXIAL_ZERO,
-    STACKED_AXIAL_DOWN,
-    STACKED_AXIAL_UP,
-    STACKED_AXIAL_ZERO,
-    StackedAxial,
     addStackedAxial,
     axialDirection,
     axialRotateAroundCenter,
     axialToStacked,
     equalStackedAxial,
+    STACKED_AXIAL_DOWN,
+    STACKED_AXIAL_UP,
+    STACKED_AXIAL_ZERO,
+    type StackedAxial,
     scaleAxial,
 } from "@towers/shared/hexgrid";
+import { produce } from "immer";
 
-import { Lobby, Prisma } from "@/generated/prisma/client";
-import { LobbyService } from "@/lobby/lobby.service";
-import { PrismaService } from "@/prisma/prisma.service";
+import { type Lobby, Prisma } from "@/generated/prisma/client";
+import type { LobbyService } from "@/lobby/lobby.service";
+import type { PrismaService } from "@/prisma/prisma.service";
 
-import { GameNotifier } from "./game.notifier";
+import type { GameNotifier } from "./game.notifier";
 
 @Injectable()
 export class GameService {
@@ -105,7 +115,12 @@ export class GameService {
             const coordBelow = addStackedAxial(coord, STACKED_AXIAL_DOWN);
             if (!game.towers.some((t) => equalStackedAxial(t, coordBelow))) return;
             if (equalStackedAxial(game.king, coord)) return;
-            if (Object.values(game.units).some((coords) => coords.some((c) => equalStackedAxial(c, coord)))) return;
+            if (
+                Object.values(game.units).some((coords) =>
+                    coords.some((c) => equalStackedAxial(c, coord)),
+                )
+            )
+                return;
 
             await this.updateGameState(
                 lobbyId,

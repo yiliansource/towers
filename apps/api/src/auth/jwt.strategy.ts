@@ -1,13 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import type { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
-import { Request } from "express";
+import type { ApiEnv } from "@towers/shared/env/api";
+import type { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
-import { ApiEnv } from "@towers/shared/env/api";
-
 import { ACCESS_TOKEN_COOKIE } from "./auth.constants";
-import { AuthService } from "./auth.service";
+import type { AuthService } from "./auth.service";
 
 function cookieExtractor(req: Request): string | null {
     if (!req?.cookies) return null;

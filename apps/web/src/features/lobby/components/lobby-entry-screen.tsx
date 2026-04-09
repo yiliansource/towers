@@ -3,19 +3,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Spinner, TextField } from "@radix-ui/themes";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-
-import { LobbyView } from "@towers/shared/contracts";
+import { type SubmitHandler, useForm } from "react-hook-form";
 
 import { FormError } from "@/common/ui/forms/FormError";
 import { FormLabel } from "@/common/ui/forms/FormLabel";
 import { TowersBanner } from "@/common/ui/towers-banner";
-import { fetchApi } from "@/common/util/fetch-api";
 import { createLogger } from "@/common/util/logger";
-import { useLobbyStore } from "@/features/lobby/store/lobby.store";
+import { useLobbyStore } from "@/features/lobby";
 
 import { createLobby, joinLobby } from "../api/lobby-actions";
-import { JoinLobbyInput, JoinLobbySchema } from "../models/join-lobby.schema";
+import { type JoinLobbyInput, JoinLobbySchema } from "../models/join-lobby.schema";
 
 const logger = createLogger("lobby-entry-screen");
 
@@ -63,7 +60,7 @@ export function LobbyEntryScreen() {
             <div className="w-full flex flex-col md:flex-row items-start md:items-center">
                 <div>
                     <p className="mb-2">Create a new lobby.</p>
-                    <Button onClick={onCreateSubmit} disabled={isSubmitting}>
+                    <Button disabled={isSubmitting} onClick={onCreateSubmit}>
                         {isSubmitting ? <Spinner /> : <span>Create Lobby</span>}
                     </Button>
                 </div>
@@ -74,10 +71,14 @@ export function LobbyEntryScreen() {
                     <p className="mb-2">Join an existing lobby.</p>
                     <div className="mb-4">
                         <FormLabel>Lobby ID</FormLabel>
-                        <TextField.Root {...register("lobbyId")} autoComplete="off" placeholder="ABCD" />
+                        <TextField.Root
+                            {...register("lobbyId")}
+                            autoComplete="off"
+                            placeholder="ABCD"
+                        />
                         <FormError className="mt-1">{errors.lobbyId?.message}</FormError>
                     </div>
-                    <Button type="submit" disabled={isSubmitting}>
+                    <Button disabled={isSubmitting} type="submit">
                         {isSubmitting ? <Spinner /> : <span>Join Lobby</span>}
                     </Button>
                 </form>

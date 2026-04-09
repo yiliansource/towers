@@ -1,12 +1,13 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: libraries */
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { parse } from "cookie";
-import { DefaultEventsMap, Server, Socket } from "socket.io";
+import type { DefaultEventsMap, Server, Socket } from "socket.io";
 
-import { UserService } from "@/user/user.service";
+import type { UserService } from "@/user/user.service";
 
 import { ACCESS_TOKEN_COOKIE } from "./auth.constants";
-import { AuthService } from "./auth.service";
-import { AuthSocketData } from "./auth.types";
+import type { AuthService } from "./auth.service";
+import type { AuthSocketData } from "./auth.types";
 
 export type AuthServer<
     CTS extends Record<string, any> = DefaultEventsMap,

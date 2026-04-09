@@ -1,6 +1,6 @@
-import { Request } from "express";
+import type { Request } from "express";
 
-import { User } from "@/generated/prisma/client";
+import type { User } from "@/generated/prisma/client";
 
 export type RequestWithUser = Request & {
     user?: User;

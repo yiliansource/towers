@@ -1,9 +1,8 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
+import type { ApiEnv } from "@towers/shared/env/api";
 import cookieParser from "cookie-parser";
-
-import { ApiEnv } from "@towers/shared/env/api";
 
 import { AppModule } from "./app.module";
 

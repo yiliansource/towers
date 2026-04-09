@@ -1,6 +1,8 @@
-import { Socket, io } from "socket.io-client";
-
-import { LobbyClientToServerEvents, LobbyServerToClientEvents } from "@towers/shared/contracts";
+import type {
+    LobbyClientToServerEvents,
+    LobbyServerToClientEvents,
+} from "@towers/shared/contracts";
+import { io, type Socket } from "socket.io-client";
 
 import { clientEnv } from "@/common/env/env.client";
 

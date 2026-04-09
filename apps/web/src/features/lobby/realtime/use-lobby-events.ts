@@ -1,10 +1,9 @@
 "use client";
 
+import type { LobbyErrorWsResponse, LobbyView } from "@towers/shared/contracts";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-
-import { LobbyErrorWsResponse, LobbyView } from "@towers/shared/contracts";
 
 import { useLobbyStore } from "../store/lobby.store";
 import { useLobbySocketContext } from "./lobby-socket.provider";
@@ -51,5 +50,5 @@ export function useLobbyEvents() {
             socket.off("lobby.game_started", onLobbyStarted);
             socket.off("lobby.removed", onLobbyRemoved);
         };
-    }, [socket, setLobby, router]);
+    }, [socket, setLobby, router, setLobbyLoading, clearLobby]);
 }

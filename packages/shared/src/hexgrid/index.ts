@@ -1,12 +1,9 @@
-export * from "./types.js";
-
 export * from "./coords/axial.js";
-export * from "./coords/stacked-axial.js";
 export * from "./coords/convert.js";
 export * from "./coords/cube.js";
-
+export * from "./coords/stacked-axial.js";
 export * from "./layout/hexToPixel.js";
 export * from "./layout/pixelToHex.js";
-
 export * from "./math/range.js";
 export * from "./math/ring.js";
+export * from "./types.js";

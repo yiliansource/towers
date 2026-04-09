@@ -1,9 +1,8 @@
 "use client";
 
+import type { GameState, LobbyView } from "@towers/shared/contracts";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-
-import { GameState, LobbyView } from "@towers/shared/contracts";
 
 import { useLobbyStore } from "@/features/lobby";
 
@@ -45,5 +44,5 @@ export function useGameEvents() {
         return () => {
             socket.off("game.finished", onGameFinished);
         };
-    }, [socket, router]);
+    }, [socket, router, setLobby, setGame, clearLobby, clearGame]);
 }

@@ -1,6 +1,5 @@
-import { useCallback, useMemo } from "react";
-
-import { StackedAxial } from "@towers/shared/hexgrid";
+import type { StackedAxial } from "@towers/shared/hexgrid";
+import { useCallback } from "react";
 
 import { useGameSocketContext } from "./game-socket.provider";
 
@@ -10,7 +9,7 @@ export function useGameCommands() {
     const placeKnight = useCallback(
         async (coord: StackedAxial) => {
             if (!socket) return;
-            // @ts-ignore
+            // @ts-expect-error
             await socket.emitWithAck("game.place_knight", { coord });
         },
         [socket],

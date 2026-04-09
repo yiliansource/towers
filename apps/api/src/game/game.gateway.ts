@@ -1,23 +1,31 @@
-import { Logger, OnModuleDestroy } from "@nestjs/common";
-import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Subscription } from "rxjs";
-import { Server } from "socket.io";
-
-import { GameClientToServerEvents, GameServerToClientEvents, LobbyError } from "@towers/shared/contracts";
-import { type StackedAxial } from "@towers/shared/hexgrid";
+import { Logger, type OnModuleDestroy } from "@nestjs/common";
+import {
+    MessageBody,
+    type OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from "@nestjs/websockets";
+import {
+    type GameClientToServerEvents,
+    type GameServerToClientEvents,
+    LobbyError,
+} from "@towers/shared/contracts";
+import type { StackedAxial } from "@towers/shared/hexgrid";
+import type { Subscription } from "rxjs";
+import type { Server } from "socket.io";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
-import type { AuthSocket } from "@/auth/socket-auth.service";
-import { SocketAuthService } from "@/auth/socket-auth.service";
+import type { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
 import type { User } from "@/generated/prisma/client";
-import { LobbyPresenceService } from "@/lobby/lobby-presence.service";
-import { LobbyMapper } from "@/lobby/lobby.mapper";
-import { LobbyNotification, LobbyNotifier } from "@/lobby/lobby.notifier";
-import { LobbyService } from "@/lobby/lobby.service";
+import type { LobbyMapper } from "@/lobby/lobby.mapper";
+import type { LobbyNotification, LobbyNotifier } from "@/lobby/lobby.notifier";
+import type { LobbyService } from "@/lobby/lobby.service";
+import type { LobbyPresenceService } from "@/lobby/lobby-presence.service";
 
-import { GameNotification, GameNotifier } from "./game.notifier";
-import { GameService } from "./game.service";
+import type { GameNotification, GameNotifier } from "./game.notifier";
+import type { GameService } from "./game.service";
 
 @WebSocketGateway({
     namespace: "/game",
@@ -121,7 +129,10 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
     }
 
     @SubscribeMessage<keyof GameClientToServerEvents>("game.place_knight")
-    async handlePlaceKnight(@AuthenticatedSocketUser() user: User, @MessageBody("coord") coord: StackedAxial) {
+    async handlePlaceKnight(
+        @AuthenticatedSocketUser() user: User,
+        @MessageBody("coord") coord: StackedAxial,
+    ) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 

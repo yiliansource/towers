@@ -1,4 +1,4 @@
-import { Axial, StackedAxial } from "../types.js";
+import type { Axial, StackedAxial } from "../types.js";
 
 export const STACKED_AXIAL_ZERO: StackedAxial = { q: 0, r: 0, h: 0 } as const;
 export const STACKED_AXIAL_UP: StackedAxial = { q: 0, r: 0, h: 1 } as const;
@@ -41,7 +41,7 @@ export function scaleStackedAxial(a: StackedAxial, factor: number): StackedAxial
 }
 
 export function stringifyStackedAxial(a: StackedAxial) {
-    return a.q + "," + a.r + "," + a.h;
+    return `${a.q},${a.r},${a.h}`;
 }
 export function parseStackedAxial(s: string): StackedAxial {
     const [q, r, h] = s.split(",").map(Number);

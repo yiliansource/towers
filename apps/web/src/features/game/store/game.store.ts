@@ -1,8 +1,7 @@
+import type { GameState } from "@towers/shared/contracts";
+import type { StackedAxial } from "@towers/shared/hexgrid";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-
-import { GameState } from "@towers/shared/contracts";
-import { StackedAxial } from "@towers/shared/hexgrid";
 
 export type GameUiState = {
     hoveredHex: StackedAxial | null;

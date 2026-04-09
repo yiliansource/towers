@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { StackedAxial } from "../hexgrid/types.js";
+import type { StackedAxial } from "../hexgrid/types.js";
 import { StackedAxialSchema } from "./hex.js";
-import { LobbyView } from "./lobby.js";
+import type { LobbyView } from "./lobby.js";
 
 export const GameErrorCode = {
     INVALID_GAME_STATE: "INVALID_GAME_STATE",

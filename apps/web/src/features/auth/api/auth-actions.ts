@@ -1,6 +1,10 @@
+import type {
+    AuthErrorHttpResponse,
+    LoginInput,
+    RegisterInput,
+    UserView,
+} from "@towers/shared/contracts";
 import toast from "react-hot-toast";
-
-import { AuthErrorHttpResponse, LoginInput, RegisterInput, UserView } from "@towers/shared/contracts";
 
 import { fetchApi } from "@/common/util/fetch-api";
 

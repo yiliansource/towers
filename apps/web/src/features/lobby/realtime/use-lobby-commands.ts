@@ -1,9 +1,8 @@
 "use client";
 
+import type { SlotColor } from "@towers/shared/contracts";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
-
-import { SlotColor } from "@towers/shared/contracts";
+import { useCallback } from "react";
 
 import { useAuthStore } from "@/features/auth";
 
@@ -29,7 +28,7 @@ export function useLobbyCommands() {
         async (message: string) => {
             if (!socket || !lobby) return;
 
-            // @ts-ignore
+            // @ts-expect-error
             await socket.timeout(5000).emitWithAck("lobby.message", { message });
         },
         [socket, lobby],
@@ -39,7 +38,7 @@ export function useLobbyCommands() {
         async (color: SlotColor) => {
             if (!socket || !lobby) return;
 
-            // @ts-ignore
+            // @ts-expect-error
             await socket.timeout(5000).emitWithAck("lobby.choose_color", { color });
         },
         [socket, lobby],
@@ -52,7 +51,7 @@ export function useLobbyCommands() {
             const seat = lobby.seats.find((s) => s.slot === slot);
             if (!seat || !!seat.user) return;
 
-            // @ts-ignore
+            // @ts-expect-error
             await socket.timeout(5000).emitWithAck("lobby.switch_slot", { slot });
         },
         [socket, lobby, lobby?.seats],
@@ -62,24 +61,24 @@ export function useLobbyCommands() {
             if (!socket || !lobby) return;
 
             const seat = lobby.seats.find((s) => s.slot === slot);
-            if (!seat || !seat.user || seat.user.id === user.id) return;
+            if (!seat?.user || seat.user.id === user.id) return;
 
-            // @ts-ignore
+            // @ts-expect-error
             await socket.timeout(5000).emitWithAck("lobby.kick_slot", { slot });
         },
-        [socket, lobby, lobby?.seats],
+        [socket, lobby, lobby?.seats, user.id],
     );
     const promoteSlot = useCallback(
         async (slot: number) => {
             if (!socket || !lobby) return;
 
             const seat = lobby.seats.find((s) => s.slot === slot);
-            if (!seat || !seat.user || seat.user.id === user.id) return;
+            if (!seat?.user || seat.user.id === user.id) return;
 
-            // @ts-ignore
+            // @ts-expect-error
             await socket.timeout(5000).emitWithAck("lobby.promote_slot", { slot });
         },
-        [socket, lobby, lobby?.seats],
+        [socket, lobby, lobby?.seats, user.id],
     );
 
     const startGame = useCallback(async () => {

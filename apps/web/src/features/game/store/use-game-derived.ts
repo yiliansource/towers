@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/features/auth/store/auth.store";
+import { useAuthStore } from "@/features/auth";
 
 import { selectIsInTurn } from "./game.selectors";
 import { useGameStore } from "./game.store";

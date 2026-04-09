@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Observable, Subject } from "rxjs";
+import { type Observable, Subject } from "rxjs";
 
 export type LobbyNotification =
     | { type: "lobby.updated"; lobbyId: string }

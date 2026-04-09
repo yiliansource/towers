@@ -1,7 +1,7 @@
 import { animated, easings, useTransition } from "@react-spring/three";
 import { Line } from "@react-three/drei";
 
-import { StackedAxial, stringifyStackedAxial } from "@towers/shared/hexgrid";
+import { type StackedAxial, stringifyStackedAxial } from "@towers/shared/hexgrid";
 
 import { stackedToWorld } from "@/common/util/hex2three";
 
@@ -42,5 +42,5 @@ export function Hex() {
         return [Math.cos(theta), 0, Math.sin(theta)] as [number, number, number];
     });
 
-    return <Line points={points} color="#333" lineWidth={1} />;
+    return <Line color="#333" lineWidth={1} points={points} />;
 }

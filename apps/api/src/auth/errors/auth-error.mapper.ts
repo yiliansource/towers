@@ -1,6 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 
-import { AuthError } from "@towers/shared/contracts";
+import type { AuthError } from "@towers/shared/contracts";
 
 export function getAuthErrorHttpStatus(error: AuthError): HttpStatus {
     switch (error.code) {

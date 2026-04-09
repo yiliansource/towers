@@ -1,11 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { PropsWithChildren } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { createLogger } from "@/common/util/logger";
 
-import { GameSocket, createGameSocket } from "./game-socket";
+import { createGameSocket, type GameSocket } from "./game-socket";
 
 type GameSocketContextValue = {
     socket: GameSocket | null;

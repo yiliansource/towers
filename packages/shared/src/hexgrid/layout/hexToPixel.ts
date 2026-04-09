@@ -1,4 +1,4 @@
-import { Axial } from "../types.js";
+import type { Axial } from "../types.js";
 import { HEX_SIZE } from "./constants.js";
 
 export function hexToPixel(hex: Axial): [number, number] {

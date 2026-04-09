@@ -1,22 +1,20 @@
 import { Body, Controller, Get, Post, Res, UseFilters } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import type { Response } from "express";
-
+import type { ConfigService } from "@nestjs/config";
 import {
     type LoginInput,
     LoginInputSchema,
     type RegisterInput,
     RegisterInputSchema,
-    UserView,
+    type UserView,
 } from "@towers/shared/contracts";
-import { ApiEnv } from "@towers/shared/env/api";
+import type { ApiEnv } from "@towers/shared/env/api";
+import type { Response } from "express";
 
 import { UseZodSchema } from "@/common/decorators/use-zod-schema.decorator";
 import type { User } from "@/generated/prisma/client";
-import { UserMapper } from "@/user/user.mapper";
-
-import { AuthCookieService } from "./auth-cookie.service";
-import { AuthService } from "./auth.service";
+import type { UserMapper } from "@/user/user.mapper";
+import type { AuthService } from "./auth.service";
+import type { AuthCookieService } from "./auth-cookie.service";
 import { AuthenticatedUser } from "./authenticated-user.decorator";
 import { AuthHttpExceptionFilter } from "./errors/auth-http-exception-filter";
 import { NoAuth } from "./no-auth.decorator";
@@ -28,13 +26,16 @@ export class AuthController {
         private readonly userMapper: UserMapper,
         private readonly authService: AuthService,
         private readonly authCookieService: AuthCookieService,
-        private readonly config: ConfigService<ApiEnv>,
+        readonly _config: ConfigService<ApiEnv>,
     ) {}
 
     @Post("register")
     @UseZodSchema(RegisterInputSchema)
     @NoAuth()
-    async handleRegister(@Body() dto: RegisterInput, @Res({ passthrough: true }) res: Response): Promise<UserView> {
+    async handleRegister(
+        @Body() dto: RegisterInput,
+        @Res({ passthrough: true }) res: Response,
+    ): Promise<UserView> {
         const { user, token } = await this.authService.registerUser(dto.username, dto.password);
         this.authCookieService.setAccessToken(res, token);
         return await this.userMapper.toView(user);
@@ -43,7 +44,10 @@ export class AuthController {
     @Post("login")
     @UseZodSchema(LoginInputSchema)
     @NoAuth()
-    async handleLogin(@Body() dto: LoginInput, @Res({ passthrough: true }) res: Response): Promise<UserView> {
+    async handleLogin(
+        @Body() dto: LoginInput,
+        @Res({ passthrough: true }) res: Response,
+    ): Promise<UserView> {
         const { user, token } = await this.authService.loginUser(dto.username, dto.password);
         this.authCookieService.setAccessToken(res, token);
         return await this.userMapper.toView(user);

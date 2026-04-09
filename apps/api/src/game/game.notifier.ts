@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { Observable, Subject } from "rxjs";
+import { type Observable, Subject } from "rxjs";
 
-export type GameNotification = { type: "game.updated"; lobbyId: string } | { type: "game.finished"; lobbyId: string };
+export type GameNotification =
+    | { type: "game.updated"; lobbyId: string }
+    | { type: "game.finished"; lobbyId: string };
 
 @Injectable()
 export class GameNotifier {

@@ -19,7 +19,10 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 COPY . .
 
+RUN yarn exec biome check packages/shared
 RUN yarn workspace @towers/shared build
+
+RUN yarn exec biome check apps/web
 RUN yarn workspace @towers/web build
 
 # ---- runtime ---

@@ -15,9 +15,13 @@
         "build:shared": "yarn workspace @towers/shared build",
         "build:web": "yarn workspace @towers/web build",
         "build:api": "yarn workspace @towers/api build",
-        "format": "prettier --write ."
+        "lint": "biome lint .",
+        "format": "biome format . --write",
+        "check": "biome check .",
+        "check:write": "biome check . --write"
     },
     "devDependencies": {
+        "@biomejs/biome": "^2.4.11",
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
         "concurrently": "^9.2.1",
         "prettier": "^3.8.1",

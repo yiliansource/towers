@@ -1,7 +1,7 @@
-import { OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
-import { Socket } from "socket.io";
+import type { OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
+import type { Socket } from "socket.io";
 
-import { AuthSocket, SocketAuthService } from "./socket-auth.service";
+import type { AuthSocket, SocketAuthService } from "./socket-auth.service";
 
 export abstract class AuthenticatedGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(private readonly socketAuthService: SocketAuthService) {}

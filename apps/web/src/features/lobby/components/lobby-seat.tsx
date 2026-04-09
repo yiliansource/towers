@@ -1,11 +1,11 @@
 "use client";
 
+import { type LobbySeatView, SlotColor } from "@towers/shared/contracts";
 import Color from "color";
 import { CrownIcon, PaletteIcon, UserRoundXIcon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useEffect, useState } from "react";
-
-import { LobbySeatView, SlotColor } from "@towers/shared/contracts";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 import { cn } from "@/common/util/cn";
 import { getSlotColorValue } from "@/common/util/color";
@@ -55,21 +55,21 @@ export function LobbySeat({ seat, onClick }: LobbySeatProps) {
                 !seat.user && "cursor-pointer",
                 seat.user && !seat.user.connected && "opacity-30 grayscale-75",
             )}
+            onClick={onClick}
             onPointerEnter={() => setActionsOpen(true)}
             onPointerLeave={() => {
                 setActionsOpen(false);
                 setCosmeticsOpen(false);
             }}
-            onClick={onClick}
         >
             <AnimatePresence initial={false}>
                 {seat.user && (
                     <motion.span
-                        key="username"
-                        className="relative z-10 text-lg font-bold text-shadow-sm"
-                        initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
+                        className="relative z-10 text-lg font-bold text-shadow-sm"
                         exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }}
+                        key="username"
                         transition={{ duration: 0.1 }}
                     >
                         {seat.user.username}
@@ -77,49 +77,49 @@ export function LobbySeat({ seat, onClick }: LobbySeatProps) {
                 )}
                 {seat.user && seat.user.id === lobby.host.id && (
                     <motion.div
-                        key="crown"
-                        className="absolute left-0 bottom-0 m-2 z-20"
-                        initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
+                        className="absolute left-0 bottom-0 m-2 z-20"
                         exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }}
+                        key="crown"
                         transition={{ duration: 0.1 }}
                     >
                         <CrownIcon className="text-amber-400" />
                     </motion.div>
                 )}
                 {seat.user && (
-                    <div key="background" className="absolute top-0 left-0 w-full h-full">
+                    <div className="absolute top-0 left-0 w-full h-full" key="background">
                         <motion.div
-                            style={{ backgroundColor: slotColor.hex() }}
+                            animate={{ x: 0 }}
                             className={cn(
                                 "absolute size-75 lg:size-50 rotate-45 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden pointer-events-none transition-colors",
                             )}
-                            initial={{ x: -300 }}
-                            animate={{ x: 0 }}
                             exit={{ x: 300 }}
+                            initial={{ x: -300 }}
+                            style={{ backgroundColor: slotColor.hex() }}
                             transition={{
                                 duration: 0.2,
                                 ease: "easeInOut",
                             }}
                         >
                             <div
-                                style={{ backgroundColor: slotAccentColor.hex() }}
                                 className={cn("absolute right-0 w-10 h-full z-5 transition-colors")}
+                                style={{ backgroundColor: slotAccentColor.hex() }}
                             ></div>
                             <div
-                                style={{ backgroundColor: slotAccentColor.hex() }}
                                 className={cn("absolute right-12 w-2 h-full z-5 transition-colors")}
+                                style={{ backgroundColor: slotAccentColor.hex() }}
                             ></div>
                         </motion.div>
                     </div>
                 )}
                 {actionsOpen && !cosmeticsOpen && seat.user && (
                     <motion.div
-                        key="actions"
-                        className="absolute p-2 bottom-0 right-0 drop-shadow-sm"
-                        initial={{ translateY: "100%", opacity: 0 }}
                         animate={{ translateY: 0, opacity: 1 }}
+                        className="absolute p-2 bottom-0 right-0 drop-shadow-sm"
                         exit={{ translateY: "100%", opacity: 0 }}
+                        initial={{ translateY: "100%", opacity: 0 }}
+                        key="actions"
                         transition={{ ease: "easeInOut", duration: 0.2 }}
                     >
                         <div className="flex flex-row gap-2">
@@ -143,11 +143,11 @@ export function LobbySeat({ seat, onClick }: LobbySeatProps) {
                 )}
                 {cosmeticsOpen && (
                     <motion.div
-                        key="cosmetics"
-                        className="absolute p-2 bg-black/40 top-0 right-0 bottom-0"
-                        initial={{ translateX: "100%", opacity: 0 }}
                         animate={{ translateX: 0, opacity: 1 }}
+                        className="absolute p-2 bg-black/40 top-0 right-0 bottom-0"
                         exit={{ translateX: "100%", opacity: 0 }}
+                        initial={{ translateX: "100%", opacity: 0 }}
+                        key="cosmetics"
                         transition={{ ease: "easeInOut", duration: 0.2 }}
                     >
                         <div className="flex flex-col h-full">
@@ -163,18 +163,18 @@ export function LobbySeat({ seat, onClick }: LobbySeatProps) {
 
                                     return (
                                         <div
-                                            key={c}
-                                            style={{
-                                                backgroundColor: color.hex(),
-                                                borderColor: color.darken(0.5).hex(),
-                                            }}
-                                            onClick={() => handleChooseColor(c)}
                                             className={cn(
                                                 "size-4 rounded-full border",
                                                 !colorsInUse.includes(c)
                                                     ? "cursor-pointer"
                                                     : "opacity-50 grayscale-100",
                                             )}
+                                            key={c}
+                                            onClick={() => handleChooseColor(c)}
+                                            style={{
+                                                backgroundColor: color.hex(),
+                                                borderColor: color.darken(0.5).hex(),
+                                            }}
                                         ></div>
                                     );
                                 })}

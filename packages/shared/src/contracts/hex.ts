@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { Axial, StackedAxial } from "../hexgrid/types.js";
+import type { Axial, StackedAxial } from "../hexgrid/types.js";
 
 export const AxialSchema = z.object({
     q: z.number().int(),

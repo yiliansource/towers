@@ -1,7 +1,5 @@
-import z from "zod";
-
-import { UserView } from "./auth.js";
-import { SlotColor } from "./common.js";
+import type { UserView } from "./auth.js";
+import type { SlotColor } from "./common.js";
 
 export const LobbyErrorCode = {
     LOBBY_NOT_FOUND: "LOBBY_NOT_FOUND",

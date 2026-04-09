@@ -1,22 +1,37 @@
-import { Logger, NotFoundException, OnModuleDestroy, UnauthorizedException, UseFilters } from "@nestjs/common";
-import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Subscription } from "rxjs";
-import { Server } from "socket.io";
-
-import { LobbyClientToServerEvents, LobbyError, LobbyServerToClientEvents, SlotColor } from "@towers/shared/contracts";
+import {
+    Logger,
+    NotFoundException,
+    type OnModuleDestroy,
+    UnauthorizedException,
+    UseFilters,
+} from "@nestjs/common";
+import {
+    MessageBody,
+    type OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from "@nestjs/websockets";
+import {
+    type LobbyClientToServerEvents,
+    LobbyError,
+    type LobbyServerToClientEvents,
+    type SlotColor,
+} from "@towers/shared/contracts";
+import type { Subscription } from "rxjs";
+import type { Server } from "socket.io";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
-import type { AuthSocket } from "@/auth/socket-auth.service";
-import { SocketAuthService } from "@/auth/socket-auth.service";
+import type { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
 import type { User } from "@/generated/prisma/client";
-import { UserService } from "@/user/user.service";
+import type { UserService } from "@/user/user.service";
 
 import { LobbyWsExceptionFilter } from "./errors/lobby-ws-exception.filter";
-import { LobbyPresenceService } from "./lobby-presence.service";
-import { LobbyMapper } from "./lobby.mapper";
-import { LobbyNotification, LobbyNotifier } from "./lobby.notifier";
-import { LobbyService } from "./lobby.service";
+import type { LobbyMapper } from "./lobby.mapper";
+import type { LobbyNotification, LobbyNotifier } from "./lobby.notifier";
+import type { LobbyService } from "./lobby.service";
+import type { LobbyPresenceService } from "./lobby-presence.service";
 
 @WebSocketGateway({
     namespace: "/lobby",
@@ -100,7 +115,10 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
     }
 
     @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.switch_slot")
-    async handleLobbySwitchSlot(@MessageBody("slot") slot: number, @AuthenticatedSocketUser() user: User) {
+    async handleLobbySwitchSlot(
+        @MessageBody("slot") slot: number,
+        @AuthenticatedSocketUser() user: User,
+    ) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new NotFoundException();
 
@@ -110,7 +128,10 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
     }
 
     @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.choose_color")
-    async handleLobbyChooseColor(@MessageBody("color") color: SlotColor, @AuthenticatedSocketUser() user: User) {
+    async handleLobbyChooseColor(
+        @MessageBody("color") color: SlotColor,
+        @AuthenticatedSocketUser() user: User,
+    ) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new NotFoundException();
 
@@ -120,7 +141,10 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
     }
 
     @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.kick_slot")
-    async handleLobbyKickSlot(@MessageBody("slot") slot: number, @AuthenticatedSocketUser() user: User) {
+    async handleLobbyKickSlot(
+        @MessageBody("slot") slot: number,
+        @AuthenticatedSocketUser() user: User,
+    ) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new NotFoundException();
 
@@ -133,7 +157,10 @@ export class LobbyGateway extends AuthenticatedGateway implements OnGatewayInit,
     }
 
     @SubscribeMessage<keyof LobbyClientToServerEvents>("lobby.promote_slot")
-    async handleLobbyPromoteSlot(@MessageBody("slot") slot: number, @AuthenticatedSocketUser() user: User) {
+    async handleLobbyPromoteSlot(
+        @MessageBody("slot") slot: number,
+        @AuthenticatedSocketUser() user: User,
+    ) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new NotFoundException();
 

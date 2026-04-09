@@ -11,7 +11,7 @@ export function useHydrateGameOnMount() {
     const setLoading = useGameStore((s) => s.setLoading);
 
     useEffect(() => {
-        (async function () {
+        (async () => {
             try {
                 setLoading(true);
 
@@ -23,5 +23,5 @@ export function useHydrateGameOnMount() {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [setLoading, setGame, clearGame]);
 }

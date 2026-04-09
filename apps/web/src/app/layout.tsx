@@ -39,19 +39,19 @@ export default function RootLayout({
 }>) {
     return (
         <html
-            lang="en"
             className={cn(
                 [fruktur, geistSans, geistMono].map((f) => f.variable),
                 `h-full antialiased`,
             )}
+            lang="en"
             suppressHydrationWarning
         >
             <Providers>
                 <body className="min-h-dvh">
-                    <Theme appearance="dark" accentColor="gold" className="flex flex-col">
+                    <Theme accentColor="gold" appearance="dark" className="flex flex-col">
                         <main className="grow px-4 flex flex-col">{children}</main>
                         <footer className="position z-50 py-3 px-4 select-none flex flex-row justify-between items-end">
-                            <Text size="2" className="text-(--gray-10)">
+                            <Text className="text-(--gray-10)" size="2">
                                 Copypright &copy; {new Date().getFullYear()} Ian Hornik
                             </Text>
                             <ProfileWidget />

@@ -1,7 +1,6 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
-import { Request, Response } from "express";
-
+import { type ArgumentsHost, Catch, type ExceptionFilter } from "@nestjs/common";
 import { AuthError } from "@towers/shared/contracts";
+import type { Request, Response } from "express";
 
 import { getAuthErrorHttpStatus } from "./auth-error.mapper";
 

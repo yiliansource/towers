@@ -16,7 +16,10 @@ RUN yarn install --immutable
 FROM deps AS builder
 COPY . .
 
+RUN yarn exec biome check packages/shared
 RUN yarn workspace @towers/shared build
+
+RUN yarn exec biome check apps/api
 RUN yarn workspace @towers/api build
 
 # ---- runtime ----

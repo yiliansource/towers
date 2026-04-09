@@ -1,11 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { PropsWithChildren } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { createLogger } from "@/common/util/logger";
 
-import { type LobbySocket, createLobbySocket } from "./lobby-socket";
+import { createLobbySocket, type LobbySocket } from "./lobby-socket";
 
 type LobbySocketContextValue = {
     socket: LobbySocket | null;

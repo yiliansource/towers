@@ -2,18 +2,16 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Flex, Spinner, Text, TextField } from "@radix-ui/themes";
+import { type RegisterFormInput, RegisterFormSchema } from "@towers/shared/contracts";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-
-import { RegisterFormInput, RegisterFormSchema, RegisterInput, UserView } from "@towers/shared/contracts";
+import { type SubmitHandler, useForm } from "react-hook-form";
 
 import { FormError } from "@/common/ui/forms/FormError";
 import { FormLabel } from "@/common/ui/forms/FormLabel";
-import { fetchApi } from "@/common/util/fetch-api";
 import { createLogger } from "@/common/util/logger";
-import { useAuthStore } from "@/features/auth/store/auth.store";
+import { useAuthStore } from "@/features/auth";
 
 import { registerUser } from "../api/auth-actions";
 
@@ -55,7 +53,7 @@ export function RegisterForm() {
         <>
             <title>Page title</title>
 
-            <Text mb="4" align="center">
+            <Text align="center" mb="4">
                 Please create an account or{" "}
                 <Link className="text-(--accent-11) hover:underline" href="/login">
                     log in
@@ -67,7 +65,11 @@ export function RegisterForm() {
                 <Flex direction="column" gap="2">
                     <Box>
                         <FormLabel>Username</FormLabel>
-                        <TextField.Root {...register("username")} autoComplete="off" placeholder="TowersEnjoyer" />
+                        <TextField.Root
+                            {...register("username")}
+                            autoComplete="off"
+                            placeholder="TowersEnjoyer"
+                        />
                         <FormError className="mt-1">{errors.username?.message}</FormError>
                     </Box>
                     <Box>
@@ -75,8 +77,8 @@ export function RegisterForm() {
                         <TextField.Root
                             {...register("password")}
                             autoComplete="new-password"
-                            type="password"
                             placeholder={"•".repeat(10)}
+                            type="password"
                         />
                         <FormError className="mt-1">{errors.password?.message}</FormError>
                     </Box>
@@ -84,13 +86,13 @@ export function RegisterForm() {
                         <FormLabel>Confirm password</FormLabel>
                         <TextField.Root
                             {...register("confirmPassword")}
-                            type="password"
                             autoComplete="new-password"
                             placeholder={"•".repeat(10)}
+                            type="password"
                         />
                         <FormError className="mt-1">{errors.confirmPassword?.message}</FormError>
                     </Box>
-                    <Button mt="4" type="submit" disabled={isRegistering}>
+                    <Button disabled={isRegistering} mt="4" type="submit">
                         {isRegistering ? <Spinner /> : <span>Register</span>}
                     </Button>
                 </Flex>

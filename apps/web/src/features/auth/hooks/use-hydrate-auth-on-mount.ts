@@ -11,7 +11,7 @@ export function useHydrateAuthOnMount() {
     const setLoading = useAuthStore((s) => s.setLoading);
 
     useEffect(() => {
-        (async function () {
+        (async () => {
             try {
                 setLoading(true);
 
@@ -23,5 +23,5 @@ export function useHydrateAuthOnMount() {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [setUser, setLoading, clearUser]);
 }

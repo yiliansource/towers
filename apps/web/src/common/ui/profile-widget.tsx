@@ -1,13 +1,13 @@
 "use client";
 
-import { Button, Spinner } from "@radix-ui/themes";
+import { Spinner } from "@radix-ui/themes";
 import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { fetchApi } from "@/common/util/fetch-api";
 import { sleep } from "@/common/util/sleep";
-import { useAuthStore } from "@/features/auth/store/auth.store";
+import { useAuthStore } from "@/features/auth";
 
 export function ProfileWidget() {
     const router = useRouter();
@@ -34,7 +34,12 @@ export function ProfileWidget() {
         <div className="inline-flex flex-row items-center gap-1">
             <p className="mb-1">{user.username}</p>
             <div>
-                <button onClick={handleLogout} disabled={loggingOut} className="px-1 opacity-70 cursor-pointer">
+                <button
+                    className="px-1 opacity-70 cursor-pointer"
+                    disabled={loggingOut}
+                    onClick={handleLogout}
+                    type="button"
+                >
                     {loggingOut ? <Spinner /> : <LogOutIcon className="size-4" />}
                 </button>
             </div>
