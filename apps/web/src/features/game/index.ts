@@ -8,7 +8,6 @@ export * from "./components/hex-highlighter";
 export * from "./components/models/king";
 export * from "./components/models/knight";
 export * from "./components/models/tower";
-export * from "./components/placement-pick-surface";
 export * from "./components/scene-camera";
 export * from "./hooks/use-game-page-guard";
 export * from "./hooks/use-game-page-lifecycle";
