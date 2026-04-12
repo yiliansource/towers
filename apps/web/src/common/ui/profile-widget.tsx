@@ -1,7 +1,6 @@
 "use client";
 
 import { fetchApi } from "@/common/util/fetch-api";
-import { sleep } from "@/common/util/promises";
 import { useAuthStore } from "@/features/auth";
 
 import { Spinner } from "@radix-ui/themes";
@@ -19,7 +18,6 @@ export function ProfileWidget() {
 
     const handleLogout = async () => {
         setLoggingOut(true);
-        await sleep(1000);
 
         const res = await fetchApi("/auth/logout", { method: "POST" });
         if (!res.ok) throw new Error("logout failed.");

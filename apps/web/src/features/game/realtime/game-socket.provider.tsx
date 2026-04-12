@@ -23,12 +23,15 @@ export function GameSocketProvider({ children }: PropsWithChildren) {
     useEffect(() => {
         const nextSocket = createGameSocket();
 
+        let reconnectTimeout: NodeJS.Timeout | null = null;
+
         const onConnect = () => {
             logger.log("connected");
             setConnected(true);
         };
         const onDisconnect = () => {
-            logger.log("disconnected");
+            logger.log("disconnected - reconnecting in 2000");
+            reconnectTimeout = setTimeout(() => nextSocket.connect(), 2000);
             setConnected(false);
         };
 
@@ -45,6 +48,8 @@ export function GameSocketProvider({ children }: PropsWithChildren) {
 
             setSocket(null);
             setConnected(false);
+
+            if (reconnectTimeout) clearTimeout(reconnectTimeout);
         };
     }, []);
 

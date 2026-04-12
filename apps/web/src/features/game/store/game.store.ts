@@ -35,7 +35,7 @@ export type GameStore = {
     clearGame: () => void;
     setLoading: (loading: boolean) => void;
 
-    startAction: (action: GameAction) => void;
+    startAction: (actionName: string) => void;
     setActionData: (key: string, value: unknown) => void;
     clearActionData: (key: string) => void;
     advanceActionStep: () => void;
@@ -59,7 +59,6 @@ export const useGameStore = create<GameStore>()(
         },
 
         applySnapshot: ({ context, boardState, availableActions }) => {
-            // console.log(context, boardState, availableActions);
             set({
                 context,
                 boardState,
@@ -74,7 +73,7 @@ export const useGameStore = create<GameStore>()(
 
             const forcedAction = availableActions.find((a) => a.forced);
             if (forcedAction) {
-                get().startAction(forcedAction);
+                get().startAction(forcedAction.name);
             }
         },
         clearGame: () =>
@@ -85,7 +84,10 @@ export const useGameStore = create<GameStore>()(
             }),
         setLoading: (loading) => set({ loading }),
 
-        startAction: (action) => {
+        startAction: (actionName) => {
+            const action = get().availableActions.find((a) => a.name === actionName);
+            if (!action) return;
+
             set({
                 actionState: {
                     action,

@@ -51,6 +51,10 @@ export function axialNeighbor(hex: Axial, dir: HexDirection): Axial {
     return addAxial(hex, axialDirection(dir));
 }
 
+export function getAxialNeighbours(hex: Axial) {
+    return AXIAL_DIRECTIONS.map((d) => addAxial(hex, d));
+}
+
 export function axialRound(f: Axial): Axial {
     return cubeToAxial(cubeRound(axialToCube(f)));
 }

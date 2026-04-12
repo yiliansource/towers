@@ -33,7 +33,7 @@ export function isStackedAxial(value: unknown): value is StackedAxial {
     );
 }
 
-export function axialToStacked(a: Axial, h: number): StackedAxial {
+export function axialToStacked(a: Axial, h: number = 0): StackedAxial {
     return stackedAxial(a.q, a.r, h);
 }
 
@@ -51,6 +51,10 @@ export function subStackedAxial(a: StackedAxial, b: StackedAxial): StackedAxial 
 
 export function scaleStackedAxial(a: StackedAxial, factor: number): StackedAxial {
     return stackedAxial(a.q * factor, a.r * factor, a.h * factor);
+}
+
+export function getStackedAxialNeighbours(a: StackedAxial) {
+    return STACKED_AXIAL_DIRECTIONS.map((d) => addStackedAxial(a, d));
 }
 
 export function stringifyStackedAxial(a: StackedAxial) {

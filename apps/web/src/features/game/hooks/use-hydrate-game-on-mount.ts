@@ -1,6 +1,7 @@
 "use client";
 
-import { waitFor } from "@/common/util/promises";
+import { waitFor } from "@towers/shared/util";
+
 import { useAuthStore } from "@/features/auth";
 
 import { useEffect } from "react";

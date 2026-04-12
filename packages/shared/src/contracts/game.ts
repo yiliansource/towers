@@ -5,6 +5,7 @@ import type { LobbyView } from "./lobby.js";
 
 export const GameErrorCode = {
     INVALID_GAME_STATE: "INVALID_GAME_STATE",
+    INVALID_GAME_OPERATION: "INVALID_GAME_OPERATION",
 } as const;
 export type GameErrorCode = (typeof GameErrorCode)[keyof typeof GameErrorCode];
 
@@ -71,33 +72,6 @@ export const UnitType = {
 } as const;
 export type UnitType = (typeof UnitType)[keyof typeof UnitType];
 
-// export const GamePerformActionPayloadSchema = z.discriminatedUnion("type", [
-//     z.object({
-//         type: z.literal("none"),
-//     }),
-//     z.object({
-//         type: z.literal("abortGame"),
-//     }),
-//     z.object({
-//         type: z.literal("endTurn"),
-//     }),
-//     z.object({
-//         type: z.literal("placeUnit"),
-//         unit: z.enum(UnitType),
-//         coord: StackedAxialSchema,
-//     }),
-//     z.object({
-//         type: z.literal("placeTower"),
-//         coord: StackedAxialSchema,
-//     }),
-//     z.object({
-//         type: z.literal("moveUnit"),
-//         unit: StackedAxialSchema,
-//         coord: StackedAxialSchema,
-//     }),
-// ]);
-// export type GamePerformActionPayload = z.infer<typeof GamePerformActionPayloadSchema>;
-
 export const GameActionStepSchema = z.enum(["selectUnit", "selectHex", "confirm"]);
 export type GameActionStep = z.infer<typeof GameActionStepSchema>;
 
@@ -105,6 +79,7 @@ export const GameActionSchema = z
     .discriminatedUnion("name", [
         z.object({
             name: z.literal("placeTower"),
+            availableCoords: z.array(StackedAxialSchema).optional(),
         }),
         z.object({
             name: z.literal("placeUnit"),
@@ -121,6 +96,9 @@ export const GameActionSchema = z
                 z.object({
                     type: z.literal("fixed"),
                     amount: z.number(),
+                }),
+                z.object({
+                    type: z.literal("dynamic"),
                 }),
             ]),
             forced: z.boolean().optional(),

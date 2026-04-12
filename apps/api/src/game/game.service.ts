@@ -29,6 +29,8 @@ import { Injectable, Logger, NotFoundException, NotImplementedException } from "
 import type { InputJsonValue } from "@prisma/client/runtime/client";
 import { produce } from "immer";
 
+import { getAllowedPlaceTowerFields } from "./actions/place-tower.action";
+import { getAllowedPlaceUnitFields } from "./actions/place-unit.action";
 import { GameNotifier } from "./game.notifier";
 
 @Injectable()
@@ -141,7 +143,7 @@ export class GameService {
         this.gameNotifier.emitGameUpdate(lobbyId);
     }
 
-    async generateGameActions(lobbyId: string): Promise<GameAction[]> {
+    async generateGameActions(lobbyId: string, playerId: string): Promise<GameAction[]> {
         const actions: GameAction[] = [];
 
         const game = await this.getGameByLobby(lobbyId);
@@ -155,10 +157,17 @@ export class GameService {
                     type: "fixed",
                     amount: 0,
                 },
-                availableCoords: await this.getAllowedTowerFields(game),
+                availableCoords: getAllowedPlaceUnitFields(game, playerId),
             });
         } else if (game.context.phase === "PLAYING") {
             actions.push(
+                {
+                    name: "moveUnit",
+                    steps: ["selectUnit", "selectHex", "confirm"],
+                    cost: {
+                        type: "dynamic",
+                    },
+                },
                 {
                     name: "placeUnit",
                     steps: ["selectHex", "confirm"],
@@ -166,6 +175,7 @@ export class GameService {
                         type: "fixed",
                         amount: 2,
                     },
+                    availableCoords: getAllowedPlaceUnitFields(game, playerId),
                 },
                 {
                     name: "placeTower",
@@ -174,6 +184,7 @@ export class GameService {
                         type: "fixed",
                         amount: 1,
                     },
+                    availableCoords: getAllowedPlaceTowerFields(game, playerId),
                 },
             );
         }
@@ -183,7 +194,7 @@ export class GameService {
 
     async getGameSnapshot(lobbyId: string) {
         const game = await this.getGameByLobby(lobbyId);
-        const actions = await this.generateGameActions(lobbyId);
+        const actions = await this.generateGameActions(lobbyId, game.context.currentPlayerId);
 
         return {
             ...game,
@@ -220,10 +231,14 @@ export class GameService {
         );
     }
 
-    async placeUnit(lobbyId: string, playerId: string, _unit: UnitType, coord: StackedAxial) {
+    async placeUnit(lobbyId: string, playerId: string, unit: UnitType, coord: StackedAxial) {
         const game = await this.getGameByLobby(lobbyId);
 
-        // TODO: Validate position
+        if (unit !== "KNIGHT") throw new GameError("INVALID_GAME_OPERATION");
+
+        const allowedFields = getAllowedPlaceUnitFields(game, playerId);
+        if (!allowedFields.some((f) => equalStackedAxial(f, coord)))
+            throw new GameError("INVALID_GAME_OPERATION");
 
         await this.updateGameState(
             lobbyId,
@@ -232,24 +247,24 @@ export class GameService {
             }),
         );
 
-        await this.endPlayerTurn(lobbyId);
-    }
-
-    async placeTower(_lobbyId: string, _coord: StackedAxial) {
-        throw new NotImplementedException();
-    }
-
-    async getAllowedTowerFields(game: GameState) {
         if (game.context.phase === "SETUP") {
-            return axialRotateAroundCenter(scaleAxial(axialDirection(0), 3), AXIAL_ZERO)
-                .map((a) => axialToStacked(a, 1))
-                .filter(
-                    (s) =>
-                        !Object.values(game.boardState.units)
-                            .flat()
-                            .some((b) => equalStackedAxial(s, b)),
-                );
+            await this.endPlayerTurn(lobbyId);
         }
+    }
+
+    async placeTower(lobbyId: string, playerId: string, coord: StackedAxial) {
+        const game = await this.getGameByLobby(lobbyId);
+
+        const allowedFields = getAllowedPlaceTowerFields(game, playerId);
+        if (!allowedFields.some((f) => equalStackedAxial(f, coord)))
+            throw new GameError("INVALID_GAME_OPERATION");
+
+        await this.updateGameState(
+            lobbyId,
+            produce(game, (draft) => {
+                draft.boardState.towers.push(coord);
+            }),
+        );
     }
 
     async moveUnit(_lobbyId: string, _playerId: string, _unit: StackedAxial, _coord: StackedAxial) {
@@ -259,14 +274,12 @@ export class GameService {
     async performAction(lobbyId: string, playerId: string, payload: GameActionSubmitPayload) {
         const _game = await this.getGameByLobby(lobbyId);
 
-        console.log(lobbyId, playerId, payload);
-
         // TODO: check if player may perform action
         if (payload.name === "placeUnit") {
             await this.placeUnit(lobbyId, playerId, payload.unit, payload.coord);
             return;
         } else if (payload.name === "placeTower") {
-            await this.placeTower(lobbyId, payload.coord);
+            await this.placeTower(lobbyId, playerId, payload.coord);
             return;
         } else if (payload.name === "moveUnit") {
             await this.moveUnit(lobbyId, playerId, payload.unit, payload.coord);

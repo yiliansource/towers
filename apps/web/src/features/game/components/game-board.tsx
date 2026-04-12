@@ -6,20 +6,19 @@ import {
     type StackedAxial,
     stringifyStackedAxial,
 } from "@towers/shared/hexgrid";
+import { sleep } from "@towers/shared/util";
 
 import { stackedToWorld } from "@/common/util/hex2three";
-import { sleep } from "@/common/util/promises";
 
 import { animated, useTransition } from "@react-spring/three";
 import { useEffect, useMemo, useState } from "react";
 
 import { useGameStore } from "../store/game.store";
+import { GameActions } from "./actions";
+import { KnightUnit } from "./game-units";
 import { HexGrid } from "./hex-grid";
 import { King } from "./models/king";
-import { Knight } from "./models/knight";
-import { Tower } from "./models/tower";
-import { PlaceUnitConfirm } from "./place-unit-confirm";
-import { PlaceUnitIndicators } from "./place-unit-indicators";
+import { TowerModel } from "./models/tower";
 
 export function GameBoard() {
     const game = useGameStore((s) => s.boardState!);
@@ -35,8 +34,7 @@ export function GameBoard() {
             <Towers coordList={game.towers} />
             <Units coordLookup={game.units} kingCoord={game.king} />
 
-            <PlaceUnitIndicators />
-            <PlaceUnitConfirm />
+            <GameActions />
         </>
     );
 }
@@ -74,7 +72,7 @@ function Towers({ coordList }: { coordList: StackedAxial[] }) {
             {transitions((style, item) => (
                 <group key={stringifyStackedAxial(item)} position={stackedToWorld(item)}>
                     <animated.group position={style.position} scale={style.scale}>
-                        <Tower />
+                        <TowerModel />
                     </animated.group>
                 </group>
             ))}
@@ -147,7 +145,7 @@ function Units({
                 <group key={state.key} position={stackedToWorld(item.coord)}>
                     <animated.group position={style.position} scale={style.scale}>
                         {item.unit === "KNIGHT" && (
-                            <Knight playerId={item.pid} coord={item.coord} />
+                            <KnightUnit playerId={item.pid} coord={item.coord} />
                         )}
                         {item.unit === "KING" && <King />}
                     </animated.group>

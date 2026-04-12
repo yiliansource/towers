@@ -1,9 +1,9 @@
 "use client";
 
 import { type LobbySeatView, SlotColor } from "@towers/shared/contracts";
+import { getSlotColorValue } from "@towers/shared/util";
 
 import { cn } from "@/common/util/cn";
-import { getSlotColorValue } from "@/common/util/color";
 import { useAuthStore } from "@/features/auth";
 
 import Color from "color";

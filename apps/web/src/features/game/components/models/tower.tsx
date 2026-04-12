@@ -3,7 +3,11 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
 
-export function Tower() {
+export interface TowerModelProps {
+    ghost?: boolean;
+}
+
+export function TowerModel({ ghost = false }: TowerModelProps) {
     const obj = useLoader(OBJLoader, "/tower.obj");
     const coloredObj = useMemo(() => {
         const clone = obj.clone();
@@ -14,17 +18,24 @@ export function Tower() {
             if ((child as THREE.Mesh).isMesh) {
                 const mesh = child as THREE.Mesh;
 
+                const transparent = ghost;
                 mesh.material = new THREE.MeshStandardMaterial({
                     color: "#d1a26d",
+                    opacity: ghost ? 0.5 : 1,
+                    transparent,
                 });
 
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
+                if (!transparent) {
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                } else {
+                    mesh.raycast = () => null;
+                }
             }
         });
 
         return clone;
-    }, [obj]);
+    }, [obj, ghost]);
 
     return <primitive object={coloredObj} />;
 }

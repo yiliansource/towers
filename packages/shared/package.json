@@ -6,10 +6,6 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "default": "./dist/index.js"
-        },
         "./contracts": {
             "types": "./dist/contracts/index.d.ts",
             "default": "./dist/contracts/index.js"
@@ -21,6 +17,10 @@
         "./env/web": {
             "types": "./dist/env/web.d.ts",
             "default": "./dist/env/web.js"
+        },
+        "./util": {
+            "types": "./dist/util/index.d.ts",
+            "default": "./dist/util/index.js"
         },
         "./hexgrid": {
             "types": "./dist/hexgrid/index.d.ts",
