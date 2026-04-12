@@ -1,10 +1,11 @@
 "use client";
 
-import type { GameState, LobbyView } from "@towers/shared/contracts";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import type { GameSnapshot, LobbyView } from "@towers/shared/contracts";
 
 import { useHydrateLobby, useLobbyStore } from "@/features/lobby";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { useGameStore } from "../store/game.store";
 import { useGameSocketContext } from "./game-socket.provider";
@@ -13,7 +14,7 @@ export function useGameEvents() {
     const { socket } = useGameSocketContext();
     const router = useRouter();
 
-    const setGame = useGameStore((s) => s.setGame);
+    const applySnapshot = useGameStore((s) => s.applySnapshot);
     const clearGame = useGameStore((s) => s.clearGame);
 
     const setLobby = useLobbyStore((s) => s.setLobby);
@@ -27,10 +28,8 @@ export function useGameEvents() {
             setLobby(payload);
         };
 
-        socket.on("lobby.updated", onLobbyUpdated);
-
-        const onGameUpdated = (game: GameState) => {
-            setGame(game);
+        const onGameUpdated = (snapshot: GameSnapshot) => {
+            applySnapshot(snapshot);
         };
         const onGameFinished = async () => {
             clearLobby();
@@ -40,11 +39,12 @@ export function useGameEvents() {
             router.push("/lobby");
         };
 
-        socket.on("game.finished", onGameFinished);
         socket.on("game.updated", onGameUpdated);
+        socket.on("game.lobby_updated", onLobbyUpdated);
+        socket.on("game.finished", onGameFinished);
 
         return () => {
             socket.off("game.finished", onGameFinished);
         };
-    }, [socket, router, setLobby, setGame, clearLobby, hydrateLobby, clearGame]);
+    }, [socket, router, setLobby, applySnapshot, clearLobby, hydrateLobby, clearGame]);
 }

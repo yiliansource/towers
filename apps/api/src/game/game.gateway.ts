@@ -1,19 +1,9 @@
-import { Logger, type OnModuleDestroy } from "@nestjs/common";
 import {
-    MessageBody,
-    type OnGatewayInit,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer,
-} from "@nestjs/websockets";
-import {
-    type GameClientToServerEvents,
+    type GameActionSubmitPayload,
+    GameClientToServerEvents,
     type GameServerToClientEvents,
     LobbyError,
 } from "@towers/shared/contracts";
-import type { StackedAxial } from "@towers/shared/hexgrid";
-import type { Subscription } from "rxjs";
-import type { Server } from "socket.io";
 
 import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
 import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
@@ -23,6 +13,17 @@ import { LobbyMapper } from "@/lobby/lobby.mapper";
 import { LobbyNotification, LobbyNotifier } from "@/lobby/lobby.notifier";
 import { LobbyService } from "@/lobby/lobby.service";
 import { LobbyPresenceService } from "@/lobby/lobby-presence.service";
+
+import { Logger, type OnModuleDestroy } from "@nestjs/common";
+import {
+    MessageBody,
+    type OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from "@nestjs/websockets";
+import type { Subscription } from "rxjs";
+import type { Server } from "socket.io";
 
 import { GameNotification, GameNotifier } from "./game.notifier";
 import { GameService } from "./game.service";
@@ -77,10 +78,10 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
             const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
             if (!lobby || lobby.state !== "INGAME") return;
 
-            const game = await this.gameService.getGameByLobby(event.lobbyId);
-            if (!game) return;
+            const snapshot = await this.gameService.getGameSnapshot(lobby.id);
+            if (!snapshot) return;
 
-            this.server.to(event.lobbyId).emit("game.updated", game);
+            this.server.to(event.lobbyId).emit("game.updated", snapshot);
         } else if (event.type === "game.finished") {
             const lobby = await this.lobbyService.getLobbyById(event.lobbyId);
             if (!lobby) return;
@@ -94,7 +95,7 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
             if (!lobby) return;
 
             const view = await this.lobbyMapper.toView(lobby);
-            this.server.to(event.lobbyId).emit("lobby.updated", view);
+            this.server.to(event.lobbyId).emit("game.lobby_updated", view);
         } else if (event.type === "lobby.game_started") {
             await this.gameService.initializeGame(event.lobbyId);
         }
@@ -131,15 +132,25 @@ export class GameGateway extends AuthenticatedGateway implements OnGatewayInit, 
         return { ok: true };
     }
 
-    @SubscribeMessage<keyof GameClientToServerEvents>("game.place_knight")
-    async handlePlaceKnight(
+    @SubscribeMessage<keyof GameClientToServerEvents>("game.end_turn")
+    async handleEndTurn(@AuthenticatedSocketUser() user: User) {
+        const lobby = await this.lobbyService.getLobbyByUser(user.id);
+        if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
+
+        await this.gameService.endPlayerTurn(lobby.id);
+
+        return { ok: true };
+    }
+
+    @SubscribeMessage<keyof GameClientToServerEvents>("game.submit_action")
+    async handleSubmitAction(
         @AuthenticatedSocketUser() user: User,
-        @MessageBody("coord") coord: StackedAxial,
+        @MessageBody() payload: GameActionSubmitPayload,
     ) {
         const lobby = await this.lobbyService.getLobbyByUser(user.id);
         if (!lobby) throw new LobbyError("USER_NOT_IN_LOBBY");
 
-        await this.gameService.placeKnight(lobby.id, user.id, coord);
+        await this.gameService.performAction(lobby.id, user.id, payload);
 
         return { ok: true };
     }

@@ -1,6 +1,6 @@
-import { createParamDecorator, type ExecutionContext } from "@nestjs/common";
-
 import type { User } from "@/generated/prisma/client";
+
+import { createParamDecorator, type ExecutionContext } from "@nestjs/common";
 
 import type { RequestWithUser } from "../types/express";
 import type { AuthSocket } from "./socket-auth.service";

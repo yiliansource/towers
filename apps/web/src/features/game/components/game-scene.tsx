@@ -1,23 +1,23 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: TODO: fix assertions */
+import { DevOnly } from "@/common/ui/dev-only";
+
 import { Stats } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 
-import { DevOnly } from "@/common/ui/dev-only";
-
 import { useGameEvents } from "../realtime/use-game-events";
 import { GameBoard } from "./game-board";
-import { GameHud } from "./game-hud";
+import { GameHudOverlay } from "./game-hud-overlay";
+import { GameSidebarInterface } from "./game-sidebar-interface";
 import { SceneCamera } from "./scene-camera";
 
 export function GameScene() {
     useGameEvents();
 
     return (
-        <div className="grow grid h-[calc(100dvh-60px)] md:grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 grid-flow-row overflow-hidden">
-            <GameHud />
+        <div className="grow grid h-[calc(100dvh-60px)] md:grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 grid-flow-row">
+            <GameSidebarInterface />
 
-            <div className="border border-(--gray-3) relative min-h-0 h-full overflow-hidden">
+            <div className="relative border border-(--gray-3) min-h-0 h-full overflow-hidden">
                 <Canvas className="absolute inset-0" shadows>
                     <DevOnly>
                         <Stats className="left-auto! right-0!" />
@@ -28,6 +28,10 @@ export function GameScene() {
 
                     <GameBoard />
                 </Canvas>
+
+                <div className="absolute inset-0 pointer-events-none">
+                    <GameHudOverlay />
+                </div>
             </div>
         </div>
     );

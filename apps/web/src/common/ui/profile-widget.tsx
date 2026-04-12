@@ -1,13 +1,13 @@
 "use client";
 
+import { fetchApi } from "@/common/util/fetch-api";
+import { sleep } from "@/common/util/promises";
+import { useAuthStore } from "@/features/auth";
+
 import { Spinner } from "@radix-ui/themes";
 import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-import { fetchApi } from "@/common/util/fetch-api";
-import { sleep } from "@/common/util/sleep";
-import { useAuthStore } from "@/features/auth";
 
 export function ProfileWidget() {
     const router = useRouter();

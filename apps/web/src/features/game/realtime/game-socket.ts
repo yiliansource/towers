@@ -1,7 +1,8 @@
 import type { GameClientToServerEvents, GameServerToClientEvents } from "@towers/shared/contracts";
-import { io, type Socket } from "socket.io-client";
 
 import { clientEnv } from "@/common/env/env.client";
+
+import { io, type Socket } from "socket.io-client";
 
 export type GameSocket = Socket<GameServerToClientEvents, GameClientToServerEvents>;
 

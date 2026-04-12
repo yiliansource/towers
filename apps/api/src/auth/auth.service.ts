@@ -1,12 +1,13 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
 import { AuthError } from "@towers/shared/contracts";
 import type { ApiEnv } from "@towers/shared/env/api";
-import * as argon2 from "argon2";
 
 import type { User } from "@/generated/prisma/client";
 import { UserService } from "@/user/user.service";
+
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import * as argon2 from "argon2";
 
 import type { AuthJwtPayload } from "./auth.types";
 

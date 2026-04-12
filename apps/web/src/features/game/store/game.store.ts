@@ -1,34 +1,137 @@
-import type { GameState } from "@towers/shared/contracts";
+import type {
+    GameAction,
+    GameBoardState,
+    GameContext,
+    GameSnapshot,
+} from "@towers/shared/contracts";
 import type { StackedAxial } from "@towers/shared/hexgrid";
+
+import { useAuthStore } from "@/features/auth";
+
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
 export type GameUiState = {
+    draggingHex: StackedAxial | null;
     hoveredHex: StackedAxial | null;
     selectedHex: StackedAxial | null;
 };
 
+export type GameActionState = {
+    action: GameAction;
+    stepIndex: number;
+    data: Record<string, unknown>;
+};
+
 export type GameStore = {
     loading: boolean;
-    game: GameState | null;
+    context: GameContext | null;
+    boardState: GameBoardState | null;
+    actionState: GameActionState | null;
+    availableActions: GameAction[];
     ui: GameUiState;
 
-    setGame: (game: GameState | null) => void;
+    applySnapshot: (snapshot: GameSnapshot) => void;
     clearGame: () => void;
     setLoading: (loading: boolean) => void;
+
+    startAction: (action: GameAction) => void;
+    setActionData: (key: string, value: unknown) => void;
+    clearActionData: (key: string) => void;
+    advanceActionStep: () => void;
+    decreaseActionStep: () => void;
+    clearAction: (cancel?: boolean) => boolean;
+
+    setDraggingHex: (coord: StackedAxial | null) => void;
 };
 
 export const useGameStore = create<GameStore>()(
-    immer((set) => ({
+    immer((set, get) => ({
         loading: true,
-        game: null,
+        context: null,
+        boardState: null,
+        actionState: null,
+        availableActions: [],
         ui: {
+            draggingHex: null,
             selectedHex: null,
             hoveredHex: null,
         },
 
-        setGame: (game) => set({ game }),
-        clearGame: () => set({ game: null }),
+        applySnapshot: ({ context, boardState, availableActions }) => {
+            // console.log(context, boardState, availableActions);
+            set({
+                context,
+                boardState,
+                availableActions,
+            });
+
+            const userId = useAuthStore.getState().user?.id;
+            if (context.currentPlayerId !== userId) {
+                get().clearAction();
+                return;
+            }
+
+            const forcedAction = availableActions.find((a) => a.forced);
+            if (forcedAction) {
+                get().startAction(forcedAction);
+            }
+        },
+        clearGame: () =>
+            set({
+                context: null,
+                boardState: null,
+                availableActions: [],
+            }),
         setLoading: (loading) => set({ loading }),
+
+        startAction: (action) => {
+            set({
+                actionState: {
+                    action,
+                    data: {},
+                    stepIndex: 0,
+                },
+            });
+        },
+        setActionData: (key, value) => {
+            set((draft) => {
+                if (!draft.actionState) return;
+                draft.actionState.data[key] = value;
+            });
+        },
+        clearActionData: (key) => {
+            set((draft) => {
+                if (!draft.actionState) return;
+                delete draft.actionState.data[key];
+            });
+        },
+        advanceActionStep: () => {
+            set((draft) => {
+                if (!draft.actionState) return;
+                draft.actionState.stepIndex++;
+            });
+        },
+        decreaseActionStep: () => {
+            set((draft) => {
+                if (!draft.actionState) return;
+                draft.actionState.stepIndex--;
+            });
+        },
+        clearAction: (_cancel = false) => {
+            const currentAction = get().actionState?.action;
+
+            set({
+                actionState: null,
+            });
+
+            return !!currentAction;
+        },
+
+        setDraggingHex: (coord) => {
+            set((draft) => {
+                draft.ui.draggingHex = coord;
+            });
+        },
     })),
 );

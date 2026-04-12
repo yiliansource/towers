@@ -1,6 +1,6 @@
-import type React from "react";
-
 import { cn } from "@/common/util/cn";
+
+import type React from "react";
 
 export function TowersBanner({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
     return (

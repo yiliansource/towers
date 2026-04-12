@@ -4,9 +4,10 @@ import type {
     RegisterInput,
     UserView,
 } from "@towers/shared/contracts";
-import toast from "react-hot-toast";
 
 import { fetchApi } from "@/common/util/fetch-api";
+
+import toast from "react-hot-toast";
 
 export async function getUser(): Promise<UserView | null> {
     const res = await fetchApi("/auth/me");

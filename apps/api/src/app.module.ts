@@ -1,8 +1,8 @@
+import { ApiEnvSchema } from "@towers/shared/env/api";
+
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
-
-import { ApiEnvSchema } from "@towers/shared/env/api";
 
 import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";

@@ -23,8 +23,23 @@
     "assist": {
         "actions": {
             "source": {
-                "organizeImports": "on",
-                "useSortedAttributes": "on",
+                "organizeImports": {
+                    "level": "on",
+                    "options": {
+                        "groups": [
+                            [":BUN:", ":NODE:"],
+                            ":BLANK_LINE:",
+                            ["@towers/shared/**"],
+                            ":BLANK_LINE:",
+                            "@/**",
+                            ":BLANK_LINE:",
+                            ":PACKAGE:",
+                            ":BLANK_LINE:",
+                            ":PATH:"
+                        ]
+                    }
+                },
+                "useSortedAttributes": "off",
                 "noDuplicateClasses": "on"
             }
         }

@@ -1,11 +1,11 @@
 "use client";
 
+import { TowersBanner } from "@/common/ui/towers-banner";
+import { createLogger } from "@/common/util/logger";
+
 import { Button } from "@radix-ui/themes";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useState } from "react";
-
-import { TowersBanner } from "@/common/ui/towers-banner";
-import { createLogger } from "@/common/util/logger";
 
 import { useLobbyCommands } from "../realtime/use-lobby-commands";
 import { useLobbyStore } from "../store/lobby.store";

@@ -1,17 +1,18 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Flex, Spinner, Text, TextField } from "@radix-ui/themes";
 import { type RegisterFormInput, RegisterFormSchema } from "@towers/shared/contracts";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { type SubmitHandler, useForm } from "react-hook-form";
 
 import { FormError } from "@/common/ui/forms/FormError";
 import { FormLabel } from "@/common/ui/forms/FormLabel";
 import { createLogger } from "@/common/util/logger";
 import { useAuthStore } from "@/features/auth";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Box, Button, Flex, Spinner, Text, TextField } from "@radix-ui/themes";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { type SubmitHandler, useForm } from "react-hook-form";
 
 import { registerUser } from "../api/auth-actions";
 

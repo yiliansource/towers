@@ -1,7 +1,8 @@
+import type { ApiEnv } from "@towers/shared/env/api";
+
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
-import type { ApiEnv } from "@towers/shared/env/api";
 import type { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 

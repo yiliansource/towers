@@ -1,7 +1,5 @@
 "use client";
 
-import { Spinner } from "@radix-ui/themes";
-
 import {
     LobbyEntryScreen,
     LobbyRoot,
@@ -10,27 +8,21 @@ import {
     useLobbyStore,
 } from "@/features/lobby";
 
+import { Spinner } from "@radix-ui/themes";
+
 export default function LobbyPage() {
     useLobbyPageLifecycle();
 
     const lobby = useLobbyStore((s) => s.lobby);
     const { isAllowed, loading } = useLobbyPageGuard();
 
-    if (loading) {
-        return (
-            <div className="m-auto">
-                <Spinner />
-            </div>
-        );
-    }
+    const content = loading ? (
+        <Spinner key="loading" className="m-auto" />
+    ) : !lobby ? (
+        <LobbyEntryScreen key="entry" />
+    ) : isAllowed ? (
+        <LobbyRoot key="lobby" />
+    ) : null;
 
-    if (!lobby) {
-        return <LobbyEntryScreen />;
-    }
-
-    if (!isAllowed) {
-        return null;
-    }
-
-    return <LobbyRoot />;
+    return <div className="flex grow">{content}</div>;
 }

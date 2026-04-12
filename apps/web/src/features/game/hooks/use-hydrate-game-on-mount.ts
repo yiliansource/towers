@@ -1,12 +1,15 @@
 "use client";
 
+import { waitFor } from "@/common/util/promises";
+import { useAuthStore } from "@/features/auth";
+
 import { useEffect } from "react";
 
 import { getGame } from "../api/game-actions";
 import { useGameStore } from "../store/game.store";
 
 export function useHydrateGameOnMount() {
-    const setGame = useGameStore((s) => s.setGame);
+    const applySnapshot = useGameStore((s) => s.applySnapshot);
     const clearGame = useGameStore((s) => s.clearGame);
     const setLoading = useGameStore((s) => s.setLoading);
 
@@ -15,13 +18,15 @@ export function useHydrateGameOnMount() {
             try {
                 setLoading(true);
 
-                const game = await getGame();
-                setGame(game);
+                const snapshot = await getGame();
+                await waitFor(() => !useAuthStore.getState().loading);
+
+                if (snapshot) applySnapshot(snapshot);
             } catch {
                 clearGame();
             } finally {
                 setLoading(false);
             }
         })();
-    }, [setLoading, setGame, clearGame]);
+    }, [setLoading, applySnapshot, clearGame]);
 }

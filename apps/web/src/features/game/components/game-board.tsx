@@ -1,4 +1,3 @@
-import { animated, useTransition } from "@react-spring/three";
 import {
     axial,
     axialRange,
@@ -7,19 +6,23 @@ import {
     type StackedAxial,
     stringifyStackedAxial,
 } from "@towers/shared/hexgrid";
-import { useEffect, useMemo, useState } from "react";
 
 import { stackedToWorld } from "@/common/util/hex2three";
-import { sleep } from "@/common/util/sleep";
+import { sleep } from "@/common/util/promises";
+
+import { animated, useTransition } from "@react-spring/three";
+import { useEffect, useMemo, useState } from "react";
 
 import { useGameStore } from "../store/game.store";
 import { HexGrid } from "./hex-grid";
 import { King } from "./models/king";
 import { Knight } from "./models/knight";
 import { Tower } from "./models/tower";
+import { PlaceUnitConfirm } from "./place-unit-confirm";
+import { PlaceUnitIndicators } from "./place-unit-indicators";
 
 export function GameBoard() {
-    const game = useGameStore((s) => s.game!);
+    const game = useGameStore((s) => s.boardState!);
 
     const gridPositions = useMemo(
         () => axialRange(axial(0, 0), 4).map((a) => axialToStacked(a, 0)),
@@ -31,6 +34,9 @@ export function GameBoard() {
             <HexGrid positions={gridPositions} />
             <Towers coordList={game.towers} />
             <Units coordLookup={game.units} kingCoord={game.king} />
+
+            <PlaceUnitIndicators />
+            <PlaceUnitConfirm />
         </>
     );
 }
@@ -41,7 +47,7 @@ function Towers({ coordList }: { coordList: StackedAxial[] }) {
     const transitions = useTransition(coordList, {
         from: {
             scale: [0, 0, 0] as [number, number, number],
-            position: [0, -1, 0] as [number, number, number],
+            position: [0, 0, 0] as [number, number, number],
         },
         enter: {
             scale: [1, 1, 1] as [number, number, number],
@@ -49,7 +55,7 @@ function Towers({ coordList }: { coordList: StackedAxial[] }) {
         },
         leave: {
             scale: [0, 0, 0] as [number, number, number],
-            position: [0, 1, 0] as [number, number, number],
+            position: [0, 0, 0] as [number, number, number],
         },
         config: { tension: 170, friction: 20 },
         delay: (i) => {
@@ -140,7 +146,9 @@ function Units({
             {transitions((style, item, state) => (
                 <group key={state.key} position={stackedToWorld(item.coord)}>
                     <animated.group position={style.position} scale={style.scale}>
-                        {item.unit === "KNIGHT" && <Knight playerId={item.pid} />}
+                        {item.unit === "KNIGHT" && (
+                            <Knight playerId={item.pid} coord={item.coord} />
+                        )}
                         {item.unit === "KING" && <King />}
                     </animated.group>
                 </group>

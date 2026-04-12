@@ -1,5 +1,7 @@
 "use client";
 
+import { isStackedAxial } from "@towers/shared/hexgrid";
+
 import { cn } from "@/common/util/cn";
 
 export interface DebugJsonProps extends React.HTMLAttributes<HTMLElement> {
@@ -7,6 +9,17 @@ export interface DebugJsonProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 export function DebugJson({ className, object, ...props }: DebugJsonProps) {
+    const json = JSON.stringify(
+        object,
+        (_, v) => {
+            if (isStackedAxial(v)) {
+                return `(${[v.q, v.r, v.h].join(",")})`;
+            }
+            return v;
+        },
+        2,
+    );
+
     return (
         <pre
             {...props}
@@ -16,7 +29,7 @@ export function DebugJson({ className, object, ...props }: DebugJsonProps) {
                 "border border-(--gray-3) text-(--gray-11) p-2 text-sm",
             )}
         >
-            <code className="">{JSON.stringify(object, undefined, 2)}</code>
+            <code className="">{json}</code>
         </pre>
     );
 }

@@ -21,5 +21,5 @@
 
 ::view-transition-old(.fade),
 ::view-transition-new(.fade) {
-    animation-duration: 120ms;
+    animation-duration: 200ms;
 }

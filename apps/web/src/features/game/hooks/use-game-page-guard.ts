@@ -1,7 +1,9 @@
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { useAuthStore } from "@/features/auth";
 import { useLobbyStore } from "@/features/lobby";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 import { useGameStore } from "../store/game.store";
 
 export function useGamePageGuard() {
@@ -13,8 +15,9 @@ export function useGamePageGuard() {
     const lobby = useLobbyStore((s) => s.lobby);
     const lobbyLoading = useLobbyStore((s) => s.loading);
     const clearLobby = useLobbyStore((s) => s.clearLobby);
+    const setLobbyLoading = useLobbyStore((s) => s.setLoading);
 
-    const game = useGameStore((s) => s.game);
+    const game = useGameStore((s) => s.boardState);
     const gameLoading = useGameStore((s) => s.loading);
 
     useEffect(() => {
@@ -26,10 +29,12 @@ export function useGamePageGuard() {
         }
 
         if (lobby.state !== "INGAME") {
-            clearLobby(true);
+            clearLobby();
+            setLobbyLoading(true);
+
             router.push("/lobby");
         }
-    }, [lobbyLoading, lobby, router, clearLobby]);
+    }, [lobbyLoading, lobby, router, clearLobby, setLobbyLoading]);
 
     const isAllowed =
         !userLoading &&

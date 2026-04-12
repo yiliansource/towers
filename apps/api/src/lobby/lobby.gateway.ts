@@ -1,4 +1,17 @@
 import {
+    type LobbyClientToServerEvents,
+    LobbyError,
+    type LobbyServerToClientEvents,
+    type SlotColor,
+} from "@towers/shared/contracts";
+
+import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
+import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
+import { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
+import type { User } from "@/generated/prisma/client";
+import { UserService } from "@/user/user.service";
+
+import {
     Logger,
     NotFoundException,
     type OnModuleDestroy,
@@ -12,20 +25,8 @@ import {
     WebSocketGateway,
     WebSocketServer,
 } from "@nestjs/websockets";
-import {
-    type LobbyClientToServerEvents,
-    LobbyError,
-    type LobbyServerToClientEvents,
-    type SlotColor,
-} from "@towers/shared/contracts";
 import type { Subscription } from "rxjs";
 import type { Server } from "socket.io";
-
-import { AuthenticatedGateway } from "@/auth/authenticated-gateway";
-import { AuthenticatedSocketUser } from "@/auth/authenticated-user.decorator";
-import { AuthSocket, SocketAuthService } from "@/auth/socket-auth.service";
-import type { User } from "@/generated/prisma/client";
-import { UserService } from "@/user/user.service";
 
 import { LobbyWsExceptionFilter } from "./errors/lobby-ws-exception.filter";
 import { LobbyMapper } from "./lobby.mapper";

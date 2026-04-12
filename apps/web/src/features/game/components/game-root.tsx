@@ -1,8 +1,8 @@
 "use client";
 
-import { useWindowSize } from "@uidotdev/usehooks";
-
 import { GameScene } from "@/features/game";
+
+import { useWindowSize } from "@uidotdev/usehooks";
 
 export function GameRoot() {
     const windowSize = useWindowSize();

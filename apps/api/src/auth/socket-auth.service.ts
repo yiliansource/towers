@@ -1,9 +1,10 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: libraries */
+
+import { UserService } from "@/user/user.service";
+
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { parse } from "cookie";
 import type { DefaultEventsMap, Server, Socket } from "socket.io";
-
-import { UserService } from "@/user/user.service";
 
 import { ACCESS_TOKEN_COOKIE } from "./auth.constants";
 import { AuthService } from "./auth.service";

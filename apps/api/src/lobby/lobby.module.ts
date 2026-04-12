@@ -1,8 +1,9 @@
-import { forwardRef, Module } from "@nestjs/common";
-
 import { AuthModule } from "@/auth/auth.module";
 import { PrismaModule } from "@/prisma/prisma.module";
 import { UserModule } from "@/user/user.module";
+
+import { forwardRef, Module } from "@nestjs/common";
+
 import { LobbyController } from "./lobby.controller";
 import { LobbyGateway } from "./lobby.gateway";
 import { LobbyMapper } from "./lobby.mapper";

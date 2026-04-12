@@ -1,9 +1,10 @@
 "use client";
 
 import type { LobbyView } from "@towers/shared/contracts";
+
 import { create } from "zustand";
 
-type LobbyState = {
+export type LobbyStore = {
     loading: boolean;
     lobby: LobbyView | null;
 
@@ -12,11 +13,11 @@ type LobbyState = {
     setLoading: (loading: boolean) => void;
 };
 
-export const useLobbyStore = create<LobbyState>()((set) => ({
+export const useLobbyStore = create<LobbyStore>()((set) => ({
     loading: true,
     lobby: null,
 
     setLobby: (lobby) => set({ lobby }),
-    clearLobby: (load = false) => set({ lobby: null, loading: load ? true : undefined }),
+    clearLobby: () => set({ lobby: null }),
     setLoading: async (loading) => set({ loading }),
 }));

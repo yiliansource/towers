@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-
 import { TowersBanner } from "@/common/ui/towers-banner";
 import { makeMetaTitle } from "@/common/util/meta-title";
 import { LoginForm } from "@/features/auth";
+
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: makeMetaTitle("Log in"),

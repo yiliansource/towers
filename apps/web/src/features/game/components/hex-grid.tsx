@@ -1,9 +1,9 @@
-import { animated, easings, useTransition } from "@react-spring/three";
-import { Line } from "@react-three/drei";
-
 import { type StackedAxial, stringifyStackedAxial } from "@towers/shared/hexgrid";
 
 import { stackedToWorld } from "@/common/util/hex2three";
+
+import { animated, easings, useTransition } from "@react-spring/three";
+import { Circle, Line } from "@react-three/drei";
 
 export function HexGrid({ positions }: { positions: StackedAxial[] }) {
     const transitions = useTransition(positions, {
@@ -28,7 +28,11 @@ export function HexGrid({ positions }: { positions: StackedAxial[] }) {
             {transitions((style, item) => (
                 <group key={stringifyStackedAxial(item)} position={stackedToWorld(item)}>
                     <animated.group scale={style.scale}>
-                        <Hex />
+                        <Hex
+                            alternate={
+                                (item.q + item.r) % 2 === 0 && (item.q - 2 * item.r) % 2 === 0
+                            }
+                        />
                     </animated.group>
                 </group>
             ))}
@@ -36,11 +40,18 @@ export function HexGrid({ positions }: { positions: StackedAxial[] }) {
     );
 }
 
-export function Hex() {
+export function Hex({ alternate = false }: { alternate?: boolean }) {
     const points = [...Array(7).keys()].map((i) => {
-        const theta = ((i + 0.5) / 6) * (Math.PI * 2);
+        const theta = ((i + 0.5) / 6) * Math.PI * 2;
         return [Math.cos(theta), 0, Math.sin(theta)] as [number, number, number];
     });
 
-    return <Line color="#333" lineWidth={1} points={points} />;
+    return (
+        <group>
+            <Circle args={[1, 6]} scale={0.99} rotation={[-Math.PI / 2, 0, Math.PI / 6]}>
+                <meshBasicMaterial color={alternate ? "#262626" : "#242424"} />
+            </Circle>
+            <Line points={points} color="#333" lineWidth={2} />
+        </group>
+    );
 }

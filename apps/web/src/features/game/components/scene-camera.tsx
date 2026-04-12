@@ -1,8 +1,10 @@
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, useCursor } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+
+import { useGameStore } from "../store/game.store";
 
 export function SceneCamera() {
     const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -10,6 +12,18 @@ export function SceneCamera() {
 
     const defaultCameraPosition = useMemo(() => new THREE.Vector3(0, 5, 5).setLength(16), []);
 
+    const [grabbing, setGrabbing] = useState(false);
+    useCursor((controlsRef.current?.enabled ?? false) && grabbing, "grabbing", "auto");
+
+    const draggingHex = useGameStore((s) => s.ui.draggingHex);
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: need to rebind events when ref changes
+    useEffect(() => {
+        if (!controlsRef.current) return;
+        controlsRef.current.enabled = !draggingHex;
+    }, [controlsRef.current, draggingHex]);
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: need to rebind events when ref changes
     useEffect(() => {
         const el = gl.domElement;
         const controls = controlsRef.current;
@@ -23,10 +37,6 @@ export function SceneCamera() {
 
         const MOVE_THRESHOLD = 4;
 
-        const setCursor = (value: string) => {
-            if (el.style.cursor !== value) el.style.cursor = value;
-        };
-
         const onPointerDown = (e: PointerEvent) => {
             pointerDown = true;
             moved = false;
@@ -36,7 +46,6 @@ export function SceneCamera() {
         };
 
         const onPointerMove = (e: PointerEvent) => {
-            if (el.style.cursor === "") setCursor("grab");
             if (!pointerDown) return;
 
             const dx = e.clientX - downX;
@@ -45,6 +54,7 @@ export function SceneCamera() {
 
             if (dist > MOVE_THRESHOLD) {
                 moved = true;
+                setGrabbing(true);
             }
         };
 
@@ -69,29 +79,16 @@ export function SceneCamera() {
             e.preventDefault();
         };
 
-        const onControlStart = () => {
-            setCursor("grabbing");
-        };
+        const onControlStart = () => {};
 
         const onControlEnd = () => {
-            setCursor("grab");
-        };
-
-        const onPointerEnter = () => {
-            setCursor("grab");
-        };
-
-        const onPointerLeave = () => {
-            setCursor("");
+            setGrabbing(false);
         };
 
         el.addEventListener("pointerdown", onPointerDown);
         el.addEventListener("pointermove", onPointerMove);
         window.addEventListener("pointerup", onPointerUp);
         el.addEventListener("contextmenu", onContextMenu);
-
-        el.addEventListener("pointerenter", onPointerEnter);
-        el.addEventListener("pointerleave", onPointerLeave);
 
         controls.addEventListener("start", onControlStart);
         controls.addEventListener("end", onControlEnd);
@@ -102,15 +99,10 @@ export function SceneCamera() {
             window.removeEventListener("pointerup", onPointerUp);
             el.removeEventListener("contextmenu", onContextMenu);
 
-            el.removeEventListener("pointerenter", onPointerEnter);
-            el.removeEventListener("pointerleave", onPointerLeave);
-
             controls.removeEventListener("start", onControlStart);
             controls.removeEventListener("end", onControlEnd);
-
-            el.style.cursor = "";
         };
-    }, [gl.domElement]);
+    }, [gl.domElement, controlsRef.current]);
 
     return (
         <>

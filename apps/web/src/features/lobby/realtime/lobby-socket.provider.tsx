@@ -1,9 +1,9 @@
 "use client";
 
+import { createLogger } from "@/common/util/logger";
+
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-
-import { createLogger } from "@/common/util/logger";
 
 import { createLobbySocket, type LobbySocket } from "./lobby-socket";
 
@@ -29,6 +29,7 @@ export function LobbySocketProvider({ children }: PropsWithChildren) {
         };
         const onDisconnect = () => {
             logger.log("disconnected");
+            setTimeout(() => nextSocket.connect(), 2000);
             setConnected(false);
         };
 

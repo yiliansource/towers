@@ -1,6 +1,7 @@
+import type { ApiEnv } from "@towers/shared/env/api";
+
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import type { ApiEnv } from "@towers/shared/env/api";
 import type { CookieOptions, Response } from "express";
 
 import { ACCESS_TOKEN_COOKIE } from "./auth.constants";

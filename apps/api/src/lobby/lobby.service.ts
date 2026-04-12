@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-
 import { LobbyError, SlotColor } from "@towers/shared/contracts";
 
 import type { Lobby, Prisma } from "@/generated/prisma/client";
 import { PrismaService } from "@/prisma/prisma.service";
+
+import { Injectable } from "@nestjs/common";
 
 import { LobbyNotifier } from "./lobby.notifier";
 import type { LobbyWithRelations } from "./lobby.types";

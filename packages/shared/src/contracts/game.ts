@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import type { StackedAxial } from "../hexgrid/types.js";
 import { StackedAxialSchema } from "./hex.js";
 import type { LobbyView } from "./lobby.js";
 
@@ -28,42 +27,43 @@ export type GamePhase = (typeof GamePhase)[keyof typeof GamePhase];
 
 export interface GameServerToClientEvents {
     "game.finished": () => void;
-    "game.updated": (payload: GameState) => void;
-    "lobby.updated": (payload: LobbyView) => void;
+    "game.updated": (payload: GameSnapshot) => void;
+    "game.lobby_updated": (payload: LobbyView) => void;
 }
 
 export interface GameClientToServerEvents {
-    "game.place_knight": (payload: { coord: StackedAxial }) => void;
+    "game.submit_action": (payload: GameActionSubmitPayload) => void;
     "game.end_turn": () => void;
     "game.abort_game": () => void;
     "game.message": (payload: string) => void;
 }
 
-export const GamePlayerSchema = z.object({
-    id: z.string(),
-    username: z.string(),
-    points: z.number(),
-});
-export type GamePlayer = z.infer<typeof GamePlayerSchema>;
-
 export const GameContextSchema = z.object({
-    turn: z.number(),
-    phase: z.enum(GamePhase),
-    currentPlayerId: z.string(),
     totalPlayers: z.number(),
+    phase: z.enum(GamePhase),
+    innerPhaseIndex: z.int(),
+    turn: z.int(),
     playOrder: z.array(z.string()),
     playOrderPos: z.int(),
+    currentPlayerId: z.string(),
 });
 export type GameContext = z.infer<typeof GameContextSchema>;
 
-export const GameStateSchema = z.object({
-    ctx: GameContextSchema,
+export const GameBoardStateSchema = z.object({
+    king: StackedAxialSchema,
     towers: z.array(StackedAxialSchema),
     units: z.record(z.string(), z.array(StackedAxialSchema)),
-    king: StackedAxialSchema,
-    players: z.array(GamePlayerSchema),
+    resources: z.record(
+        z.string(),
+        z.object({
+            score: z.int(),
+            actionPoints: z.int(),
+            towers: z.int(),
+            knights: z.int(),
+        }),
+    ),
 });
-export type GameState = z.infer<typeof GameStateSchema>;
+export type GameBoardState = z.infer<typeof GameBoardStateSchema>;
 
 export const UnitType = {
     KNIGHT: "KNIGHT",
@@ -71,19 +71,88 @@ export const UnitType = {
 } as const;
 export type UnitType = (typeof UnitType)[keyof typeof UnitType];
 
-export const GamePerformActionPayloadSchema = z.discriminatedUnion("type", [
+// export const GamePerformActionPayloadSchema = z.discriminatedUnion("type", [
+//     z.object({
+//         type: z.literal("none"),
+//     }),
+//     z.object({
+//         type: z.literal("abortGame"),
+//     }),
+//     z.object({
+//         type: z.literal("endTurn"),
+//     }),
+//     z.object({
+//         type: z.literal("placeUnit"),
+//         unit: z.enum(UnitType),
+//         coord: StackedAxialSchema,
+//     }),
+//     z.object({
+//         type: z.literal("placeTower"),
+//         coord: StackedAxialSchema,
+//     }),
+//     z.object({
+//         type: z.literal("moveUnit"),
+//         unit: StackedAxialSchema,
+//         coord: StackedAxialSchema,
+//     }),
+// ]);
+// export type GamePerformActionPayload = z.infer<typeof GamePerformActionPayloadSchema>;
+
+export const GameActionStepSchema = z.enum(["selectUnit", "selectHex", "confirm"]);
+export type GameActionStep = z.infer<typeof GameActionStepSchema>;
+
+export const GameActionSchema = z
+    .discriminatedUnion("name", [
+        z.object({
+            name: z.literal("placeTower"),
+        }),
+        z.object({
+            name: z.literal("placeUnit"),
+            availableCoords: z.array(StackedAxialSchema).optional(),
+        }),
+        z.object({
+            name: z.literal("moveUnit"),
+        }),
+    ])
+    .and(
+        z.object({
+            steps: z.array(GameActionStepSchema),
+            cost: z.discriminatedUnion("type", [
+                z.object({
+                    type: z.literal("fixed"),
+                    amount: z.number(),
+                }),
+            ]),
+            forced: z.boolean().optional(),
+        }),
+    );
+export type GameAction = z.infer<typeof GameActionSchema>;
+
+export const GameActionSubmitPayloadSchema = z.discriminatedUnion("name", [
     z.object({
-        type: z.literal("none"),
+        name: z.literal("placeTower"),
+        coord: StackedAxialSchema,
     }),
     z.object({
-        type: z.literal("abortGame"),
+        name: z.literal("placeUnit"),
+        unit: z.enum(UnitType),
+        coord: StackedAxialSchema,
     }),
     z.object({
-        type: z.literal("endTurn"),
-    }),
-    z.object({
-        type: z.literal("placeKnight"),
+        name: z.literal("moveUnit"),
+        unit: StackedAxialSchema,
         coord: StackedAxialSchema,
     }),
 ]);
-export type GamePerformActionPayload = z.infer<typeof GamePerformActionPayloadSchema>;
+export type GameActionSubmitPayload = z.infer<typeof GameActionSubmitPayloadSchema>;
+
+export const GameStateSchema = z.object({
+    context: GameContextSchema,
+    boardState: GameBoardStateSchema,
+});
+export type GameState = z.infer<typeof GameStateSchema>;
+
+export const GameSnapshotSchema = GameStateSchema.extend({
+    availableActions: z.array(GameActionSchema),
+});
+export type GameSnapshot = z.infer<typeof GameSnapshotSchema>;

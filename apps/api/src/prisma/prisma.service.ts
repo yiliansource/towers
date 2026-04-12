@@ -1,8 +1,8 @@
+import type { ApiEnv } from "@towers/shared/env/api";
+
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-
-import type { ApiEnv } from "@towers/shared/env/api";
 
 import { PrismaClient } from "../generated/prisma/client";
 

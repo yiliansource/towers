@@ -1,6 +1,6 @@
 import { SlotColor } from "@towers/shared/contracts";
 
-export function getSlotColorValue(color: SlotColor): string {
+export function getSlotColorValue(color: SlotColor | null): string {
     switch (color) {
         case SlotColor.GREEN:
             return "#1fb85c";

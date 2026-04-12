@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-
 import type { AuthSocket } from "@/auth/socket-auth.service";
 import { UserService } from "@/user/user.service";
+
+import { Injectable } from "@nestjs/common";
 
 type LobbyPresenceEntry = {
     socketId: string;

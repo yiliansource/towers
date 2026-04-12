@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-
 import type { UserView } from "@towers/shared/contracts";
 
 import { ViewMapper } from "@/common/view-mapper";
+
+import { Injectable } from "@nestjs/common";
 
 export interface SimpleUser {
     id: string;

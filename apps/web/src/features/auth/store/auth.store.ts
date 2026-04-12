@@ -1,4 +1,5 @@
 import type { UserView } from "@towers/shared/contracts";
+
 import { create } from "zustand";
 
 export type AuthStore = {

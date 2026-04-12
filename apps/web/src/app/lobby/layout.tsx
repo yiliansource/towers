@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
-
 import { makeMetaTitle } from "@/common/util/meta-title";
+
+import type { Metadata } from "next";
 
 import LobbyProviders from "./providers";
 

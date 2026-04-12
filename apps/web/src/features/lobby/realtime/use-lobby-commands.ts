@@ -1,10 +1,12 @@
 "use client";
 
 import type { SlotColor } from "@towers/shared/contracts";
+
+import { useAuthStore } from "@/features/auth";
+
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
-import { useAuthStore } from "@/features/auth";
 import { useHydrateLobby } from "../hooks/use-hydrate";
 import { useLobbyStore } from "../store/lobby.store";
 import { useLobbySocketContext } from "./lobby-socket.provider";

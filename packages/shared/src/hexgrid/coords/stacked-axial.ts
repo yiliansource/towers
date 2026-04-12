@@ -20,6 +20,19 @@ export function stackedAxial(q: number, r: number, h: number): StackedAxial {
     return { q, r, h };
 }
 
+export function isStackedAxial(value: unknown): value is StackedAxial {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "q" in value &&
+        "r" in value &&
+        "h" in value &&
+        typeof (value as { q: unknown }).q === "number" &&
+        typeof (value as { r: unknown }).r === "number" &&
+        typeof (value as { h: unknown }).h === "number"
+    );
+}
+
 export function axialToStacked(a: Axial, h: number): StackedAxial {
     return stackedAxial(a.q, a.r, h);
 }

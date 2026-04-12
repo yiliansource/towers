@@ -1,5 +1,6 @@
-import { type ArgumentsHost, Catch, type ExceptionFilter } from "@nestjs/common";
 import { LobbyError, type LobbyErrorHttpResponse } from "@towers/shared/contracts";
+
+import { type ArgumentsHost, Catch, type ExceptionFilter } from "@nestjs/common";
 import type { Request, Response } from "express";
 
 import { getLobbyErrorHttpStatus, mapLobbyError } from "./lobby-error.mapper";

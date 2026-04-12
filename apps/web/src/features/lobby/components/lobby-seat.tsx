@@ -1,15 +1,16 @@
 "use client";
 
 import { type LobbySeatView, SlotColor } from "@towers/shared/contracts";
+
+import { cn } from "@/common/util/cn";
+import { getSlotColorValue } from "@/common/util/color";
+import { useAuthStore } from "@/features/auth";
+
 import Color from "color";
 import { CrownIcon, PaletteIcon, UserRoundXIcon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
 import { useEffect, useState } from "react";
-
-import { cn } from "@/common/util/cn";
-import { getSlotColorValue } from "@/common/util/color";
-import { useAuthStore } from "@/features/auth";
 
 import { useLobbyCommands } from "../realtime/use-lobby-commands";
 import { useLobbyStore } from "../store/lobby.store";
@@ -51,7 +52,6 @@ export function LobbySeat({ seat }: LobbySeatProps) {
             className={cn(
                 "relative shadow py-3 px-3 h-22 w-full lg:w-40 bg-(--gray-2) select-none overflow-hidden",
                 !seat.user && "cursor-pointer",
-                seat.user && !seat.user.connected && "opacity-30 grayscale-75",
             )}
             onClick={() => switchSlot(seat.slot)}
             onPointerEnter={() => setActionsOpen(true)}
@@ -64,7 +64,10 @@ export function LobbySeat({ seat }: LobbySeatProps) {
                 {seat.user && (
                     <motion.span
                         animate={{ opacity: 1 }}
-                        className="relative z-10 text-lg font-bold text-shadow-sm"
+                        className={cn(
+                            "relative z-10 text-lg font-bold text-shadow-sm",
+                            seat.user && !seat.user.connected && "opacity-30 grayscale-75",
+                        )}
                         exit={{ opacity: 0 }}
                         initial={{ opacity: 0 }}
                         key="username"
@@ -91,6 +94,7 @@ export function LobbySeat({ seat }: LobbySeatProps) {
                             animate={{ x: 0 }}
                             className={cn(
                                 "absolute size-75 lg:size-50 rotate-45 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden pointer-events-none transition-colors",
+                                seat.user && !seat.user.connected && "opacity-30 grayscale-75",
                             )}
                             exit={{ x: 300 }}
                             initial={{ x: -300 }}
@@ -142,7 +146,7 @@ export function LobbySeat({ seat }: LobbySeatProps) {
                 {cosmeticsOpen && (
                     <motion.div
                         animate={{ translateX: 0, opacity: 1 }}
-                        className="absolute p-2 bg-black/40 top-0 right-0 bottom-0"
+                        className={"absolute p-2 bg-black/40 top-0 right-0 bottom-0"}
                         exit={{ translateX: "100%", opacity: 0 }}
                         initial={{ translateX: "100%", opacity: 0 }}
                         key="cosmetics"

@@ -1,4 +1,3 @@
-import { Body, Controller, Get, Post, Res, UseFilters } from "@nestjs/common";
 import {
     type LoginInput,
     LoginInputSchema,
@@ -6,11 +5,14 @@ import {
     RegisterInputSchema,
     type UserView,
 } from "@towers/shared/contracts";
-import type { Response } from "express";
 
 import { UseZodSchema } from "@/common/decorators/use-zod-schema.decorator";
 import type { User } from "@/generated/prisma/client";
 import { UserMapper } from "@/user/user.mapper";
+
+import { Body, Controller, Get, Post, Res, UseFilters } from "@nestjs/common";
+import type { Response } from "express";
+
 import { AuthService } from "./auth.service";
 import { AuthCookieService } from "./auth-cookie.service";
 import { AuthenticatedUser } from "./authenticated-user.decorator";

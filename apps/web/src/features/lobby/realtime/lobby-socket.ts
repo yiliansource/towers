@@ -2,9 +2,10 @@ import type {
     LobbyClientToServerEvents,
     LobbyServerToClientEvents,
 } from "@towers/shared/contracts";
-import { io, type Socket } from "socket.io-client";
 
 import { clientEnv } from "@/common/env/env.client";
+
+import { io, type Socket } from "socket.io-client";
 
 export type LobbySocket = Socket<LobbyServerToClientEvents, LobbyClientToServerEvents>;
 

@@ -1,6 +1,6 @@
-import { Module } from "@nestjs/common";
-
 import { PrismaModule } from "@/prisma/prisma.module";
+
+import { Module } from "@nestjs/common";
 
 import { UserMapper } from "./user.mapper";
 import { UserService } from "./user.service";

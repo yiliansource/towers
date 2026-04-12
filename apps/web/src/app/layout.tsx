@@ -1,14 +1,16 @@
 import { Text, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
-import type { Metadata } from "next";
-import { Fruktur, Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "react-hot-toast";
 
 import { ProfileWidget } from "@/common/ui/profile-widget";
 import { cn } from "@/common/util/cn";
 import { makeMetaTitle } from "@/common/util/meta-title";
 
+import type { Metadata } from "next";
+import { Fruktur, Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
+
 import "./globals.css";
+
 import { Providers } from "./providers";
 
 const fruktur = Fruktur({
