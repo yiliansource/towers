@@ -1,9 +1,11 @@
-import { stringifyAxial } from "./coords/axial.js";
+import { AXIAL_ZERO, stringifyAxial } from "./coords/axial.js";
 import {
     addStackedAxial,
     STACKED_AXIAL_DIRECTIONS,
+    stackedAxial,
     stringifyStackedAxial,
 } from "./coords/stacked-axial.js";
+import { axialRange } from "./math/range.js";
 import { StackedAxial } from "./types.js";
 
 export function getCastles(towers: StackedAxial[]): StackedAxial[][] {
@@ -55,4 +57,11 @@ export function getTowersHeightMap(towers: StackedAxial[]): Map<string, number> 
         map.set(key, maxH);
     }
     return map;
+}
+
+export function getGroundCoordinates(towers: StackedAxial[], worldRadius: number): StackedAxial[] {
+    const towersHeightMap = getTowersHeightMap(towers);
+    return axialRange(AXIAL_ZERO, worldRadius).map((a) =>
+        stackedAxial(a.q, a.r, towersHeightMap.get(stringifyAxial(a)) ?? 0),
+    );
 }

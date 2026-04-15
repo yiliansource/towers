@@ -43,6 +43,8 @@ export function useGameEvents() {
         socket.on("game.lobby_updated", onLobbyUpdated);
         socket.on("game.finished", onGameFinished);
 
+        socket.connect();
+
         return () => {
             socket.off("game.finished", onGameFinished);
         };

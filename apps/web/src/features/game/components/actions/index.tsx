@@ -1,14 +1,13 @@
-import { PlaceTowerConfirm, PlaceTowerIndicators } from "./place-tower";
-import { PlaceUnitConfirm, PlaceUnitIndicators } from "./place-unit";
+import { MoveUnitAction } from "./move-unit";
+import { PlaceTowerAction } from "./place-tower";
+import { PlaceUnitAction } from "./place-unit";
 
 export function GameActions() {
     return (
         <>
-            <PlaceUnitIndicators />
-            <PlaceUnitConfirm />
-
-            <PlaceTowerIndicators />
-            <PlaceTowerConfirm />
+            <PlaceTowerAction />
+            <PlaceUnitAction />
+            <MoveUnitAction />
         </>
     );
 }

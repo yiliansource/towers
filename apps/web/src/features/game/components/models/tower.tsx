@@ -26,9 +26,12 @@ export function TowerModel({ ghost = false }: TowerModelProps) {
                 });
 
                 if (!transparent) {
+                    mesh.material.side = THREE.DoubleSide;
+                    mesh.material.shadowSide = THREE.FrontSide;
                     mesh.castShadow = true;
                     mesh.receiveShadow = true;
                 } else {
+                    mesh.material.side = THREE.FrontSide;
                     mesh.raycast = () => null;
                 }
             }
@@ -37,5 +40,9 @@ export function TowerModel({ ghost = false }: TowerModelProps) {
         return clone;
     }, [obj, ghost]);
 
-    return <primitive object={coloredObj} />;
+    return (
+        <group>
+            <primitive object={coloredObj} />
+        </group>
+    );
 }

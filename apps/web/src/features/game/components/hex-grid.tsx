@@ -1,9 +1,9 @@
-import { type StackedAxial, stringifyStackedAxial } from "@towers/shared/hexgrid";
+import { type StackedAxial, stringifyAxial, stringifyStackedAxial } from "@towers/shared/hexgrid";
 
 import { stackedToWorld } from "@/common/util/hex2three";
 
 import { animated, easings, useTransition } from "@react-spring/three";
-import { Circle, Line } from "@react-three/drei";
+import { Circle, Line, Text } from "@react-three/drei";
 
 export function HexGrid({ positions }: { positions: StackedAxial[] }) {
     const transitions = useTransition(positions, {
@@ -34,6 +34,14 @@ export function HexGrid({ positions }: { positions: StackedAxial[] }) {
                             }
                         />
                     </animated.group>
+                    <Text
+                        rotation={[-Math.PI / 2, 0, 0]}
+                        position={[0, 0.1, 0]}
+                        fontSize={0.2}
+                        color="#3a3a3a"
+                    >
+                        {stringifyAxial(item)}
+                    </Text>
                 </group>
             ))}
         </>

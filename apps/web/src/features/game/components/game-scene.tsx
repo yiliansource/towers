@@ -38,16 +38,18 @@ export function GameScene() {
 }
 
 function SceneLights() {
-    const dir = new THREE.Vector3(0, 0, 1).setLength(10);
-    dir.applyEuler(new THREE.Euler(-40 * (Math.PI / 180), -40 * (Math.PI / 180), 0));
+    const mainLightDir = new THREE.Vector3(0, 0, 1).setLength(10);
+    mainLightDir.applyEuler(new THREE.Euler(-40 * (Math.PI / 180), -40 * (Math.PI / 180), 0));
+
+    const offLightDir = mainLightDir.clone().applyEuler(new THREE.Euler(0, Math.PI, 0));
 
     return (
         <>
-            <ambientLight intensity={0.8} />
+            <ambientLight intensity={0.6} />
             <directionalLight
                 castShadow
                 intensity={2}
-                position={dir}
+                position={mainLightDir}
                 shadow-camera-bottom={-10}
                 shadow-camera-far={50}
                 shadow-camera-left={-10}
@@ -55,7 +57,10 @@ function SceneLights() {
                 shadow-camera-right={10}
                 shadow-camera-top={10}
                 shadow-mapSize={[2048, 2048]}
+                shadow-bias={-0.0001}
+                shadow-normalBias={0.02}
             />
+            <directionalLight intensity={0.6} position={offLightDir} />
         </>
     );
 }

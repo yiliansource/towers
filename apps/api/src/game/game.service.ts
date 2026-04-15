@@ -14,18 +14,21 @@ import {
     axialDirection,
     axialRotateAroundCenter,
     axialToStacked,
+    dijkstra,
     equalStackedAxial,
+    getGroundCoordinates,
     STACKED_AXIAL_UP,
     STACKED_AXIAL_ZERO,
     type StackedAxial,
     scaleAxial,
+    stringifyStackedAxial,
 } from "@towers/shared/hexgrid";
 
 import { type Lobby, Prisma } from "@/generated/prisma/client";
 import { LobbyService } from "@/lobby/lobby.service";
 import { PrismaService } from "@/prisma/prisma.service";
 
-import { Injectable, Logger, NotFoundException, NotImplementedException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import type { InputJsonValue } from "@prisma/client/runtime/client";
 import { produce } from "immer";
 
@@ -110,9 +113,9 @@ export class GameService {
                         p,
                         {
                             score: 0,
-                            actionPoints: 0,
+                            actionPoints: 2,
                             towers: 0,
-                            knights: 0,
+                            knights: 6,
                         },
                     ]),
                 ),
@@ -226,7 +229,21 @@ export class GameService {
                 }
 
                 draft.context.currentPlayerId = draft.context.playOrder[draft.context.playOrderPos];
-                draft.boardState.resources[draft.context.currentPlayerId].actionPoints = 5;
+
+                const resources = draft.boardState.resources[draft.context.currentPlayerId]!;
+                if (draft.context.phase === "PLAYING") {
+                    resources.actionPoints = 5;
+
+                    if (draft.context.turn === 0) {
+                        if (draft.context.innerPhaseIndex === 0) {
+                            resources.towers = 8;
+                        } else if (draft.context.innerPhaseIndex === 1) {
+                            resources.towers = 6;
+                        } else if (draft.context.innerPhaseIndex === 2) {
+                            resources.towers = 6;
+                        }
+                    }
+                }
             }),
         );
     }
@@ -244,6 +261,8 @@ export class GameService {
             lobbyId,
             produce(game, (draft) => {
                 draft.boardState.units[playerId].push(coord);
+                draft.boardState.resources[playerId].actionPoints -= 2;
+                draft.boardState.resources[playerId].knights -= 1;
             }),
         );
 
@@ -263,16 +282,52 @@ export class GameService {
             lobbyId,
             produce(game, (draft) => {
                 draft.boardState.towers.push(coord);
+                draft.boardState.resources[playerId].actionPoints -= 1;
+                draft.boardState.resources[playerId].towers -= 1;
             }),
         );
     }
 
-    async moveUnit(_lobbyId: string, _playerId: string, _unit: StackedAxial, _coord: StackedAxial) {
-        throw new NotImplementedException();
+    async moveUnit(lobbyId: string, playerId: string, unit: StackedAxial, coord: StackedAxial) {
+        const game = await this.getGameByLobby(lobbyId);
+
+        // TODO: validate
+
+        await this.updateGameState(
+            lobbyId,
+            produce(game, (draft) => {
+                const oldPosIndex = draft.boardState.units[playerId].findIndex((c) =>
+                    equalStackedAxial(unit, c),
+                );
+                draft.boardState.units[playerId].splice(oldPosIndex, 1, coord);
+
+                const dijkstraRes = dijkstra(
+                    getGroundCoordinates(game.boardState.towers, 4),
+                    game.boardState.towers,
+                    Object.values(game.boardState.units).flat().concat(game.boardState.king),
+                    unit,
+                );
+                const cost = dijkstraRes.distanceMap.get(stringifyStackedAxial(coord));
+                if (cost && Number.isFinite(cost)) {
+                    draft.boardState.resources[playerId].actionPoints -= cost;
+                }
+            }),
+        );
     }
 
     async performAction(lobbyId: string, playerId: string, payload: GameActionSubmitPayload) {
-        const _game = await this.getGameByLobby(lobbyId);
+        const game = await this.getGameByLobby(lobbyId);
+        const playerResources = game.boardState.resources[playerId]!;
+
+        const actions = await this.generateGameActions(lobbyId, playerId);
+        const action = actions.find((a) => a.name === payload.name);
+        if (!action) throw new GameError("INVALID_GAME_OPERATION");
+
+        if (action.cost.type === "fixed") {
+            if (playerResources.actionPoints < action.cost.amount) {
+                throw new GameError("INVALID_GAME_OPERATION");
+            }
+        }
 
         // TODO: check if player may perform action
         if (payload.name === "placeUnit") {

@@ -1,4 +1,5 @@
 import type { Axial, StackedAxial } from "../types.js";
+import { AXIAL_DIRECTIONS } from "./axial.js";
 
 export const STACKED_AXIAL_ZERO: StackedAxial = { q: 0, r: 0, h: 0 } as const;
 export const STACKED_AXIAL_UP: StackedAxial = { q: 0, r: 0, h: 1 } as const;
@@ -51,6 +52,18 @@ export function subStackedAxial(a: StackedAxial, b: StackedAxial): StackedAxial 
 
 export function scaleStackedAxial(a: StackedAxial, factor: number): StackedAxial {
     return stackedAxial(a.q * factor, a.r * factor, a.h * factor);
+}
+
+export function stackedAxialLength(a: StackedAxial) {
+    return Math.max(Math.abs(a.q), Math.abs(a.r), Math.abs(a.q + a.r)) + Math.abs(a.h);
+}
+
+export function stackedAxialDistance(a: StackedAxial, b: StackedAxial) {
+    return stackedAxialLength(subStackedAxial(b, a));
+}
+
+export function getUnstackedAxialNeighbours(a: StackedAxial) {
+    return AXIAL_DIRECTIONS.map((d) => axialToStacked(d, 0)).map((d) => addStackedAxial(a, d));
 }
 
 export function getStackedAxialNeighbours(a: StackedAxial) {

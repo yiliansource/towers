@@ -39,6 +39,7 @@ export type GameStore = {
     setActionData: (key: string, value: unknown) => void;
     clearActionData: (key: string) => void;
     advanceActionStep: () => void;
+    setActionStep: (index: number) => void;
     decreaseActionStep: () => void;
     clearAction: (cancel?: boolean) => boolean;
 
@@ -112,6 +113,12 @@ export const useGameStore = create<GameStore>()(
             set((draft) => {
                 if (!draft.actionState) return;
                 draft.actionState.stepIndex++;
+            });
+        },
+        setActionStep: (index) => {
+            set((draft) => {
+                if (!draft.actionState) return;
+                draft.actionState.stepIndex = index;
             });
         },
         decreaseActionStep: () => {

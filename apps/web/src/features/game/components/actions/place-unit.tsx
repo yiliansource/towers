@@ -13,6 +13,15 @@ import { useGameStore } from "../../store/game.store";
 import { ClickableHex } from "../clickable-hex";
 import { KnightModel } from "../models/knight";
 
+export function PlaceUnitAction() {
+    return (
+        <>
+            <PlaceUnitIndicators />
+            <PlaceUnitConfirm />
+        </>
+    );
+}
+
 export function PlaceUnitConfirm() {
     const actionState = useGameStore((s) => s.actionState);
     const action = useGameStore(selectCurrentAction);

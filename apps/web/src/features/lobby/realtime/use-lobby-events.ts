@@ -22,8 +22,6 @@ export function useLobbyEvents() {
     useEffect(() => {
         if (!socket || !lobby) return;
 
-        socket.connect();
-
         const onLobbyException = (error: LobbyErrorWsResponse) => {
             toast.error(error.code);
         };
@@ -47,6 +45,8 @@ export function useLobbyEvents() {
         socket.on("lobby.updated", onLobbyUpdated);
         socket.on("lobby.game_started", onLobbyStarted);
         socket.on("lobby.removed", onLobbyRemoved);
+
+        socket.connect();
 
         return () => {
             socket.off("exception", onLobbyException);

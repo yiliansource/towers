@@ -9,6 +9,7 @@ export type GameSocket = Socket<GameServerToClientEvents, GameClientToServerEven
 export function createGameSocket(): GameSocket {
     return io(`${clientEnv.NEXT_PUBLIC_API_URL}/game`, {
         withCredentials: true,
+        autoConnect: false,
         transports: ["websocket"],
     });
 }

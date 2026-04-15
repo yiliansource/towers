@@ -7,4 +7,5 @@ export * from "./layout/hexToPixel.js";
 export * from "./layout/pixelToHex.js";
 export * from "./math/range.js";
 export * from "./math/ring.js";
+export * from "./pathfinding.js";
 export * from "./types.js";

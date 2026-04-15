@@ -26,3 +26,25 @@ export function groupBy<T, K>(arr: T[], keyFn: (item: T) => K): Map<K, T[]> {
 
     return result;
 }
+
+export function minBy<T, U extends number | string>(
+    arr: readonly T[],
+    selector: (item: T) => U,
+): T | undefined {
+    if (arr.length === 0) return undefined;
+
+    let minItem = arr[0];
+    let minValue = selector(minItem);
+
+    for (let i = 1; i < arr.length; i++) {
+        const item = arr[i];
+        const value = selector(item);
+
+        if (value < minValue) {
+            minValue = value;
+            minItem = item;
+        }
+    }
+
+    return minItem;
+}

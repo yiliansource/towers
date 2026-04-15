@@ -12,6 +12,15 @@ import { selectCurrentAction, selectCurrentActionStep } from "../../store/game.s
 import { useGameStore } from "../../store/game.store";
 import { TowerModel } from "../models/tower";
 
+export function PlaceTowerAction() {
+    return (
+        <>
+            <PlaceTowerIndicators />
+            <PlaceTowerConfirm />
+        </>
+    );
+}
+
 export function PlaceTowerConfirm() {
     const actionState = useGameStore((s) => s.actionState);
     const action = useGameStore(selectCurrentAction);
